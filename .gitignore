@@ -7,6 +7,4 @@ dist/
 .DS_Store
 *.log
 .env
-.env.local
-docs/
-gradle
+.env.local
