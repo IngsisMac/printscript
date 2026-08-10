@@ -1,0 +1,12 @@
+.gradle/
+.idea/
+*.iml
+build/
+out/
+dist/
+.DS_Store
+*.log
+.env
+.env.local
+docs/
+gradle
