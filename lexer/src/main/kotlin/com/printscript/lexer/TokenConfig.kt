@@ -29,7 +29,11 @@ class TokenConfig(
                     "false" to TokenType.FALSE,
                 )
 
-            val keywords = commonKeywords + v11Keywords
+            val keywords =
+                when (version) {
+                    Version.V1_0 -> commonKeywords
+                    Version.V1_1 -> commonKeywords + v11Keywords
+                }
 
             return TokenConfig(keywords, version)
         }
