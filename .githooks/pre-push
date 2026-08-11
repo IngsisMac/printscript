@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "==> Running pre-push checks (gradlew check jacocoTestReport)..."
+./gradlew check jacocoTestReport
+if [ $? -ne 0 ]; then
+    echo "❌ Pre-push verification failed! Please fix all tests and coverage checks before pushing."
+    exit 1
+fi
+echo "✅ Pre-push verification passed!"
