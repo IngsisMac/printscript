@@ -28,9 +28,20 @@ class Parser(
 
     private fun statement(): Statement? {
         return when (currentToken?.type) {
-            TokenType.LET, TokenType.CONST -> declaration()
+            TokenType.LET -> declaration()
+            TokenType.CONST -> {
+                if (version == Version.V1_0) {
+                    throw ParseException("const is not supported in version 1.0", currentToken!!.span)
+                }
+                declaration()
+            }
             TokenType.PRINTLN -> printStatement()
-            TokenType.IF -> ifStatement()
+            TokenType.IF -> {
+                if (version == Version.V1_0) {
+                    throw ParseException("if statements are not supported in version 1.0", currentToken!!.span)
+                }
+                ifStatement()
+            }
             TokenType.IDENTIFIER -> {
                 // Could be assignment or expression statement
                 val saved = saveState()
@@ -272,4 +283,4 @@ class Parser(
     )
 }
 
-class ParseException(message: String, val span: Span) : Exception("$span: $message")
+class ParseException(val rawMessage: String, val span: Span) : Exception(rawMessage)

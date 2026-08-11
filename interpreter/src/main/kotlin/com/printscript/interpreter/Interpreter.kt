@@ -16,7 +16,22 @@ class Interpreter(
     private val errors = mutableListOf<PrintScriptError>()
 
     fun execute(statements: Iterator<Statement>): List<PrintScriptError> {
-        for (stmt in statements) {
+        while (statements.hasNext()) {
+            val stmt = try {
+                statements.next()
+            } catch (e: Exception) {
+                errors.add(
+                    PrintScriptError(
+                        e.message ?: "Error",
+                        com.printscript.common.Span(
+                            com.printscript.common.Position(1, 1),
+                            com.printscript.common.Position(1, 1)
+                        )
+                    )
+                )
+                break
+            }
+
             try {
                 executeStatement(stmt, globalEnv)
             } catch (e: RuntimeException) {
@@ -39,6 +54,11 @@ class Interpreter(
                         "boolean" -> BooleanValue(false)
                         else -> throw RuntimeException("Unknown type: ${stmt.type}")
                     }
+                }
+                when (stmt.type) {
+                    "number" -> if (value !is NumberValue) throw RuntimeException("Type mismatch: expected number but got StringValue")
+                    "string" -> if (value !is StringValue) throw RuntimeException("Type mismatch: expected string")
+                    "boolean" -> if (value !is BooleanValue) throw RuntimeException("Type mismatch: expected boolean")
                 }
                 env.define(stmt.name, value)
             }
