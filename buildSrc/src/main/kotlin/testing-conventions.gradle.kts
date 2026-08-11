@@ -20,6 +20,9 @@ testing {
     suites {
         val test by getting(JvmTestSuite::class) {
             useJUnitJupiter()
+            dependencies {
+                implementation(project())
+            }
         }
 
         register<JvmTestSuite>("integrationTest") {
