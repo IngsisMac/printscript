@@ -6,7 +6,6 @@ import com.printscript.common.Span
 import com.printscript.common.Version
 import com.printscript.token.Token
 import com.printscript.token.TokenType
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -52,6 +51,7 @@ class ParserLazyTest {
     }
 
     private fun assertNotNull(obj: Any?) {
-        org.junit.jupiter.api.Assertions.assertNotNull(obj)
+        org.junit.jupiter.api.Assertions
+            .assertNotNull(obj)
     }
 }

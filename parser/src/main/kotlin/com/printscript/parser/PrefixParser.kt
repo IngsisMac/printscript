@@ -45,8 +45,7 @@ class StringLiteralPrefixParser : PrefixParser {
 class BooleanLiteralPrefixParser(
     private val version: Version,
 ) : PrefixParser {
-    override fun matches(token: Token): Boolean =
-        token.type == TokenType.TRUE || token.type == TokenType.FALSE
+    override fun matches(token: Token): Boolean = token.type == TokenType.TRUE || token.type == TokenType.FALSE
 
     override fun parse(
         token: Token,
@@ -100,8 +99,7 @@ class ReadFunctionPrefixParser(
 }
 
 class UnaryOperatorPrefixParser : PrefixParser {
-    override fun matches(token: Token): Boolean =
-        token.type == TokenType.MINUS || token.type == TokenType.PLUS
+    override fun matches(token: Token): Boolean = token.type == TokenType.MINUS || token.type == TokenType.PLUS
 
     override fun parse(
         token: Token,

@@ -49,8 +49,9 @@ class ExpressionParser(
 
     fun parseUnaryExpression(stream: TokenStream): Expression {
         val token = stream.peek()
-        val prefixParser = prefixParsers.firstOrNull { it.matches(token) }
-            ?: throw ParseException("Unexpected token '${token.lexeme}' (${token.type})", token.span)
+        val prefixParser =
+            prefixParsers.firstOrNull { it.matches(token) }
+                ?: throw ParseException("Unexpected token '${token.lexeme}' (${token.type})", token.span)
 
         stream.consume() // consume token
         return prefixParser.parse(token, stream, this)

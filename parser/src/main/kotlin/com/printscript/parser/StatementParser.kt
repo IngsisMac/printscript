@@ -23,7 +23,8 @@ class DeclarationStatementParser(
 ) : StatementParser {
     override fun matches(stream: TokenStream): Boolean {
         val token = stream.peek()
-        return token.type == TokenType.LET || token.type == TokenType.CONST ||
+        return token.type == TokenType.LET ||
+            token.type == TokenType.CONST ||
             (token.type == TokenType.IDENTIFIER && token.lexeme == "const")
     }
 
@@ -67,8 +68,7 @@ class DeclarationStatementParser(
 }
 
 class AssignmentStatementParser : StatementParser {
-    override fun matches(stream: TokenStream): Boolean =
-        stream.check(TokenType.IDENTIFIER) && stream.peekNext().type == TokenType.EQUAL
+    override fun matches(stream: TokenStream): Boolean = stream.check(TokenType.IDENTIFIER) && stream.peekNext().type == TokenType.EQUAL
 
     override fun parse(
         stream: TokenStream,
@@ -83,8 +83,7 @@ class AssignmentStatementParser : StatementParser {
 }
 
 class PrintStatementParser : StatementParser {
-    override fun matches(stream: TokenStream): Boolean =
-        stream.check(TokenType.PRINTLN)
+    override fun matches(stream: TokenStream): Boolean = stream.check(TokenType.PRINTLN)
 
     override fun parse(
         stream: TokenStream,

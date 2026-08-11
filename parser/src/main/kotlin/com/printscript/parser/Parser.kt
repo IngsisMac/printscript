@@ -41,8 +41,7 @@ class Parser(
         throw ParseException("Unexpected token '${token.lexeme}' (${token.type})", token.span)
     }
 
-    fun parseExpression(minBp: Int = 0): Expression =
-        expressionParser.parseExpression(stream, minBp)
+    fun parseExpression(minBp: Int = 0): Expression = expressionParser.parseExpression(stream, minBp)
 }
 
 class ParseException(
