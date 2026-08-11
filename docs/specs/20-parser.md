@@ -8,7 +8,7 @@ Todos los escenarios unitarios de este archivo se ejecutan pasando un
 ---
 
 ### PS-PAR-001 — Declaración con inicialización produce un VariableDeclaration
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "let x: number = 5;"
@@ -21,7 +21,7 @@ And su inicializador es un NumberLiteral de valor 5
 ---
 
 ### PS-PAR-002 — Declaración sin inicialización es válida
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "let x: number;"
@@ -32,7 +32,7 @@ Then se obtiene un VariableDeclaration con inicializador nulo
 ---
 
 ### PS-PAR-003 — Asignación a variable ya declarada
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "x = 5;"
@@ -43,7 +43,7 @@ Then se obtiene un Assignment cuyo destino es el identificador "x"
 ---
 
 ### PS-PAR-004 — `println` produce un PrintlnStatement
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "println(\"hola\");"
@@ -55,7 +55,7 @@ And su argumento es un StringLiteral de valor "hola"
 ---
 
 ### PS-PAR-005 — La multiplicación liga más fuerte que la suma
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "let x: number = 2 + 3 * 4;"
@@ -70,7 +70,7 @@ And su operando derecho es un BinaryExpression con operador *
 ---
 
 ### PS-PAR-006 — Los operadores de igual precedencia asocian a izquierda
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "let x: number = 10 - 3 - 2;"
@@ -81,7 +81,7 @@ Then el árbol resultante equivale a ((10 - 3) - 2)
 ---
 
 ### PS-PAR-007 — Los paréntesis cambian la precedencia
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "let x: number = (2 + 3) * 4;"
@@ -92,7 +92,7 @@ Then el operador raíz es *
 ---
 
 ### PS-PAR-008 — Falta el punto y coma
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "let x: number = 5"
@@ -106,7 +106,7 @@ And el span señala el final de la expresión
 ---
 
 ### PS-PAR-009 — Paréntesis sin cerrar
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given los tokens de "println(\"hola\";"
@@ -117,7 +117,7 @@ Then se reporta un error de paréntesis sin cerrar con su posición
 ---
 
 ### PS-PAR-010 — `const` es inválido en 1.0
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un parser configurado para la versión 1.0
@@ -131,7 +131,7 @@ Then se reporta un error con su posición
 ---
 
 ### PS-PAR-011 — `if` es inválido en 1.0
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un parser configurado para la versión 1.0
@@ -149,7 +149,7 @@ Then se reporta un error con su posición
 ---
 
 ### PS-PAR-012 — El parser entrega statements de a uno
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una fuente con 32768 sentencias
@@ -163,7 +163,7 @@ And no existe ninguna colección con todos los statements
 ---
 
 ### PS-PAR-013 — El buffer de lookahead no crece con el archivo
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una fuente con 32768 sentencias
@@ -176,7 +176,7 @@ Then el tamaño del buffer de tokens nunca supera un máximo acotado
 ---
 
 ### PS-PAR-014 — `const` es válido en 1.1
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given un parser configurado para la versión 1.1
@@ -188,7 +188,7 @@ Then se obtiene un VariableDeclaration no mutable
 ---
 
 ### PS-PAR-015 — `if` con `else` produce el árbol esperado
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given un parser configurado para la versión 1.1
@@ -203,7 +203,7 @@ Then se obtiene un IfStatement con bloque then y bloque else
 ---
 
 ### PS-PAR-016 — `else if` no está soportado
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given un parser configurado para la versión 1.1
