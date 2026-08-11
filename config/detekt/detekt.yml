@@ -10,7 +10,8 @@ complexity:
   LargeClass:
     active: false
   LongMethod:
-    active: false
+    active: true
+    threshold: 20
 
 exceptions:
   TooGenericExceptionThrown:
@@ -19,6 +20,23 @@ exceptions:
     active: false
   SwallowedException:
     active: false
+
+naming:
+  ClassNaming:
+    active: true
+    classPattern: '[A-Z][a-zA-Z0-9]*'
+  FunctionNaming:
+    active: true
+    functionPattern: '[a-z][a-zA-Z0-9]*'
+  VariableNaming:
+    active: true
+    variablePattern: '[a-z][a-zA-Z0-9]*'
+  PackageNaming:
+    active: true
+    packagePattern: '[a-z]+(\.[a-z][a-z0-9]*)*'
+  EnumNaming:
+    active: true
+    enumEntryPattern: '[A-Z][_A-Z0-9]*'
 
 style:
   ThrowsCount:
@@ -30,3 +48,13 @@ style:
     maxLineLength: 140
   UnusedPrivateProperty:
     active: false
+  WildcardImport:
+    active: true
+  SpacingBetweenPackageAndImports:
+    active: true
+  TrailingWhitespace:
+    active: true
+  NewLineAtEndOfFile:
+    active: true
+
+
