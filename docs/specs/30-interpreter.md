@@ -5,7 +5,7 @@ Convenciones en [`00-convenciones.md`](00-convenciones.md).
 ---
 
 ### PS-INT-001 — Concatenación de strings (ejemplo 1 de la consigna)
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un programa PrintScript 1.0:
@@ -24,7 +24,7 @@ And no se reporta ningún error
 ---
 
 ### PS-INT-002 — División que da entero exacto (ejemplo 2 de la consigna)
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un programa PrintScript 1.0:
@@ -47,7 +47,7 @@ And no se reporta ningún error
 ---
 
 ### PS-INT-003 — Reasignación con división (ejemplo 3 de la consigna)
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un programa PrintScript 1.0:
@@ -66,7 +66,7 @@ Then el emitter recibe exactamente una línea: "Result: 3"
 ---
 
 ### PS-INT-004 — El emitter recibe el mensaje sin salto de línea
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa "println(\"hola\");"
@@ -81,7 +81,7 @@ And el string no termina en "\n"
 ---
 
 ### PS-INT-005 — La aritmética decimal es exacta
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa:
@@ -99,7 +99,7 @@ Then el emitter recibe "0.3"
 ---
 
 ### PS-INT-006 — La división no terminante no explota
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa "println(1 / 3);"
@@ -113,7 +113,7 @@ And el emitter recibe un decimal con la precisión de DECIMAL64
 ---
 
 ### PS-INT-007 — Concatenación de string con number produce string
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa:
@@ -128,7 +128,7 @@ Then el emitter recibe "valor: 5"
 ---
 
 ### PS-INT-008 — Usar una variable no declarada es un error posicionado
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa "println(x);"
@@ -140,7 +140,7 @@ And el span señala el identificador "x"
 ---
 
 ### PS-INT-009 — Asignar un tipo incompatible es un error
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa "let x: number = \"hola\";"
@@ -153,7 +153,7 @@ Then se reporta un error de tipo incompatible con su posición
 ---
 
 ### PS-INT-010 — Operar aritméticamente sobre strings es un error
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa:
@@ -172,7 +172,7 @@ Then se reporta un error con su posición
 ---
 
 ### PS-INT-011 — Redeclarar una variable es un error
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa:
@@ -187,7 +187,7 @@ Then se reporta un error de variable ya declarada con su posición
 ---
 
 ### PS-INT-012 — La validación no ejecuta
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given el programa "println(\"hola\");"
@@ -199,7 +199,7 @@ And no se reporta ningún error
 ---
 
 ### PS-INT-013 — Reasignar una constante es un error
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given el programa:
@@ -216,7 +216,7 @@ Then se reporta un error de reasignación de constante con su posición
 ---
 
 ### PS-INT-014 — `if` ejecuta el bloque correcto
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given el programa:
@@ -231,7 +231,7 @@ Then el emitter recibe exactamente una línea: "si"
 ---
 
 ### PS-INT-015 — La condición del `if` debe ser booleana
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given el programa:
@@ -248,7 +248,7 @@ Then se reporta un error con su posición
 ---
 
 ### PS-INT-016 — `readInput` toma el valor del proveedor
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given un InputSource que devuelve "42"
@@ -264,7 +264,7 @@ Then el emitter recibe "Ingresá un número: " y luego "42"
 ---
 
 ### PS-INT-017 — `readInput` falla si el valor no es del tipo esperado
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given un InputSource que devuelve "Hola"
@@ -276,7 +276,7 @@ Then se reporta un error de conversión de tipo
 ---
 
 ### PS-INT-018 — `readEnv` lee una variable de ambiente
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given la variable de ambiente BEST_FOOTBALL_CLUB con valor "San Lorenzo"
@@ -290,7 +290,7 @@ Then el emitter recibe "San Lorenzo"
 ---
 
 ### PS-INT-019 — El intérprete no acumula statements
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una fuente de 32768 sentencias println

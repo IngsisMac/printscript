@@ -37,7 +37,24 @@ object PrintScriptRunner {
             val lexer = Lexer(source, version)
             val parser = Parser(lexer, version)
             val statements = parser.parse()
-            val interpreter = Interpreter(version, output, input)
+            val interpreter = Interpreter(version, output, input, isValidationMode = false)
+            val errors = interpreter.execute(statements)
+            ExecutionResult(errors)
+        } catch (e: ParseException) {
+            ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
+        } catch (e: OutOfMemoryError) {
+            OOM_RESULT
+        }
+
+    fun validate(
+        source: Reader,
+        version: Version,
+    ): ExecutionResult =
+        try {
+            val lexer = Lexer(source, version)
+            val parser = Parser(lexer, version)
+            val statements = parser.parse()
+            val interpreter = Interpreter(version, isValidationMode = true)
             val errors = interpreter.execute(statements)
             ExecutionResult(errors)
         } catch (e: ParseException) {
