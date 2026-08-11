@@ -11,6 +11,7 @@ data class Declaration(
     val type: String, // "number", "string", "boolean"
     val value: Expression?,
     override val span: Span,
+    val isConst: Boolean = false,
 ) : Statement()
 
 data class Assignment(
