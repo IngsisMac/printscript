@@ -1,6 +1,17 @@
 package com.printscript.parser
 
-import com.printscript.ast.*
+import com.printscript.ast.Assignment
+import com.printscript.ast.BinaryOp
+import com.printscript.ast.BooleanLiteral
+import com.printscript.ast.CallExpression
+import com.printscript.ast.Declaration
+import com.printscript.ast.Expression
+import com.printscript.ast.IfStatement
+import com.printscript.ast.NumberLiteral
+import com.printscript.ast.PrintStatement
+import com.printscript.ast.Statement
+import com.printscript.ast.StringLiteral
+import com.printscript.ast.Variable
 import com.printscript.common.Position
 import com.printscript.common.Span
 import com.printscript.common.Version
@@ -19,15 +30,16 @@ class Parser(
         advance()
     }
 
-    fun parse(): Iterator<Statement> = sequence {
-        while (currentToken?.type != TokenType.EOF && currentToken != null) {
-            val stmt = statement()
-            if (stmt != null) yield(stmt)
-        }
-    }.iterator()
+    fun parse(): Iterator<Statement> =
+        sequence {
+            while (currentToken?.type != TokenType.EOF && currentToken != null) {
+                val stmt = statement()
+                if (stmt != null) yield(stmt)
+            }
+        }.iterator()
 
-    private fun statement(): Statement? {
-        return when (currentToken?.type) {
+    private fun statement(): Statement? =
+        when (currentToken?.type) {
             TokenType.LET -> declaration()
             TokenType.CONST -> {
                 if (version == Version.V1_0) {
@@ -60,7 +72,6 @@ class Parser(
                 null
             }
         }
-    }
 
     private fun declaration(): Statement {
         val startSpan = currentToken!!.span
@@ -69,12 +80,13 @@ class Parser(
         expect(TokenType.COLON)
         val type = expect(TokenType.NUMBER, TokenType.STRING, TokenType.BOOLEAN).lexeme
 
-        val value = if (currentToken?.type == TokenType.EQUAL) {
-            advance()
-            expression()
-        } else {
-            null
-        }
+        val value =
+            if (currentToken?.type == TokenType.EQUAL) {
+                advance()
+                expression()
+            } else {
+                null
+            }
 
         val endSpan = currentToken?.span ?: startSpan
         expect(TokenType.SEMICOLON)
@@ -119,18 +131,19 @@ class Parser(
         }
         expect(TokenType.RBRACE)
 
-        val elseBranch = if (currentToken?.type == TokenType.ELSE) {
-            advance()
-            expect(TokenType.LBRACE)
-            val elseBody = mutableListOf<Statement>()
-            while (currentToken?.type != TokenType.RBRACE && currentToken != null) {
-                statement()?.let { elseBody.add(it) }
+        val elseBranch =
+            if (currentToken?.type == TokenType.ELSE) {
+                advance()
+                expect(TokenType.LBRACE)
+                val elseBody = mutableListOf<Statement>()
+                while (currentToken?.type != TokenType.RBRACE && currentToken != null) {
+                    statement()?.let { elseBody.add(it) }
+                }
+                expect(TokenType.RBRACE)
+                elseBody
+            } else {
+                null
             }
-            expect(TokenType.RBRACE)
-            elseBody
-        } else {
-            null
-        }
 
         val endSpan = currentToken?.span ?: startSpan
         return IfStatement(condition, thenBranch, elseBranch, Span(startSpan.start, endSpan.end))
@@ -195,8 +208,8 @@ class Parser(
         return left
     }
 
-    private fun unary(): Expression {
-        return if (currentToken?.type in listOf(TokenType.MINUS, TokenType.PLUS)) {
+    private fun unary(): Expression =
+        if (currentToken?.type in listOf(TokenType.MINUS, TokenType.PLUS)) {
             val op = currentToken!!.lexeme
             val opSpan = currentToken!!.span
             advance()
@@ -205,7 +218,6 @@ class Parser(
         } else {
             call()
         }
-    }
 
     private fun call(): Expression {
         var expr = primary()
@@ -272,6 +284,7 @@ class Parser(
     }
 
     private fun saveState(): ParserState = ParserState(currentToken, nextToken)
+
     private fun restoreState(state: ParserState) {
         currentToken = state.currentToken
         nextToken = state.nextToken
@@ -283,4 +296,7 @@ class Parser(
     )
 }
 
-class ParseException(val rawMessage: String, val span: Span) : Exception(rawMessage)
+class ParseException(
+    val rawMessage: String,
+    val span: Span,
+) : Exception(rawMessage)

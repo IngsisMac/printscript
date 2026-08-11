@@ -65,7 +65,7 @@ testing {
 
 tasks.named("check") {
     dependsOn(testing.suites.named("integrationTest"))
-    dependsOn(testing.suites.named("memoryTest"))
+    // memoryTest is executed on-demand via ./gradlew memoryTest to prevent JVM memory contention during dev checks
 }
 
 

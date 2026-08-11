@@ -10,25 +10,18 @@ import java.io.Reader
 class Lexer(
     private val source: Reader,
     private val version: Version,
+    private val config: TokenConfig = TokenConfig.from(version),
 ) : Iterator<Token> {
     private var currentLine = 1
     private var currentColumn = 1
     private var currentChar: Int? = source.read()
     private var nextToken: Token? = null
-    private val keywords = mapOf(
-        "let" to TokenType.LET,
-        "const" to TokenType.CONST,
-        "number" to TokenType.NUMBER,
-        "string" to TokenType.STRING,
-        "boolean" to TokenType.BOOLEAN,
-        "println" to TokenType.PRINTLN,
-        "readInput" to TokenType.READ_INPUT,
-        "readEnv" to TokenType.READ_ENV,
-        "if" to TokenType.IF,
-        "else" to TokenType.ELSE,
-        "true" to TokenType.TRUE,
-        "false" to TokenType.FALSE,
-    )
+
+    init {
+        if (currentChar == -1) {
+            currentChar = null
+        }
+    }
 
     override fun hasNext(): Boolean {
         if (nextToken != null) return true
@@ -47,15 +40,9 @@ class Lexer(
     }
 
     private fun readNextToken(): Token? {
-        skipWhitespaceExceptNewline()
+        skipWhitespace()
 
         if (currentChar == null) return null
-        if (currentChar == '\n'.code) {
-            advance()
-            currentLine++
-            currentColumn = 1
-            return readNextToken()
-        }
 
         val startLine = currentLine
         val startColumn = currentColumn
@@ -110,44 +97,78 @@ class Lexer(
                 advance()
                 Token(TokenType.EQUAL, "=", Span(startPos, Position(currentLine, currentColumn - 1)))
             }
-            currentChar == '"'.code -> readStringLiteral(startPos)
+            currentChar == '"'.code || currentChar == '\''.code -> readStringLiteral(startPos)
             currentChar?.let { it.toChar().isDigit() } == true -> readNumberLiteral(startPos)
             currentChar?.let { it.toChar().isLetter() || it.toChar() == '_' } == true -> readIdentifierOrKeyword(startPos)
             else -> {
+                val badChar = currentChar!!.toChar()
+                val errPos = Position(currentLine, currentColumn)
                 advance()
-                readNextToken() // Skip unknown chars
+                throw LexerException("Unexpected character '$badChar'", Span(startPos, errPos))
             }
         }
     }
 
     private fun readStringLiteral(startPos: Position): Token {
+        val quoteChar = currentChar!!.toChar()
         val sb = StringBuilder()
         advance() // skip opening quote
 
-        while (currentChar != null && currentChar != '"'.code) {
-            sb.append(currentChar!!.toChar())
-            if (currentChar == '\n'.code) {
-                currentLine++
-                currentColumn = 0
+        var isClosed = false
+
+        while (currentChar != null) {
+            val ch = currentChar!!.toChar()
+            if (ch == quoteChar) {
+                isClosed = true
+                advance() // skip closing quote
+                break
             }
+            sb.append(ch)
             advance()
         }
 
-        if (currentChar == '"'.code) advance() // skip closing quote
+        if (!isClosed) {
+            val errPos = Position(currentLine, currentColumn)
+            throw LexerException("Unterminated string literal", Span(startPos, errPos))
+        }
 
-        val lexeme = "\"" + sb.toString() + "\""
-        return Token(TokenType.STRING_LITERAL, sb.toString(), Span(startPos, Position(currentLine, currentColumn)))
+        val endPos = Position(currentLine, currentColumn - 1)
+        return Token(TokenType.STRING_LITERAL, sb.toString(), Span(startPos, endPos))
     }
 
     private fun readNumberLiteral(startPos: Position): Token {
         val sb = StringBuilder()
+        var hasDecimalPoint = false
 
-        while (currentChar != null && (currentChar!!.toChar().isDigit() || currentChar == '.'.code)) {
-            sb.append(currentChar!!.toChar())
-            advance()
+        while (currentChar != null) {
+            val ch = currentChar!!.toChar()
+            if (ch.isDigit()) {
+                sb.append(ch)
+                advance()
+            } else if (ch == '.') {
+                if (hasDecimalPoint) {
+                    val errPos = Position(currentLine, currentColumn)
+                    throw LexerException(
+                        "Invalid number literal: multiple decimal points in '${sb.toString()}.'",
+                        Span(startPos, errPos),
+                    )
+                }
+                hasDecimalPoint = true
+                sb.append(ch)
+                advance()
+            } else {
+                break
+            }
         }
 
-        return Token(TokenType.NUMBER_LITERAL, sb.toString(), Span(startPos, Position(currentLine, currentColumn - 1)))
+        val lexeme = sb.toString()
+        if (lexeme.endsWith(".")) {
+            val errPos = Position(currentLine, currentColumn - 1)
+            throw LexerException("Invalid number literal: trailing decimal point in '$lexeme'", Span(startPos, errPos))
+        }
+
+        val endPos = Position(currentLine, currentColumn - 1)
+        return Token(TokenType.NUMBER_LITERAL, lexeme, Span(startPos, endPos))
     }
 
     private fun readIdentifierOrKeyword(startPos: Position): Token {
@@ -159,14 +180,23 @@ class Lexer(
         }
 
         val lexeme = sb.toString()
-        val type = keywords[lexeme] ?: TokenType.IDENTIFIER
+        val type = config.keywords[lexeme] ?: TokenType.IDENTIFIER
 
-        return Token(type, lexeme, Span(startPos, Position(currentLine, currentColumn - 1)))
+        val endPos = Position(currentLine, currentColumn - 1)
+        return Token(type, lexeme, Span(startPos, endPos))
     }
 
-    private fun skipWhitespaceExceptNewline() {
-        while (currentChar != null && currentChar!!.toChar() in " \t\r") {
-            advance()
+    private fun skipWhitespace() {
+        while (currentChar != null) {
+            when (currentChar!!.toChar()) {
+                ' ', '\t', '\r' -> advance()
+                '\n' -> {
+                    advance()
+                    currentLine++
+                    currentColumn = 1
+                }
+                else -> break
+            }
         }
     }
 
@@ -178,3 +208,4 @@ class Lexer(
         }
     }
 }
+

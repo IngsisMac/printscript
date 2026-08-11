@@ -13,7 +13,6 @@ class MockInputStream(
     private val line: String = LINE,
     private val numberOfLines: Int = NUMBER_OF_LINES,
 ) : InputStream() {
-
     private var currentLineIndex = 0
     private var currentCharIndex = 0
 

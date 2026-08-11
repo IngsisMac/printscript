@@ -32,6 +32,7 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
 configure<io.gitlab.arturbosch.detekt.extensions.DetektExtension> {
     buildUponDefaultConfig = true
     allRules = false
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
 }
 
 jacoco {

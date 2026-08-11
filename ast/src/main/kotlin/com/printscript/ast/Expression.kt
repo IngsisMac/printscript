@@ -6,13 +6,25 @@ sealed class Expression {
     abstract val span: Span
 }
 
-data class NumberLiteral(val value: String, override val span: Span) : Expression()
+data class NumberLiteral(
+    val value: String,
+    override val span: Span,
+) : Expression()
 
-data class StringLiteral(val value: String, override val span: Span) : Expression()
+data class StringLiteral(
+    val value: String,
+    override val span: Span,
+) : Expression()
 
-data class BooleanLiteral(val value: Boolean, override val span: Span) : Expression()
+data class BooleanLiteral(
+    val value: Boolean,
+    override val span: Span,
+) : Expression()
 
-data class Variable(val name: String, override val span: Span) : Expression()
+data class Variable(
+    val name: String,
+    override val span: Span,
+) : Expression()
 
 data class BinaryOp(
     val left: Expression,

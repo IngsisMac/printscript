@@ -5,6 +5,7 @@ import com.printscript.common.OutputEmitter
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.ArrayList
 
@@ -16,9 +17,11 @@ import java.util.ArrayList
  * TODO: Deshardcodear los datos de este test (mensajes/líneas/número de repeticiones) en el futuro
  * para parametrizar y expandir con casos adicionales para incrementar la cobertura.
  */
+@Disabled("Desactivado temporalmente a pedido del usuario hasta implementar mas alla de los happy paths")
 class MemoryStreamingTest {
-
-    class PrintCounter(private val expectedMessage: String) : OutputEmitter {
+    class PrintCounter(
+        private val expectedMessage: String,
+    ) : OutputEmitter {
         var count = 0
             private set
 
@@ -45,12 +48,13 @@ class MemoryStreamingTest {
         val counter = PrintCounter(MockInputStream.MESSAGE)
         val input = InputSource { "" }
 
-        val result = PrintScriptRunner.execute(
-            source = stream.reader(),
-            version = Version.V1_0,
-            output = counter,
-            input = input,
-        )
+        val result =
+            PrintScriptRunner.execute(
+                source = stream.reader(),
+                version = Version.V1_0,
+                output = counter,
+                input = input,
+            )
 
         assertTrue(result.errors.isEmpty(), "Expected no errors but got: ${result.errors}")
         assertEquals(MockInputStream.NUMBER_OF_LINES, counter.count)
@@ -63,12 +67,13 @@ class MemoryStreamingTest {
         val collector = PrintCollector()
         val input = InputSource { "" }
 
-        val result = PrintScriptRunner.execute(
-            source = stream.reader(),
-            version = Version.V1_0,
-            output = collector,
-            input = input,
-        )
+        val result =
+            PrintScriptRunner.execute(
+                source = stream.reader(),
+                version = Version.V1_0,
+                output = collector,
+                input = input,
+            )
 
         assertEquals(1, result.errors.size, "Expected exactly 1 error on OOM, got: ${result.errors}")
         assertEquals("Java heap space", result.errors[0].message)

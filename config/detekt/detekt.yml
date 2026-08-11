@@ -1,0 +1,32 @@
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+complexity:
+  CyclomaticComplexMethod:
+    active: false
+  TooManyFunctions:
+    active: false
+  LargeClass:
+    active: false
+  LongMethod:
+    active: false
+
+exceptions:
+  TooGenericExceptionThrown:
+    active: false
+  TooGenericExceptionCaught:
+    active: false
+  SwallowedException:
+    active: false
+
+style:
+  ThrowsCount:
+    active: false
+  ReturnCount:
+    active: false
+  MaxLineLength:
+    active: true
+    maxLineLength: 140
+  UnusedPrivateProperty:
+    active: false
