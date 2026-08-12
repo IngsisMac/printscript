@@ -47,20 +47,24 @@ class GoldenFilesTest {
         val result = PrintScriptRunner.execute(reader, Version.V1_0, emitter, input)
         val expectedError = testCase.expectedErrorsPath.readText().trim()
 
+        verifyExpectedError(result, expectedError, testCase.name)
+    }
+
+    private fun verifyExpectedError(
+        result: ExecutionResult,
+        expectedError: String,
+        name: String,
+    ) {
         if (expectedError == "# NONE" || expectedError.isEmpty()) {
             assertTrue(
                 result.errors.isEmpty(),
-                "Case '${testCase.name}' expected 0 errors but got: ${result.errors}",
+                "Case '$name' expected 0 errors but got: ${result.errors}",
             )
         } else {
-            assertTrue(
-                result.errors.isNotEmpty(),
-                "Case '${testCase.name}' expected error matching '$expectedError' but got 0 errors",
-            )
             val matches = result.errors.any { it.message.contains(expectedError, ignoreCase = true) }
             assertTrue(
                 matches,
-                "Case '${testCase.name}' expected error message containing '$expectedError' but got: ${result.errors}",
+                "Case '$name' expected error message containing '$expectedError' but got: ${result.errors}",
             )
         }
     }

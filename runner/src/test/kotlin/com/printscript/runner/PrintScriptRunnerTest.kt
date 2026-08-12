@@ -121,9 +121,7 @@ class PrintScriptRunnerTest {
                     cbuf: CharArray,
                     off: Int,
                     len: Int,
-                ): Int {
-                    throw OutOfMemoryError("Java heap space")
-                }
+                ): Int = throw OutOfMemoryError("Java heap space")
 
                 override fun close() {
                     // No-op for mock reader
@@ -144,9 +142,7 @@ class PrintScriptRunnerTest {
                     cbuf: CharArray,
                     off: Int,
                     len: Int,
-                ): Int {
-                    throw OutOfMemoryError("Java heap space")
-                }
+                ): Int = throw OutOfMemoryError("Java heap space")
 
                 override fun close() {
                     // No-op for mock reader

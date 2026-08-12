@@ -41,7 +41,20 @@ class DeclarationStatementParser(
 
         val name = stream.expect(TokenType.IDENTIFIER).lexeme
         stream.expect(TokenType.COLON)
+        val typeToken = parseTypeToken(stream)
 
+        val value =
+            if (stream.match(TokenType.EQUAL)) {
+                parser.parseExpression()
+            } else {
+                null
+            }
+
+        val endToken = stream.expect(TokenType.SEMICOLON)
+        return Declaration(name, typeToken.lexeme, value, Span(keywordToken.span.start, endToken.span.end), isConst)
+    }
+
+    private fun parseTypeToken(stream: TokenStream): com.printscript.token.Token {
         val typeToken =
             if (stream.checkAny(TokenType.NUMBER, TokenType.STRING, TokenType.BOOLEAN)) {
                 stream.consume()
@@ -54,16 +67,7 @@ class DeclarationStatementParser(
         if (typeToken.lexeme == "boolean" && version == Version.V1_0) {
             throw ParseException("boolean type is not supported in version 1.0", typeToken.span)
         }
-
-        val value =
-            if (stream.match(TokenType.EQUAL)) {
-                parser.parseExpression()
-            } else {
-                null
-            }
-
-        val endToken = stream.expect(TokenType.SEMICOLON)
-        return Declaration(name, typeToken.lexeme, value, Span(keywordToken.span.start, endToken.span.end), isConst)
+        return typeToken
     }
 }
 
@@ -111,43 +115,45 @@ class IfStatementParser(
         parser: Parser,
     ): Statement {
         val startToken = stream.consume()
-        if (version == Version.V1_0 || startToken.lexeme == "if") {
-            if (version == Version.V1_0) {
-                throw ParseException("if statements are not supported in version 1.0", startToken.span)
-            }
+        if (version == Version.V1_0 && startToken.lexeme == "if") {
+            throw ParseException("if statements are not supported in version 1.0", startToken.span)
         }
 
         stream.expect(TokenType.LPAREN)
         val condition = parser.parseExpression()
         stream.expect(TokenType.RPAREN)
 
-        stream.expect(TokenType.LBRACE)
-        val thenBranch = mutableListOf<Statement>()
-        while (!stream.check(TokenType.RBRACE) && !stream.check(TokenType.EOF)) {
-            val stmt = parser.parseNextStatement()
-            if (stmt != null) thenBranch.add(stmt)
-        }
-        val thenEnd = stream.expect(TokenType.RBRACE)
-
-        var lastEndSpan = thenEnd.span
-        val elseBranch =
-            if (stream.match(TokenType.ELSE)) {
-                if (stream.check(TokenType.IF)) {
-                    throw ParseException("else if is not supported", stream.peek().span)
-                }
-                stream.expect(TokenType.LBRACE)
-                val elseBody = mutableListOf<Statement>()
-                while (!stream.check(TokenType.RBRACE) && !stream.check(TokenType.EOF)) {
-                    val stmt = parser.parseNextStatement()
-                    if (stmt != null) elseBody.add(stmt)
-                }
-                val elseEnd = stream.expect(TokenType.RBRACE)
-                lastEndSpan = elseEnd.span
-                elseBody
-            } else {
-                null
-            }
+        val (thenBranch, thenEnd) = parseBlock(stream, parser)
+        val elseResult = parseElseBranch(stream, parser)
+        val elseBranch = elseResult?.first
+        val lastEndSpan = elseResult?.second ?: thenEnd.span
 
         return IfStatement(condition, thenBranch, elseBranch, Span(startToken.span.start, lastEndSpan.end))
+    }
+
+    private fun parseElseBranch(
+        stream: TokenStream,
+        parser: Parser,
+    ): Pair<List<Statement>?, Span>? {
+        if (!stream.match(TokenType.ELSE)) return null
+        if (stream.check(TokenType.IF)) {
+            throw ParseException("else if is not supported", stream.peek().span)
+        }
+        val (elseBody, elseEnd) = parseBlock(stream, parser)
+        return elseBody to elseEnd.span
+    }
+
+    private fun parseBlock(
+        stream: TokenStream,
+        parser: Parser,
+    ): Pair<List<Statement>, com.printscript.token.Token> {
+        stream.expect(TokenType.LBRACE)
+        val body = mutableListOf<Statement>()
+        while (!stream.check(TokenType.RBRACE) && !stream.check(TokenType.EOF)) {
+            val stmt = parser.parseNextStatement()
+            if (stmt != null) body.add(stmt)
+        }
+        val endToken = stream.expect(TokenType.RBRACE)
+        return body to endToken
     }
 }

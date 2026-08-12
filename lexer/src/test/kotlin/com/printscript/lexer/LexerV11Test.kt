@@ -21,8 +21,13 @@ class LexerV11Test {
 
         val expectedKeywords =
             listOf(
-                TokenType.CONST, TokenType.BOOLEAN, TokenType.TRUE,
-                TokenType.IF, TokenType.LBRACE, TokenType.RBRACE, TokenType.ELSE,
+                TokenType.CONST,
+                TokenType.BOOLEAN,
+                TokenType.TRUE,
+                TokenType.IF,
+                TokenType.LBRACE,
+                TokenType.RBRACE,
+                TokenType.ELSE,
             )
 
         expectedKeywords.forEach { expected ->

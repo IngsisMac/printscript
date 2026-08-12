@@ -13,7 +13,6 @@ import com.printscript.token.Token
 import com.printscript.token.TokenType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -27,49 +26,26 @@ class ParserV10Test {
         lexeme: String,
     ): Token = Token(type, lexeme, defaultSpan)
 
+    private fun parseString(source: String): List<com.printscript.ast.Statement> =
+        Parser(com.printscript.lexer.Lexer(java.io.StringReader(source), Version.V1_0), Version.V1_0)
+            .parse()
+            .asSequence()
+            .toList()
+
     // PS-PAR-001 — Declaración con inicialización produce un Declaration
     @Test
     fun `parse declaration with initialization`() {
-        val tokens =
-            listOf(
-                token(TokenType.LET, "let"),
-                token(TokenType.IDENTIFIER, "x"),
-                token(TokenType.COLON, ":"),
-                token(TokenType.NUMBER, "number"),
-                token(TokenType.EQUAL, "="),
-                token(TokenType.NUMBER_LITERAL, "5"),
-                token(TokenType.SEMICOLON, ";"),
-            ).iterator()
-
-        val parser = Parser(tokens, Version.V1_0)
-        val statements = parser.parse().asSequence().toList()
-
-        assertEquals(1, statements.size)
-        val decl = statements[0] as Declaration
+        val decl = parseString("let x: number = 5;")[0] as Declaration
         assertEquals("x", decl.name)
         assertEquals("number", decl.type)
         assertFalse(decl.isConst)
-        assertNotNull(decl.value)
         assertEquals("5", (decl.value as NumberLiteral).value)
     }
 
     // PS-PAR-002 — Declaración sin inicialización es válida
     @Test
     fun `parse declaration without initialization`() {
-        val tokens =
-            listOf(
-                token(TokenType.LET, "x"),
-                token(TokenType.IDENTIFIER, "x"),
-                token(TokenType.COLON, ":"),
-                token(TokenType.NUMBER, "number"),
-                token(TokenType.SEMICOLON, ";"),
-            ).iterator()
-
-        val parser = Parser(tokens, Version.V1_0)
-        val statements = parser.parse().asSequence().toList()
-
-        assertEquals(1, statements.size)
-        val decl = statements[0] as Declaration
+        val decl = parseString("let x: number;")[0] as Declaration
         assertEquals("x", decl.name)
         assertEquals("number", decl.type)
         assertNull(decl.value)
@@ -78,19 +54,7 @@ class ParserV10Test {
     // PS-PAR-003 — Asignación a variable ya declarada
     @Test
     fun `parse assignment`() {
-        val tokens =
-            listOf(
-                token(TokenType.IDENTIFIER, "x"),
-                token(TokenType.EQUAL, "="),
-                token(TokenType.NUMBER_LITERAL, "5"),
-                token(TokenType.SEMICOLON, ";"),
-            ).iterator()
-
-        val parser = Parser(tokens, Version.V1_0)
-        val statements = parser.parse().asSequence().toList()
-
-        assertEquals(1, statements.size)
-        val assign = statements[0] as Assignment
+        val assign = parseString("x = 5;")[0] as Assignment
         assertEquals("x", assign.name)
         assertEquals("5", (assign.value as NumberLiteral).value)
     }
@@ -98,45 +62,14 @@ class ParserV10Test {
     // PS-PAR-004 — println produce un PrintStatement
     @Test
     fun `parse print statement`() {
-        val tokens =
-            listOf(
-                token(TokenType.PRINTLN, "println"),
-                token(TokenType.LPAREN, "("),
-                token(TokenType.STRING_LITERAL, "hola"),
-                token(TokenType.RPAREN, ")"),
-                token(TokenType.SEMICOLON, ";"),
-            ).iterator()
-
-        val parser = Parser(tokens, Version.V1_0)
-        val statements = parser.parse().asSequence().toList()
-
-        assertEquals(1, statements.size)
-        val printStmt = statements[0] as PrintStatement
+        val printStmt = parseString("println(\"hola\");")[0] as PrintStatement
         assertEquals("hola", (printStmt.expression as StringLiteral).value)
     }
 
     // PS-PAR-005 — La multiplicación liga más fuerte que la suma (2 + 3 * 4)
     @Test
     fun `parse expression multiplication higher precedence than addition`() {
-        val tokens =
-            listOf(
-                token(TokenType.LET, "let"),
-                token(TokenType.IDENTIFIER, "x"),
-                token(TokenType.COLON, ":"),
-                token(TokenType.NUMBER, "number"),
-                token(TokenType.EQUAL, "="),
-                token(TokenType.NUMBER_LITERAL, "2"),
-                token(TokenType.PLUS, "+"),
-                token(TokenType.NUMBER_LITERAL, "3"),
-                token(TokenType.STAR, "*"),
-                token(TokenType.NUMBER_LITERAL, "4"),
-                token(TokenType.SEMICOLON, ";"),
-            ).iterator()
-
-        val parser = Parser(tokens, Version.V1_0)
-        val statements = parser.parse().asSequence().toList()
-
-        val decl = statements[0] as Declaration
+        val decl = parseString("let x: number = 2 + 3 * 4;")[0] as Declaration
         val rootOp = decl.value as BinaryOp
         assertEquals("+", rootOp.operator)
         assertEquals("2", (rootOp.left as NumberLiteral).value)
@@ -150,24 +83,7 @@ class ParserV10Test {
     // PS-PAR-006 — Los operadores de igual precedencia asocian a izquierda (10 - 3 - 2)
     @Test
     fun `parse expression left associativity for equal precedence`() {
-        val tokens =
-            listOf(
-                token(TokenType.LET, "let"),
-                token(TokenType.IDENTIFIER, "x"),
-                token(TokenType.COLON, ":"),
-                token(TokenType.NUMBER, "number"),
-                token(TokenType.EQUAL, "="),
-                token(TokenType.NUMBER_LITERAL, "10"),
-                token(TokenType.MINUS, "-"),
-                token(TokenType.NUMBER_LITERAL, "3"),
-                token(TokenType.MINUS, "-"),
-                token(TokenType.NUMBER_LITERAL, "2"),
-                token(TokenType.SEMICOLON, ";"),
-            ).iterator()
-
-        val parser = Parser(tokens, Version.V1_0)
-        val decl = parser.parse().next() as Declaration
-
+        val decl = parseString("let x: number = 10 - 3 - 2;")[0] as Declaration
         val rootOp = decl.value as BinaryOp
         assertEquals("-", rootOp.operator)
         assertEquals("2", (rootOp.right as NumberLiteral).value)
@@ -181,26 +97,7 @@ class ParserV10Test {
     // PS-PAR-007 — Los paréntesis cambian la precedencia ((2 + 3) * 4)
     @Test
     fun `parse expression parentheses override precedence`() {
-        val tokens =
-            listOf(
-                token(TokenType.LET, "let"),
-                token(TokenType.IDENTIFIER, "x"),
-                token(TokenType.COLON, ":"),
-                token(TokenType.NUMBER, "number"),
-                token(TokenType.EQUAL, "="),
-                token(TokenType.LPAREN, "("),
-                token(TokenType.NUMBER_LITERAL, "2"),
-                token(TokenType.PLUS, "+"),
-                token(TokenType.NUMBER_LITERAL, "3"),
-                token(TokenType.RPAREN, ")"),
-                token(TokenType.STAR, "*"),
-                token(TokenType.NUMBER_LITERAL, "4"),
-                token(TokenType.SEMICOLON, ";"),
-            ).iterator()
-
-        val parser = Parser(tokens, Version.V1_0)
-        val decl = parser.parse().next() as Declaration
-
+        val decl = parseString("let x: number = (2 + 3) * 4;")[0] as Declaration
         val rootOp = decl.value as BinaryOp
         assertEquals("*", rootOp.operator)
 
