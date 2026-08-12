@@ -48,6 +48,10 @@ style:
     maxLineLength: 140
   UnusedPrivateProperty:
     active: false
+  MagicNumber:
+    active: false
+  LoopWithTooManyJumpStatements:
+    active: false
   WildcardImport:
     active: true
   SpacingBetweenPackageAndImports:
