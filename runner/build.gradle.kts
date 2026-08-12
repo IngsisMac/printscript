@@ -13,7 +13,10 @@ dependencies {
     api(project(":common"))
 
     testImplementation(project(":common"))
+    testImplementation(project(":token"))
+    testImplementation(project(":ast"))
     testImplementation(project(":lexer"))
     testImplementation(project(":parser"))
     testImplementation(project(":interpreter"))
 }
+
