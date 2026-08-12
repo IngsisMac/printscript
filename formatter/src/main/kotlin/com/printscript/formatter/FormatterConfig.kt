@@ -15,7 +15,10 @@ data class FormatterConfig(
 ) {
     companion object {
         fun fromMap(map: Map<String, Any?>): FormatterConfig {
-            fun getBool(key: String, default: Boolean): Boolean {
+            fun getBool(
+                key: String,
+                default: Boolean,
+            ): Boolean {
                 val value = map[key] ?: return default
                 return when (value) {
                     is Boolean -> value
@@ -24,7 +27,10 @@ data class FormatterConfig(
                 }
             }
 
-            fun getInt(key: String, default: Int): Int {
+            fun getInt(
+                key: String,
+                default: Int,
+            ): Int {
                 val value = map[key] ?: return default
                 return when (value) {
                     is Number -> value.toInt()

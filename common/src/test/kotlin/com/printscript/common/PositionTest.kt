@@ -35,9 +35,10 @@ class PositionTest {
         val invalidLine = 0
         val column = defaultColumn
 
-        val exception = assertThrows<IllegalArgumentException> {
-            Position(invalidLine, column)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                Position(invalidLine, column)
+            }
 
         assertEquals("Line must be >= 1, got 0", exception.message)
     }
@@ -48,9 +49,10 @@ class PositionTest {
         val line = defaultLine
         val invalidColumn = 0
 
-        val exception = assertThrows<IllegalArgumentException> {
-            Position(line, invalidColumn)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                Position(line, invalidColumn)
+            }
 
         assertEquals("Column must be >= 1, got 0", exception.message)
     }

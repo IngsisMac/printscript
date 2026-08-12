@@ -58,8 +58,8 @@ class StatementTest {
     }
 
     @Test
-    @DisplayName("IfStatement admite rama else opcional y listas de sentencias")
-    fun ifStatementAdmiteBloquesThenYElse() {
+    @DisplayName("IfStatement admite rama else cuando se especifica")
+    fun ifStatementAdmiteRamaElse() {
         val thenStmt = PrintStatement(StringLiteral("si", dummySpan), dummySpan)
         val elseStmt = PrintStatement(StringLiteral("no", dummySpan), dummySpan)
 
@@ -70,6 +70,15 @@ class StatementTest {
             span = dummySpan,
         )
 
+        assertEquals(1, ifWithElse.thenBranch.size)
+        assertEquals(1, ifWithElse.elseBranch?.size)
+    }
+
+    @Test
+    @DisplayName("IfStatement admite rama else nula cuando no se especifica")
+    fun ifStatementAdmiteRamaElseNula() {
+        val thenStmt = PrintStatement(StringLiteral("si", dummySpan), dummySpan)
+
         val ifWithoutElse = IfStatement(
             condition = BooleanLiteral(false, dummySpan),
             thenBranch = listOf(thenStmt),
@@ -77,8 +86,6 @@ class StatementTest {
             span = dummySpan,
         )
 
-        assertEquals(1, ifWithElse.thenBranch.size)
-        assertEquals(1, ifWithElse.elseBranch?.size)
         assertNull(ifWithoutElse.elseBranch)
     }
 

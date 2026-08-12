@@ -74,7 +74,9 @@ object PrintScriptRunner {
             val parser = Parser(lexer, version)
             val statements = parser.parse()
             val formatter = com.printscript.formatter.DefaultFormatter()
-            val formatterConfig = com.printscript.formatter.FormatterConfig.fromMap(config)
+            val formatterConfig =
+                com.printscript.formatter.FormatterConfig
+                    .fromMap(config)
             for (statement in statements) {
                 formatter.format(statement, writer, formatterConfig)
             }

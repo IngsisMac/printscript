@@ -30,29 +30,32 @@ class LexerParserIntegrationTest {
 
     @BeforeEach
     fun setUp() {
-        validV10Code = """
+        validV10Code =
+            """
             let x: number = 42;
             x = 100;
-        """.trimIndent()
+            """.trimIndent()
 
-        validV11Code = """
+        validV11Code =
+            """
             const isReady: boolean = true;
             if (isReady) {
                 println("Ready!");
             } else {
                 println("Waiting...");
             }
-        """.trimIndent()
+            """.trimIndent()
 
         operatorPrecedenceCode = "println(5 + 3 * 2);"
         emptyCode = "   \n\t  "
 
-        syntaxErrorCases = listOf(
-            "let x: number = ;",
-            "let : number = 5;",
-            "if (true) { println(1); ",
-            "println(;"
-        )
+        syntaxErrorCases =
+            listOf(
+                "let x: number = ;",
+                "let : number = 5;",
+                "if (true) { println(1); ",
+                "println(;",
+            )
     }
 
     @Test

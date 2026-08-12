@@ -28,12 +28,13 @@ class PipelineIntegrationTest {
     @Test
     @DisplayName("Pipeline completo v1.0 - aritmética y concatenación de cadenas")
     fun fullPipelineV10ArithmeticAndStringConcatenation() {
-        val code = """
+        val code =
+            """
             let a: number = 10;
             let b: number = 20;
             let sum: number = a + b;
             println("Sum: " + sum);
-        """.trimIndent()
+            """.trimIndent()
 
         val input = InputSource { "" }
         val lexer = Lexer(StringReader(code), Version.V1_0)
@@ -49,7 +50,8 @@ class PipelineIntegrationTest {
     @Test
     @DisplayName("Pipeline completo v1.1 - interacción con readInput y condicionales")
     fun fullPipelineV11ReadInputInteractionAndConditionals() {
-        val code = """
+        val code =
+            """
             let userAgeStr: string = readInput("Age?");
             let isAdult: boolean = true;
             if (isAdult) {
@@ -57,7 +59,7 @@ class PipelineIntegrationTest {
             } else {
                 println("No input");
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val input = InputSource { "25" }
         val lexer = Lexer(StringReader(code), Version.V1_1)
@@ -73,7 +75,8 @@ class PipelineIntegrationTest {
     @Test
     @DisplayName("Pipeline completo v1.1 - lógica booleana y scopes anidados")
     fun fullPipelineV11BooleanLogicAndNestedScopes() {
-        val code = """
+        val code =
+            """
             const active: boolean = true;
             let result: string = "initial";
             if (active) {
@@ -83,7 +86,7 @@ class PipelineIntegrationTest {
                 result = "inactive";
             }
             println(result);
-        """.trimIndent()
+            """.trimIndent()
 
         val input = InputSource { "" }
         val lexer = Lexer(StringReader(code), Version.V1_1)
@@ -99,10 +102,11 @@ class PipelineIntegrationTest {
     @Test
     @DisplayName("Pipeline completo - referencia a variable no inicializada produce error")
     fun fullPipelineUninitializedVariableReferenceError() {
-        val code = """
+        val code =
+            """
             let x: number;
             println(x);
-        """.trimIndent()
+            """.trimIndent()
 
         val input = InputSource { "" }
         val lexer = Lexer(StringReader(code), Version.V1_0)
@@ -117,10 +121,11 @@ class PipelineIntegrationTest {
     @Test
     @DisplayName("Pipeline completo - operaciones decimales sin notación científica")
     fun fullPipelineDecimalOperationsWithoutScientificNotation() {
-        val code = """
+        val code =
+            """
             let x: number = 0.1 + 0.2;
             println(x);
-        """.trimIndent()
+            """.trimIndent()
 
         val input = InputSource { "" }
         val lexer = Lexer(StringReader(code), Version.V1_0)

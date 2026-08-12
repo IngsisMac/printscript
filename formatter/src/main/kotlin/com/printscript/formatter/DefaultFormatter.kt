@@ -8,7 +8,6 @@ import com.printscript.ast.Statement
 import java.io.Writer
 
 class DefaultFormatter : Formatter {
-
     override fun format(
         statement: Statement,
         writer: Writer,

@@ -19,4 +19,3 @@ dependencies {
     testImplementation(project(":parser"))
     testImplementation(project(":interpreter"))
 }
-

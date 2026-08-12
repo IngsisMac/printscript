@@ -34,9 +34,10 @@ class VersionTest {
     fun versionFromLanzaIllegalArgumentExceptionAnteIdentificadoresNoReconocidos() {
         val unknownId = "2.0"
 
-        val exception = assertThrows<IllegalArgumentException> {
-            Version.from(unknownId)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                Version.from(unknownId)
+            }
 
         assertEquals("Unknown version: 2.0", exception.message)
     }

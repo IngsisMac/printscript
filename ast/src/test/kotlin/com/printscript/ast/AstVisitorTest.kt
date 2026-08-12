@@ -13,14 +13,23 @@ class AstVisitorTest {
 
     private class TestVisitor : AstVisitor<String> {
         override fun visit(node: Declaration): String = "Declaration:${node.name}"
+
         override fun visit(node: Assignment): String = "Assignment:${node.name}"
+
         override fun visit(node: PrintStatement): String = "PrintStatement"
+
         override fun visit(node: IfStatement): String = "IfStatement"
+
         override fun visit(node: NumberLiteral): String = "NumberLiteral:${node.value}"
+
         override fun visit(node: StringLiteral): String = "StringLiteral:${node.value}"
+
         override fun visit(node: BooleanLiteral): String = "BooleanLiteral:${node.value}"
+
         override fun visit(node: Variable): String = "Variable:${node.name}"
+
         override fun visit(node: BinaryOp): String = "BinaryOp:${node.operator}"
+
         override fun visit(node: CallExpression): String = "CallExpression:${node.name}"
     }
 

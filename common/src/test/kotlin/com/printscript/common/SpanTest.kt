@@ -49,9 +49,10 @@ class SpanTest {
         val start = Position(1, 10)
         val end = Position(1, 5)
 
-        val exception = assertThrows<IllegalArgumentException> {
-            Span(start, end)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                Span(start, end)
+            }
 
         assertEquals("Invalid span: start [1:10] must be before end [1:5]", exception.message)
     }
@@ -62,9 +63,10 @@ class SpanTest {
         val start = Position(2, 1)
         val end = Position(1, 10)
 
-        val exception = assertThrows<IllegalArgumentException> {
-            Span(start, end)
-        }
+        val exception =
+            assertThrows<IllegalArgumentException> {
+                Span(start, end)
+            }
 
         assertEquals("Invalid span: start [2:1] must be before end [1:10]", exception.message)
     }

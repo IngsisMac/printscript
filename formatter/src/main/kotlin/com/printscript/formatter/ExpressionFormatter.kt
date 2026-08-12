@@ -9,9 +9,11 @@ import com.printscript.ast.StringLiteral
 import com.printscript.ast.Variable
 
 object ExpressionFormatter {
-
-    fun format(expression: Expression, config: FormatterConfig): String {
-        return when (expression) {
+    fun format(
+        expression: Expression,
+        config: FormatterConfig,
+    ): String =
+        when (expression) {
             is NumberLiteral -> expression.value
             is StringLiteral -> "\"${expression.value}\""
             is BooleanLiteral -> expression.value.toString()
@@ -19,9 +21,11 @@ object ExpressionFormatter {
             is BinaryOp -> formatBinaryOp(expression, config)
             is CallExpression -> formatCallExpression(expression, config)
         }
-    }
 
-    private fun formatBinaryOp(op: BinaryOp, config: FormatterConfig): String {
+    private fun formatBinaryOp(
+        op: BinaryOp,
+        config: FormatterConfig,
+    ): String {
         val space = if (config.mandatorySpaceSurroundingOperations) " " else ""
         val leftStr = formatChildExpression(op.left, op.operator, isLeft = true, config = config)
         val rightStr = formatChildExpression(op.right, op.operator, isLeft = false, config = config)
@@ -44,7 +48,11 @@ object ExpressionFormatter {
         return childFormatted
     }
 
-    private fun needsParentheses(childOp: String, parentOp: String, isLeft: Boolean): Boolean {
+    private fun needsParentheses(
+        childOp: String,
+        parentOp: String,
+        isLeft: Boolean,
+    ): Boolean {
         val childPrec = precedence(childOp)
         val parentPrec = precedence(parentOp)
 
@@ -53,15 +61,17 @@ object ExpressionFormatter {
         return false
     }
 
-    private fun precedence(op: String): Int {
-        return when (op) {
+    private fun precedence(op: String): Int =
+        when (op) {
             "*", "/" -> 2
             "+", "-" -> 1
             else -> 0
         }
-    }
 
-    private fun formatCallExpression(call: CallExpression, config: FormatterConfig): String {
+    private fun formatCallExpression(
+        call: CallExpression,
+        config: FormatterConfig,
+    ): String {
         val argStr = call.argument?.let { format(it, config) } ?: ""
         return "${call.name}($argStr)"
     }
