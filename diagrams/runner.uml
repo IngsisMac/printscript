@@ -1,0 +1,32 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.runner" {
+
+    class PrintScriptRunner {
+        + execute(source : Reader, version : Version, emitter : OutputEmitter, input : InputSource) : RunResult
+        + format(source : Reader, version : Version, config : FormatterConfig, writer : Writer) : FormatResult
+        + analyze(source : Reader, version : Version, config : LinterConfig) : AnalyzeResult
+    }
+
+    class RunResult {
+        + errors : List<PrintScriptError>
+        + isSuccess : Boolean
+    }
+
+    class FormatResult {
+        + errors : List<PrintScriptError>
+        + isSuccess : Boolean
+    }
+
+    class AnalyzeResult {
+        + warnings : List<PrintScriptError>
+        + isSuccess : Boolean
+    }
+
+    PrintScriptRunner ..> RunResult
+    PrintScriptRunner ..> FormatResult
+    PrintScriptRunner ..> AnalyzeResult
+}
+
+@enduml

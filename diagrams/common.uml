@@ -1,0 +1,55 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.common" {
+
+    class Position {
+        + line : Int
+        + column : Int
+        + compareTo(other : Position) : Int
+    }
+
+    class Span {
+        + start : Position
+        + end : Position
+        + contains(position : Position) : Boolean
+    }
+
+    enum Version {
+        V1_0
+        V1_1
+        + from(versionStr : String) : Version
+    }
+
+    interface OutputEmitter {
+        + emit(message : String)
+    }
+
+    interface InputSource {
+        + readInput(prompt : String) : String
+    }
+
+    interface EnvSource {
+        + readEnv(name : String) : String
+    }
+
+    enum ErrorType {
+        LEXICAL
+        SYNTAX
+        SEMANTIC
+        RUNTIME
+    }
+
+    class PrintScriptError {
+        + message : String
+        + span : Span
+        + type : ErrorType
+    }
+
+    Span *-- "1" Position : start
+    Span *-- "1" Position : end
+    PrintScriptError --> "1" Span : span
+    PrintScriptError --> "1" ErrorType : type
+}
+
+@enduml

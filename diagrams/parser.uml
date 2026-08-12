@@ -1,0 +1,54 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.parser" {
+
+    interface Parser {
+        + hasNext() : Boolean
+        + next() : Statement
+    }
+
+    class DefaultParser {
+        - tokenStream : TokenStream
+        - statementParser : StatementParser
+        + hasNext() : Boolean
+        + next() : Statement
+    }
+
+    class TokenStream {
+        - tokenIterator : Iterator<Token>
+        + peek() : Token
+        + consume() : Token
+        + consumeIf(type : TokenType) : Token
+        + expect(type : TokenType) : Token
+    }
+
+    class StatementParser {
+        - expressionParser : ExpressionParser
+        + parseStatement(tokens : TokenStream) : Statement
+    }
+
+    class ExpressionParser {
+        - prefixParsers : Map<TokenType, PrefixParser>
+        - infixParsers : Map<TokenType, InfixParser>
+        + parseExpression(tokens : TokenStream, precedence : Int) : Expression
+    }
+
+    interface PrefixParser {
+        + parse(tokens : TokenStream, parser : ExpressionParser) : Expression
+    }
+
+    interface InfixParser {
+        + getPrecedence() : Int
+        + parse(tokens : TokenStream, left : Expression, parser : ExpressionParser) : Expression
+    }
+
+    Parser <|.. DefaultParser
+    DefaultParser --> "1" TokenStream : tokenStream
+    DefaultParser --> "1" StatementParser : statementParser
+    StatementParser --> "1" ExpressionParser : expressionParser
+    ExpressionParser --> "*" PrefixParser : prefixParsers
+    ExpressionParser --> "*" InfixParser : infixParsers
+}
+
+@enduml

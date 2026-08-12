@@ -1,0 +1,44 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.token" {
+
+    enum TokenType {
+        LET
+        CONST
+        IF
+        ELSE
+        PRINTLN
+        READ_INPUT
+        READ_ENV
+        NUMBER_TYPE
+        STRING_TYPE
+        BOOLEAN_TYPE
+        IDENTIFIER
+        NUMBER_LITERAL
+        STRING_LITERAL
+        BOOLEAN_LITERAL
+        PLUS
+        MINUS
+        STAR
+        SLASH
+        ASSIGN
+        COLON
+        SEMICOLON
+        LPAREN
+        RPAREN
+        LBRACE
+        RBRACE
+        EOF
+    }
+
+    class Token {
+        + type : TokenType
+        + value : String
+        + span : Span
+    }
+
+    Token --> "1" TokenType : type
+}
+
+@enduml

@@ -1,0 +1,59 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.cli" {
+
+    class CLIApp {
+        + main(args : Array<String>)
+    }
+
+    enum Operation {
+        VALIDATION
+        EXECUTION
+        FORMATTING
+        ANALYZING
+    }
+
+    class CLIOptions {
+        + operation : Operation
+        + sourceFile : File
+        + version : Version
+        + configFile : File
+    }
+
+    interface CommandHandler {
+        + run(options : CLIOptions) : Int
+    }
+
+    class ExecutionCommandHandler {
+        + run(options : CLIOptions) : Int
+    }
+
+    class ValidationCommandHandler {
+        + run(options : CLIOptions) : Int
+    }
+
+    class FormattingCommandHandler {
+        + run(options : CLIOptions) : Int
+    }
+
+    class AnalyzingCommandHandler {
+        + run(options : CLIOptions) : Int
+    }
+
+    CLIApp --> CLIOptions : parses
+    CLIApp --> CommandHandler : dispatches
+    CLIOptions --> Operation
+
+    CommandHandler <|.. ExecutionCommandHandler
+    CommandHandler <|.. ValidationCommandHandler
+    CommandHandler <|.. FormattingCommandHandler
+    CommandHandler <|.. AnalyzingCommandHandler
+
+    ExecutionCommandHandler ..> PrintScriptRunner
+    ValidationCommandHandler ..> PrintScriptRunner
+    FormattingCommandHandler ..> PrintScriptRunner
+    AnalyzingCommandHandler ..> PrintScriptRunner
+}
+
+@enduml

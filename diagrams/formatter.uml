@@ -1,0 +1,60 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.formatter" {
+
+    interface Formatter {
+        + format(statement : Statement, writer : Writer)
+    }
+
+    class DefaultFormatter {
+        - config : FormatterConfig
+        - rules : List<FormattingRule>
+        + format(statement : Statement, writer : Writer)
+    }
+
+    class FormatterConfig {
+        + spaceBeforeColon : Int
+        + spaceAfterColon : Int
+        + spaceAroundEquals : Int
+        + newlineBeforePrintln : Int
+        + indentSpaces : Int
+        + ifBraceSameLine : Boolean
+    }
+
+    interface FormattingRule {
+        + appliesTo(statement : Statement) : Boolean
+        + format(statement : Statement, config : FormatterConfig, writer : Writer)
+    }
+
+    class DeclarationFormattingRule {
+        + appliesTo(statement : Statement) : Boolean
+        + format(statement : Statement, config : FormatterConfig, writer : Writer)
+    }
+
+    class AssignationFormattingRule {
+        + appliesTo(statement : Statement) : Boolean
+        + format(statement : Statement, config : FormatterConfig, writer : Writer)
+    }
+
+    class PrintFormattingRule {
+        + appliesTo(statement : Statement) : Boolean
+        + format(statement : Statement, config : FormatterConfig, writer : Writer)
+    }
+
+    class IfFormattingRule {
+        + appliesTo(statement : Statement) : Boolean
+        + format(statement : Statement, config : FormatterConfig, writer : Writer)
+    }
+
+    Formatter <|.. DefaultFormatter
+    DefaultFormatter --> "1" FormatterConfig : config
+    DefaultFormatter --> "*" FormattingRule : rules
+
+    FormattingRule <|.. DeclarationFormattingRule
+    FormattingRule <|.. AssignationFormattingRule
+    FormattingRule <|.. PrintFormattingRule
+    FormattingRule <|.. IfFormattingRule
+}
+
+@enduml

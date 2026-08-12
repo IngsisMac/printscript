@@ -1,0 +1,53 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.linter" {
+
+    interface Linter {
+        + analyze(statement : Statement) : List<PrintScriptError>
+    }
+
+    class DefaultLinter {
+        - config : LinterConfig
+        - rules : List<LinterRule>
+        + analyze(statement : Statement) : List<PrintScriptError>
+    }
+
+    enum IdentifierCase {
+        CAMEL_CASE
+        SNAKE_CASE
+    }
+
+    class LinterConfig {
+        + identifierCase : IdentifierCase
+        + enforceSimplePrintlnExpression : Boolean
+        + enforceSimpleReadInputExpression : Boolean
+    }
+
+    interface LinterRule {
+        + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
+    }
+
+    class IdentifierNamingRule {
+        + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
+    }
+
+    class PrintlnExpressionRule {
+        + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
+    }
+
+    class ReadInputExpressionRule {
+        + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
+    }
+
+    Linter <|.. DefaultLinter
+    DefaultLinter --> "1" LinterConfig : config
+    DefaultLinter --> "*" LinterRule : rules
+    LinterConfig --> "1" IdentifierCase : identifierCase
+
+    LinterRule <|.. IdentifierNamingRule
+    LinterRule <|.. PrintlnExpressionRule
+    LinterRule <|.. ReadInputExpressionRule
+}
+
+@enduml

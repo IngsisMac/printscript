@@ -1,0 +1,139 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.common" {
+    enum Version {
+        V1_0
+        V1_1
+    }
+    class Position {
+        + line : Int
+        + column : Int
+    }
+    class Span {
+        + start : Position
+        + end : Position
+    }
+    interface OutputEmitter {
+        + emit(message : String)
+    }
+    interface InputSource {
+        + readInput(prompt : String) : String
+    }
+    interface EnvSource {
+        + readEnv(name : String) : String
+    }
+}
+
+package "com.printscript.token" {
+    enum TokenType {
+        LET
+        CONST
+        IF
+        ELSE
+        PRINTLN
+        READ_INPUT
+        READ_ENV
+        NUMBER_TYPE
+        STRING_TYPE
+        BOOLEAN_TYPE
+        IDENTIFIER
+        NUMBER_LITERAL
+        STRING_LITERAL
+        BOOLEAN_LITERAL
+        PLUS
+        MINUS
+        STAR
+        SLASH
+        ASSIGN
+        COLON
+        SEMICOLON
+        LPAREN
+        RPAREN
+        LBRACE
+        RBRACE
+        EOF
+    }
+    class Token {
+        + type : TokenType
+        + value : String
+        + span : Span
+    }
+}
+
+package "com.printscript.ast" {
+    interface Statement {
+        + span : Span
+    }
+    interface Expression {
+        + span : Span
+    }
+}
+
+package "com.printscript.lexer" {
+    interface Lexer {
+        + hasNext() : Boolean
+        + next() : Token
+    }
+}
+
+package "com.printscript.parser" {
+    interface Parser {
+        + hasNext() : Boolean
+        + next() : Statement
+    }
+}
+
+package "com.printscript.interpreter" {
+    interface Interpreter {
+        + execute(statement : Statement)
+    }
+}
+
+package "com.printscript.formatter" {
+    interface Formatter {
+        + format(statement : Statement, writer : Writer)
+    }
+}
+
+package "com.printscript.linter" {
+    interface Linter {
+        + analyze(statement : Statement) : List<PrintScriptError>
+    }
+}
+
+package "com.printscript.runner" {
+    class PrintScriptRunner {
+        + execute(source : Reader, version : Version, emitter : OutputEmitter, input : InputSource) : RunResult
+        + format(source : Reader, version : Version, config : FormatterConfig, writer : Writer) : FormatResult
+        + analyze(source : Reader, version : Version, config : LinterConfig) : AnalyzeResult
+    }
+}
+
+Token --> TokenType
+Token --> Span
+Statement --> Span
+Expression --> Span
+
+Lexer ..|> Iterator
+Lexer ..> Token
+
+Parser ..|> Iterator
+Parser ..> Lexer
+Parser ..> Statement
+
+Interpreter ..> Statement
+Interpreter ..> OutputEmitter
+Interpreter ..> InputSource
+Interpreter ..> EnvSource
+
+Formatter ..> Statement
+Linter ..> Statement
+
+PrintScriptRunner ..> Lexer
+PrintScriptRunner ..> Parser
+PrintScriptRunner ..> Interpreter
+PrintScriptRunner ..> Formatter
+PrintScriptRunner ..> Linter
+
+@enduml
