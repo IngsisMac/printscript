@@ -118,8 +118,7 @@ data class StringValue(
 ) : Value() {
     override val typeName = "string"
 
-    override fun toNumber(span: Span): BigDecimal =
-        throw InterpreterException("Cannot convert string to number", span)
+    override fun toNumber(span: Span): BigDecimal = throw InterpreterException("Cannot convert string to number", span)
 
     override fun toString() = value
 }
@@ -129,8 +128,7 @@ data class BooleanValue(
 ) : Value() {
     override val typeName = "boolean"
 
-    override fun toNumber(span: Span): BigDecimal =
-        if (value) BigDecimal.ONE else BigDecimal.ZERO
+    override fun toNumber(span: Span): BigDecimal = if (value) BigDecimal.ONE else BigDecimal.ZERO
 
     override fun toString() = value.toString()
 }
