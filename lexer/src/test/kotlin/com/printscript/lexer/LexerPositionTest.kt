@@ -4,12 +4,18 @@ import com.printscript.common.Position
 import com.printscript.common.Version
 import com.printscript.token.TokenType
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.StringReader
 
 class LexerPositionTest {
-    private val version = Version.V1_0
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        version = Version.V1_0
+    }
 
     private fun createLexer(source: String): Lexer = Lexer(StringReader(source), version)
 
@@ -17,6 +23,7 @@ class LexerPositionTest {
     @DisplayName("Cada token conoce su posición de inicio y de fin (Span)")
     fun cadaTokenConoceSuPosicionDeInicioYFin() {
         val lexer = createLexer("let x: number = 5;")
+
         val firstToken = lexer.next()
 
         assertEquals(TokenType.LET, firstToken.type)

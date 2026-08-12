@@ -5,20 +5,23 @@ import com.printscript.common.OutputEmitter
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.util.ArrayList
 
-/**
- * Tests de streaming y memoria (suite memoryTest con max heap 7 MB).
- * PS-MEM-001: Valida que el pipeline sea streaming de punta a punta (32.768 impresiones sin OOM).
- * PS-MEM-002: Valida la captura de OutOfMemoryError produciendo la cadena "Java heap space".
- *
- * TODO: Deshardcodear los datos de este test (mensajes/líneas/número de repeticiones) en el futuro
- * para parametrizar y expandir con casos adicionales para incrementar la cobertura.
- */
 @Disabled("Desactivado temporalmente a pedido del usuario hasta implementar mas alla de los happy paths")
 class MemoryStreamingTest {
+    private lateinit var input: InputSource
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        input = InputSource { "" }
+        version = Version.V1_0
+    }
+
     class PrintCounter(
         private val expectedMessage: String,
     ) : OutputEmitter {
@@ -43,15 +46,15 @@ class MemoryStreamingTest {
     }
 
     @Test
-    fun `testWithCounter - streaming pipeline execution with 7MB heap`() {
+    @DisplayName("PS-MEM-001 | Ejecución streaming en pipeline con heap de 7MB")
+    fun testWithCounterStreamingPipelineExecutionWith7MBHeap() {
         val stream = MockInputStream()
         val counter = PrintCounter(MockInputStream.MESSAGE)
-        val input = InputSource { "" }
 
         val result =
             PrintScriptRunner.execute(
                 source = stream.reader(),
-                version = Version.V1_0,
+                version = version,
                 output = counter,
                 input = input,
             )
@@ -61,16 +64,15 @@ class MemoryStreamingTest {
     }
 
     @Test
-    fun `testWithCollector - captures OutOfMemoryError and reports Java heap space`() {
-        // Usar 64K líneas para garantizar el desborde de memoria (heap max 7 MB) al acumular en PrintCollector
+    @DisplayName("PS-MEM-002 | Captura de OutOfMemoryError reportando Java heap space")
+    fun testWithCollectorCapturesOutOfMemoryErrorAndReportsJavaHeapSpace() {
         val stream = MockInputStream(numberOfLines = 64 * 1024)
         val collector = PrintCollector()
-        val input = InputSource { "" }
 
         val result =
             PrintScriptRunner.execute(
                 source = stream.reader(),
-                version = Version.V1_0,
+                version = version,
                 output = collector,
                 input = input,
             )

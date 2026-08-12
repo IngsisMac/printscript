@@ -6,11 +6,20 @@ import com.printscript.common.Version
 import com.printscript.token.Token
 import com.printscript.token.TokenType
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class ParserErrorTest {
-    private val defaultSpan = Span(Position(1, 1), Position(1, 10))
+    private lateinit var defaultSpan: Span
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        defaultSpan = Span(Position(1, 1), Position(1, 10))
+        version = Version.V1_0
+    }
 
     private fun token(
         type: TokenType,
@@ -18,9 +27,9 @@ class ParserErrorTest {
         span: Span = defaultSpan,
     ): Token = Token(type, lexeme, span)
 
-    // PS-PAR-008 — Falta el punto y coma
     @Test
-    fun `missing semicolon throws ParseException`() {
+    @DisplayName("PS-PAR-008 | Falta el punto y coma lanza ParseException")
+    fun missingSemicolonThrowsParseException() {
         val tokens =
             listOf(
                 token(TokenType.LET, "let"),
@@ -30,15 +39,16 @@ class ParserErrorTest {
                 token(TokenType.EQUAL, "="),
                 token(TokenType.NUMBER_LITERAL, "5"),
             ).iterator()
+        val parser = Parser(tokens, version)
 
-        val parser = Parser(tokens, Version.V1_0)
         val ex = assertThrows<ParseException> { parser.parse().next() }
+
         assertTrue(ex.rawMessage.contains("Expected SEMICOLON"))
     }
 
-    // PS-PAR-009 — Paréntesis sin cerrar
     @Test
-    fun `unclosed parenthesis in println throws ParseException`() {
+    @DisplayName("PS-PAR-009 | Paréntesis sin cerrar en println lanza ParseException")
+    fun unclosedParenthesisInPrintlnThrowsParseException() {
         val tokens =
             listOf(
                 token(TokenType.PRINTLN, "println"),
@@ -46,28 +56,32 @@ class ParserErrorTest {
                 token(TokenType.STRING_LITERAL, "hola"),
                 token(TokenType.SEMICOLON, ";"),
             ).iterator()
+        val parser = Parser(tokens, version)
 
-        val parser = Parser(tokens, Version.V1_0)
         val ex = assertThrows<ParseException> { parser.parse().next() }
+
         assertTrue(ex.rawMessage.contains("Expected RPAREN"))
     }
 
     @Test
-    fun `unexpected token at statement start throws ParseException`() {
+    @DisplayName("Token inesperado al inicio de la sentencia lanza ParseException")
+    fun unexpectedTokenAtStatementStartThrowsParseException() {
         val tokens =
             listOf(
                 token(TokenType.PLUS, "+"),
                 token(TokenType.NUMBER_LITERAL, "5"),
                 token(TokenType.SEMICOLON, ";"),
             ).iterator()
+        val parser = Parser(tokens, version)
 
-        val parser = Parser(tokens, Version.V1_0)
         val ex = assertThrows<ParseException> { parser.parse().next() }
+
         assertTrue(ex.rawMessage.contains("Unexpected token"))
     }
 
     @Test
-    fun `missing colon in declaration throws ParseException`() {
+    @DisplayName("Falta de dos puntos en declaración lanza ParseException")
+    fun missingColonInDeclarationThrowsParseException() {
         val tokens =
             listOf(
                 token(TokenType.LET, "let"),
@@ -75,9 +89,10 @@ class ParserErrorTest {
                 token(TokenType.NUMBER, "number"),
                 token(TokenType.SEMICOLON, ";"),
             ).iterator()
+        val parser = Parser(tokens, version)
 
-        val parser = Parser(tokens, Version.V1_0)
         val ex = assertThrows<ParseException> { parser.parse().next() }
+
         assertTrue(ex.rawMessage.contains("Expected COLON"))
     }
 }

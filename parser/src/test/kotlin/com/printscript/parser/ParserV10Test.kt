@@ -15,11 +15,20 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class ParserV10Test {
-    private val defaultSpan = Span(Position(1, 1), Position(1, 10))
+    private lateinit var defaultSpan: Span
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        defaultSpan = Span(Position(1, 1), Position(1, 10))
+        version = Version.V1_0
+    }
 
     private fun token(
         type: TokenType,
@@ -27,49 +36,54 @@ class ParserV10Test {
     ): Token = Token(type, lexeme, defaultSpan)
 
     private fun parseString(source: String): List<com.printscript.ast.Statement> =
-        Parser(com.printscript.lexer.Lexer(java.io.StringReader(source), Version.V1_0), Version.V1_0)
+        Parser(com.printscript.lexer.Lexer(java.io.StringReader(source), version), version)
             .parse()
             .asSequence()
             .toList()
 
-    // PS-PAR-001 — Declaración con inicialización produce un Declaration
     @Test
-    fun `parse declaration with initialization`() {
+    @DisplayName("PS-PAR-001 | Declaración con inicialización produce un Declaration")
+    fun parseDeclarationWithInitialization() {
         val decl = parseString("let x: number = 5;")[0] as Declaration
+
         assertEquals("x", decl.name)
         assertEquals("number", decl.type)
         assertFalse(decl.isConst)
         assertEquals("5", (decl.value as NumberLiteral).value)
     }
 
-    // PS-PAR-002 — Declaración sin inicialización es válida
     @Test
-    fun `parse declaration without initialization`() {
+    @DisplayName("PS-PAR-002 | Declaración sin inicialización es válida")
+    fun parseDeclarationWithoutInitialization() {
         val decl = parseString("let x: number;")[0] as Declaration
+
         assertEquals("x", decl.name)
         assertEquals("number", decl.type)
         assertNull(decl.value)
     }
 
-    // PS-PAR-003 — Asignación a variable ya declarada
     @Test
-    fun `parse assignment`() {
+    @DisplayName("PS-PAR-003 | Asignación a variable ya declarada")
+    fun parseAssignment() {
         val assign = parseString("x = 5;")[0] as Assignment
+
         assertEquals("x", assign.name)
         assertEquals("5", (assign.value as NumberLiteral).value)
     }
 
-    // PS-PAR-004 — println produce un PrintStatement
     @Test
-    fun `parse print statement`() {
+    @DisplayName("PS-PAR-004 | println produce un PrintStatement")
+    fun parsePrintStatement() {
         val printStmt = parseString("println(\"hola\");")[0] as PrintStatement
+
         assertEquals("hola", (printStmt.expression as StringLiteral).value)
     }
 
-    // PS-PAR-005 — La multiplicación liga más fuerte que la suma (2 + 3 * 4)
     @Test
-    fun `parse expression multiplication higher precedence than addition`() {
+    @DisplayName("PS-PAR-005 | La multiplicación liga más fuerte que la suma (2 + 3 * 4)")
+    fun parseExpressionMultiplicationHigherPrecedenceThanAddition() {
         val decl = parseString("let x: number = 2 + 3 * 4;")[0] as Declaration
+
         val rootOp = decl.value as BinaryOp
         assertEquals("+", rootOp.operator)
         assertEquals("2", (rootOp.left as NumberLiteral).value)
@@ -80,10 +94,11 @@ class ParserV10Test {
         assertEquals("4", (rightOp.right as NumberLiteral).value)
     }
 
-    // PS-PAR-006 — Los operadores de igual precedencia asocian a izquierda (10 - 3 - 2)
     @Test
-    fun `parse expression left associativity for equal precedence`() {
+    @DisplayName("PS-PAR-006 | Los operadores de igual precedencia asocian a izquierda (10 - 3 - 2)")
+    fun parseExpressionLeftAssociativityForEqualPrecedence() {
         val decl = parseString("let x: number = 10 - 3 - 2;")[0] as Declaration
+
         val rootOp = decl.value as BinaryOp
         assertEquals("-", rootOp.operator)
         assertEquals("2", (rootOp.right as NumberLiteral).value)
@@ -94,10 +109,11 @@ class ParserV10Test {
         assertEquals("3", (leftOp.right as NumberLiteral).value)
     }
 
-    // PS-PAR-007 — Los paréntesis cambian la precedencia ((2 + 3) * 4)
     @Test
-    fun `parse expression parentheses override precedence`() {
+    @DisplayName("PS-PAR-007 | Los paréntesis cambian la precedencia ((2 + 3) * 4)")
+    fun parseExpressionParenthesesOverridePrecedence() {
         val decl = parseString("let x: number = (2 + 3) * 4;")[0] as Declaration
+
         val rootOp = decl.value as BinaryOp
         assertEquals("*", rootOp.operator)
 
@@ -108,9 +124,9 @@ class ParserV10Test {
         assertEquals("4", (rootOp.right as NumberLiteral).value)
     }
 
-    // PS-PAR-010 — const es inválido en 1.0
     @Test
-    fun `const is invalid in version 1 0`() {
+    @DisplayName("PS-PAR-010 | const es inválido en 1.0")
+    fun constIsInvalidInVersion10() {
         val tokens =
             listOf(
                 token(TokenType.IDENTIFIER, "const"),
@@ -121,15 +137,16 @@ class ParserV10Test {
                 token(TokenType.NUMBER_LITERAL, "5"),
                 token(TokenType.SEMICOLON, ";"),
             ).iterator()
+        val parser = Parser(tokens, version)
 
-        val parser = Parser(tokens, Version.V1_0)
         val ex = assertThrows<ParseException> { parser.parse().next() }
+
         assertTrue(ex.rawMessage.contains("const is not supported in version 1.0"))
     }
 
-    // PS-PAR-011 — if es inválido en 1.0
     @Test
-    fun `if is invalid in version 1 0`() {
+    @DisplayName("PS-PAR-011 | if es inválido en 1.0")
+    fun ifIsInvalidInVersion10() {
         val tokens =
             listOf(
                 token(TokenType.IDENTIFIER, "if"),
@@ -144,9 +161,10 @@ class ParserV10Test {
                 token(TokenType.SEMICOLON, ";"),
                 token(TokenType.RBRACE, "}"),
             ).iterator()
+        val parser = Parser(tokens, version)
 
-        val parser = Parser(tokens, Version.V1_0)
         val ex = assertThrows<ParseException> { parser.parse().next() }
+
         assertTrue(ex.rawMessage.contains("if statements are not supported in version 1.0"))
     }
 }

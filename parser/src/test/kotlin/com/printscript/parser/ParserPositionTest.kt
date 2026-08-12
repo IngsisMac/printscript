@@ -10,9 +10,18 @@ import com.printscript.common.Version
 import com.printscript.token.Token
 import com.printscript.token.TokenType
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class ParserPositionTest {
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        version = Version.V1_0
+    }
+
     private fun pos(
         line: Int,
         col: Int,
@@ -33,7 +42,8 @@ class ParserPositionTest {
     ): Token = Token(type, lexeme, span(1, startCol, 1, endCol))
 
     @Test
-    fun `declaration span spans from start keyword to semicolon`() {
+    @DisplayName("El span de declaración abarca desde la palabra clave hasta el punto y coma")
+    fun declarationSpanSpansFromStartKeywordToSemicolon() {
         val tokens =
             listOf(
                 token(TokenType.LET, "let", 1, 4),
@@ -45,7 +55,7 @@ class ParserPositionTest {
                 token(TokenType.SEMICOLON, ";", 18, 19),
             ).iterator()
 
-        val parser = Parser(tokens, Version.V1_0)
+        val parser = Parser(tokens, version)
         val decl = parser.parse().next() as Declaration
 
         assertEquals(pos(1, 1), decl.span.start)
@@ -53,7 +63,8 @@ class ParserPositionTest {
     }
 
     @Test
-    fun `assignment span spans from identifier to semicolon`() {
+    @DisplayName("El span de asignación abarca desde el identificador hasta el punto y coma")
+    fun assignmentSpanSpansFromIdentifierToSemicolon() {
         val tokens =
             listOf(
                 token(TokenType.IDENTIFIER, "x", 3, 4),
@@ -62,7 +73,7 @@ class ParserPositionTest {
                 token(TokenType.SEMICOLON, ";", 9, 10),
             ).iterator()
 
-        val parser = Parser(tokens, Version.V1_0)
+        val parser = Parser(tokens, version)
         val assign = parser.parse().next() as Assignment
 
         assertEquals(pos(1, 3), assign.span.start)
@@ -70,7 +81,8 @@ class ParserPositionTest {
     }
 
     @Test
-    fun `print statement span spans from println to semicolon`() {
+    @DisplayName("El span de print statement abarca desde println hasta el punto y coma")
+    fun printStatementSpanSpansFromPrintlnToSemicolon() {
         val tokens =
             listOf(
                 token(TokenType.PRINTLN, "println", 1, 8),
@@ -80,7 +92,7 @@ class ParserPositionTest {
                 token(TokenType.SEMICOLON, ";", 14, 15),
             ).iterator()
 
-        val parser = Parser(tokens, Version.V1_0)
+        val parser = Parser(tokens, version)
         val printStmt = parser.parse().next() as PrintStatement
 
         assertEquals(pos(1, 1), printStmt.span.start)
@@ -88,7 +100,8 @@ class ParserPositionTest {
     }
 
     @Test
-    fun `binary op span spans from left operand start to right operand end`() {
+    @DisplayName("El span del operador binario abarca del operando izquierdo al operando derecho")
+    fun binaryOpSpanSpansFromLeftOperandStartToRightOperandEnd() {
         val tokens =
             listOf(
                 token(TokenType.LET, "let", 1, 4),
@@ -102,7 +115,7 @@ class ParserPositionTest {
                 token(TokenType.SEMICOLON, ";", 22, 23),
             ).iterator()
 
-        val parser = Parser(tokens, Version.V1_0)
+        val parser = Parser(tokens, version)
         val decl = parser.parse().next() as Declaration
         val op = decl.value as BinaryOp
 

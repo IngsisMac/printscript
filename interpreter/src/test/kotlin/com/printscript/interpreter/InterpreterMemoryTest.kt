@@ -10,16 +10,28 @@ import com.printscript.common.Span
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class InterpreterMemoryTest {
+    private lateinit var input: InputSource
+    private lateinit var dummySpan: Span
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        input = InputSource { "" }
+        dummySpan = Span(Position(1, 1), Position(1, 1))
+        version = Version.V1_0
+    }
+
     @Test
-    fun `PS-INT-019 - interpreter does not accumulate statements`() {
+    @DisplayName("PS-INT-019 | Intérprete no acumula sentencias en memoria")
+    fun interpreterDoesNotAccumulateStatements() {
         val totalStatements = 32768
         var count = 0
         val emitter = OutputEmitter { count++ }
-        val input = InputSource { "" }
-        val dummySpan = Span(Position(1, 1), Position(1, 1))
 
         val statementIterator =
             object : Iterator<Statement> {
@@ -37,7 +49,7 @@ class InterpreterMemoryTest {
                 }
             }
 
-        val interpreter = Interpreter(Version.V1_0, emitter, input)
+        val interpreter = Interpreter(version, emitter, input)
         val errors = interpreter.execute(statementIterator)
 
         assertTrue(errors.isEmpty(), "Expected 0 errors but got: $errors")

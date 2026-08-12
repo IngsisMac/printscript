@@ -3,12 +3,18 @@ package com.printscript.lexer
 import com.printscript.common.Version
 import com.printscript.token.TokenType
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.StringReader
 
 class LexerV10Test {
-    private val version = Version.V1_0
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        version = Version.V1_0
+    }
 
     private fun createLexer(source: String): Lexer = Lexer(StringReader(source), version)
 
@@ -16,6 +22,7 @@ class LexerV10Test {
     @DisplayName("Declaración simple produce la secuencia de tokens esperada")
     fun declaracionSimpleProduceSecuenciaDeTokensEsperada() {
         val lexer = createLexer("let x: number = 5;")
+
         val tokens = lexer.asSequence().toList()
 
         val expectedTypes =
@@ -28,7 +35,6 @@ class LexerV10Test {
                 TokenType.NUMBER_LITERAL,
                 TokenType.SEMICOLON,
             )
-
         assertEquals(expectedTypes, tokens.map { it.type })
         assertEquals("x", tokens[1].lexeme)
         assertEquals("5", tokens[5].lexeme)
@@ -44,6 +50,7 @@ class LexerV10Test {
             """.trimIndent()
 
         val lexer = createLexer(code)
+
         val stringTokens = lexer.asSequence().filter { it.type == TokenType.STRING_LITERAL }.toList()
 
         assertEquals(2, stringTokens.size)
@@ -61,6 +68,7 @@ class LexerV10Test {
             """.trimIndent()
 
         val lexer = createLexer(code)
+
         val numberTokens = lexer.asSequence().filter { it.type == TokenType.NUMBER_LITERAL }.toList()
 
         assertEquals(2, numberTokens.size)
@@ -72,6 +80,7 @@ class LexerV10Test {
     @DisplayName("Los cuatro operadores aritméticos se reconocen en orden")
     fun cuatroOperadoresAritmeticosSeReconocenEnOrden() {
         val lexer = createLexer("let a: number = 1 + 2 - 3 * 4 / 5;")
+
         val opTokens =
             lexer
                 .asSequence()
@@ -100,6 +109,7 @@ class LexerV10Test {
     @DisplayName("println es un token propio de tipo PRINTLN y no un identificador")
     fun printlnEsTokenPropioYNoIdentificador() {
         val lexer = createLexer("println(5);")
+
         val firstToken = lexer.next()
 
         assertEquals(TokenType.PRINTLN, firstToken.type)
@@ -110,6 +120,7 @@ class LexerV10Test {
     @DisplayName("En versión 1.0 const no es keyword y se reconoce como identificador")
     fun enVersion10ConstSeReconoceComoIdentificador() {
         val lexer = createLexer("const x: number = 5;")
+
         val firstToken = lexer.next()
 
         assertEquals(TokenType.IDENTIFIER, firstToken.type)

@@ -4,6 +4,8 @@ import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
@@ -11,6 +13,19 @@ import java.io.FileReader
 import java.util.stream.Stream
 
 class GoldenFilesTest {
+    private lateinit var output: StringBuilder
+    private lateinit var emitter: OutputEmitter
+    private lateinit var input: InputSource
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        output = StringBuilder()
+        emitter = OutputEmitter { output.append(it) }
+        input = InputSource { "" }
+        version = Version.V1_0
+    }
+
     data class GoldenTestCase(
         val name: String,
         val inputPath: File,
@@ -38,14 +53,12 @@ class GoldenFilesTest {
 
     @ParameterizedTest
     @MethodSource("goldenTestCases")
-    fun `run golden validation test case`(testCase: GoldenTestCase) {
-        val output = StringBuilder()
-        val emitter = OutputEmitter { output.append(it) }
-        val input = InputSource { "" }
-
+    @DisplayName("Ejecuta caso de prueba golden file y verifica reporte de errores")
+    fun runGoldenValidationTestCase(testCase: GoldenTestCase) {
         val reader = FileReader(testCase.inputPath)
-        val result = PrintScriptRunner.execute(reader, Version.V1_0, emitter, input)
         val expectedError = testCase.expectedErrorsPath.readText().trim()
+
+        val result = PrintScriptRunner.execute(reader, version, emitter, input)
 
         verifyExpectedError(result, expectedError, testCase.name)
     }

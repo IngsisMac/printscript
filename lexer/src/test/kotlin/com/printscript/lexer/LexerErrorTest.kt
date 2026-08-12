@@ -4,12 +4,18 @@ import com.printscript.common.Position
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.StringReader
 
 class LexerErrorTest {
-    private val version = Version.V1_0
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        version = Version.V1_0
+    }
 
     private fun createLexer(source: String): Lexer = Lexer(StringReader(source), version)
 

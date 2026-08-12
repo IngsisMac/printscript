@@ -2,12 +2,18 @@ package com.printscript.lexer
 
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.Reader
 
 class LexerLazyTest {
-    private val version = Version.V1_0
+    private lateinit var version: Version
+
+    @BeforeEach
+    fun setUp() {
+        version = Version.V1_0
+    }
 
     private class TrackedReader(
         private val content: String,
@@ -47,11 +53,9 @@ class LexerLazyTest {
         val reader = TrackedReader(largeSource)
         val lexer = Lexer(reader, version)
 
-        // Read only first 5 tokens
         val firstFiveTokens = (1..5).map { lexer.next() }
 
         assertEquals(5, firstFiveTokens.size)
-        // Ensure reader hasn't been read to the end (32768 lines is ~600,000 chars, we only read ~30 chars)
         assertEquals(true, reader.charactersRead < 200)
     }
 }

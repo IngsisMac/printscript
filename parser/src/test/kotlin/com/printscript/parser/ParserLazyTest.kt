@@ -7,24 +7,36 @@ import com.printscript.common.Version
 import com.printscript.token.Token
 import com.printscript.token.TokenType
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class ParserLazyTest {
-    private val defaultSpan = Span(Position(1, 1), Position(1, 10))
+    private lateinit var defaultSpan: Span
+    private lateinit var version: Version
 
-    // PS-PAR-012 & PS-PAR-013 — Lazy evaluation and bounded token lookahead
+    @BeforeEach
+    fun setUp() {
+        defaultSpan = Span(Position(1, 1), Position(1, 10))
+        version = Version.V1_0
+    }
+
     @Test
-    fun `parser consumes tokens lazily statement by statement`() {
+    @DisplayName("PS-PAR-012 | Parser consume tokens de forma perezosa sentencia por sentencia")
+    fun parserConsumesTokensLazilyStatementByStatement() {
         var count = 0
         val tokens = createLazyStream { count++ }
 
-        val iterator = Parser(tokens, Version.V1_0).parse()
+        val iterator = Parser(tokens, version).parse()
+
         assertTrue(iterator.hasNext())
         org.junit.jupiter.api.Assertions
             .assertNotNull(iterator.next() as PrintStatement)
         assertTrue(count <= 10, "Consumed count ($count) exceeds limit")
+
         assertTrue(iterator.hasNext())
         iterator.next()
+
         assertTrue(count <= 15, "Consumed count ($count) exceeds limit")
     }
 
