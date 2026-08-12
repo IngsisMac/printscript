@@ -62,4 +62,26 @@ object PrintScriptRunner {
         } catch (e: OutOfMemoryError) {
             OOM_RESULT
         }
+
+    fun format(
+        source: Reader,
+        version: Version,
+        config: Map<String, Any?> = emptyMap(),
+        writer: java.io.Writer,
+    ): ExecutionResult =
+        try {
+            val lexer = Lexer(source, version)
+            val parser = Parser(lexer, version)
+            val statements = parser.parse()
+            val formatter = com.printscript.formatter.DefaultFormatter()
+            val formatterConfig = com.printscript.formatter.FormatterConfig.fromMap(config)
+            for (statement in statements) {
+                formatter.format(statement, writer, formatterConfig)
+            }
+            ExecutionResult(emptyList())
+        } catch (e: ParseException) {
+            ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
+        } catch (e: OutOfMemoryError) {
+            OOM_RESULT
+        }
 }
