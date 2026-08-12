@@ -40,12 +40,25 @@ jacoco {
 }
 
 tasks.withType<Test>().configureEach {
-    finalizedBy("jacocoTestReport")
+    finalizedBy("jacocoTestReport", "jacocoTestCoverageVerification")
 }
 
 tasks.withType<JacocoReport>().configureEach {
     reports {
         xml.required.set(true)
         html.required.set(true)
+    }
+}
+
+tasks.withType<JacocoCoverageVerification>().configureEach {
+    violationRules {
+        rule {
+            element = "BUNDLE"
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = "0.80".toBigDecimal()
+            }
+        }
     }
 }
