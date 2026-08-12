@@ -63,12 +63,13 @@ class StatementTest {
         val thenStmt = PrintStatement(StringLiteral("si", dummySpan), dummySpan)
         val elseStmt = PrintStatement(StringLiteral("no", dummySpan), dummySpan)
 
-        val ifWithElse = IfStatement(
-            condition = BooleanLiteral(true, dummySpan),
-            thenBranch = listOf(thenStmt),
-            elseBranch = listOf(elseStmt),
-            span = dummySpan,
-        )
+        val ifWithElse =
+            IfStatement(
+                condition = BooleanLiteral(true, dummySpan),
+                thenBranch = listOf(thenStmt),
+                elseBranch = listOf(elseStmt),
+                span = dummySpan,
+            )
 
         assertEquals(1, ifWithElse.thenBranch.size)
         assertEquals(1, ifWithElse.elseBranch?.size)
@@ -79,12 +80,13 @@ class StatementTest {
     fun ifStatementAdmiteRamaElseNula() {
         val thenStmt = PrintStatement(StringLiteral("si", dummySpan), dummySpan)
 
-        val ifWithoutElse = IfStatement(
-            condition = BooleanLiteral(false, dummySpan),
-            thenBranch = listOf(thenStmt),
-            elseBranch = null,
-            span = dummySpan,
-        )
+        val ifWithoutElse =
+            IfStatement(
+                condition = BooleanLiteral(false, dummySpan),
+                thenBranch = listOf(thenStmt),
+                elseBranch = null,
+                span = dummySpan,
+            )
 
         assertNull(ifWithoutElse.elseBranch)
     }
