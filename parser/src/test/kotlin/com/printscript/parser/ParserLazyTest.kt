@@ -22,7 +22,7 @@ class ParserLazyTest {
     }
 
     @Test
-    @DisplayName("PS-PAR-012 | Parser consume tokens de forma perezosa sentencia por sentencia")
+    @DisplayName("Parser consume tokens de forma perezosa sentencia por sentencia")
     fun parserConsumesTokensLazilyStatementByStatement() {
         var count = 0
         val tokens = createLazyStream { count++ }

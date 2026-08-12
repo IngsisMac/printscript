@@ -27,7 +27,7 @@ class InterpreterMemoryTest {
     }
 
     @Test
-    @DisplayName("PS-INT-019 | Intérprete no acumula sentencias en memoria")
+    @DisplayName("Intérprete no acumula sentencias en memoria")
     fun interpreterDoesNotAccumulateStatements() {
         val totalStatements = 32768
         var count = 0

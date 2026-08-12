@@ -28,7 +28,7 @@ class ParserErrorTest {
     ): Token = Token(type, lexeme, span)
 
     @Test
-    @DisplayName("PS-PAR-008 | Falta el punto y coma lanza ParseException")
+    @DisplayName("Falta el punto y coma lanza ParseException")
     fun missingSemicolonThrowsParseException() {
         val tokens =
             listOf(
@@ -47,7 +47,7 @@ class ParserErrorTest {
     }
 
     @Test
-    @DisplayName("PS-PAR-009 | Paréntesis sin cerrar en println lanza ParseException")
+    @DisplayName("Paréntesis sin cerrar en println lanza ParseException")
     fun unclosedParenthesisInPrintlnThrowsParseException() {
         val tokens =
             listOf(

@@ -3,11 +3,13 @@ package com.printscript.interpreter
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class InterpreterV11Test : BaseInterpreterTest(Version.V1_1) {
     @Test
-    fun `PS-INT-013 - reassigning a const is an error`() {
+    @DisplayName("Reasignar una constante genera error")
+    fun reassigningConstIsAnError() {
         val src =
             """
             const x: number = 1;
@@ -21,7 +23,8 @@ class InterpreterV11Test : BaseInterpreterTest(Version.V1_1) {
     }
 
     @Test
-    fun `PS-INT-014 - if executes the correct branch`() {
+    @DisplayName("Sentencia if ejecuta la rama correcta")
+    fun ifExecutesCorrectBranch() {
         val src =
             """
             let flag: boolean = true;
@@ -39,7 +42,8 @@ class InterpreterV11Test : BaseInterpreterTest(Version.V1_1) {
     }
 
     @Test
-    fun `PS-INT-015 - if condition must be a boolean`() {
+    @DisplayName("Condición de sentencia if debe ser de tipo boolean")
+    fun ifConditionMustBeBoolean() {
         val src =
             """
             let n: number = 1;
@@ -55,7 +59,8 @@ class InterpreterV11Test : BaseInterpreterTest(Version.V1_1) {
     }
 
     @Test
-    fun `PS-INT-016 - readInput takes value from provider`() {
+    @DisplayName("readInput toma el valor ingresado por el proveedor de entradas")
+    fun readInputTakesValueFromProvider() {
         val src =
             """
             let n: number = readInput("Ingresá un número: ");
@@ -70,7 +75,8 @@ class InterpreterV11Test : BaseInterpreterTest(Version.V1_1) {
     }
 
     @Test
-    fun `PS-INT-017 - readInput fails if type conversion fails`() {
+    @DisplayName("readInput falla si la conversión de tipo de datos no es válida")
+    fun readInputFailsIfTypeConversionFails() {
         val src = "let flag: boolean = readInput(\"dame un boolean: \");"
         inputs["dame un boolean: "] = "Hola"
 
@@ -81,7 +87,8 @@ class InterpreterV11Test : BaseInterpreterTest(Version.V1_1) {
     }
 
     @Test
-    fun `PS-INT-018 - readEnv reads environment variable`() {
+    @DisplayName("readEnv lee correctamente una variable de entorno existente")
+    fun readEnvReadsEnvironmentVariable() {
         val src = "println(readEnv(\"PATH\"));"
 
         val errors = execute(src)

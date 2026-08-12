@@ -78,5 +78,6 @@ Los IDs **no se reutilizan** aunque un escenario se elimine.
 4. Los escenarios de error especifican **la posición esperada**, porque la consigna lo
    exige.
 5. Cuando un escenario pasa a ✅, se anota qué test lo cubre.
-6. Todos los tests en código Kotlin deben usar `@BeforeEach` para preparar fixtures/componentes y estructurar el caso con escenario Given-When-Then implícito (separado visualmente por saltos de línea, **sin comentarios explícitos** `// Given`, `// When`, `// Then`).
+6. Todos los tests en código Kotlin deben usar `@BeforeEach` para preparar fixtures/componentes, estructurar el caso con Given-When-Then implícito (sin comentarios explícitos `// Given`, `// When`, `// Then`) y usar **nombres puramente explicativos** (sin ningún prefijo `PS` ni códigos con letras en los nombres de tests o `@DisplayName`).
+
 

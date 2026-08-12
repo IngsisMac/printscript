@@ -42,7 +42,7 @@ class ParserV10Test {
             .toList()
 
     @Test
-    @DisplayName("PS-PAR-001 | Declaración con inicialización produce un Declaration")
+    @DisplayName("Declaración con inicialización produce un Declaration")
     fun parseDeclarationWithInitialization() {
         val decl = parseString("let x: number = 5;")[0] as Declaration
 
@@ -53,7 +53,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-002 | Declaración sin inicialización es válida")
+    @DisplayName("Declaración sin inicialización es válida")
     fun parseDeclarationWithoutInitialization() {
         val decl = parseString("let x: number;")[0] as Declaration
 
@@ -63,7 +63,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-003 | Asignación a variable ya declarada")
+    @DisplayName("Asignación a variable ya declarada")
     fun parseAssignment() {
         val assign = parseString("x = 5;")[0] as Assignment
 
@@ -72,7 +72,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-004 | println produce un PrintStatement")
+    @DisplayName("println produce un PrintStatement")
     fun parsePrintStatement() {
         val printStmt = parseString("println(\"hola\");")[0] as PrintStatement
 
@@ -80,7 +80,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-005 | La multiplicación liga más fuerte que la suma (2 + 3 * 4)")
+    @DisplayName("La multiplicación liga más fuerte que la suma (2 + 3 * 4)")
     fun parseExpressionMultiplicationHigherPrecedenceThanAddition() {
         val decl = parseString("let x: number = 2 + 3 * 4;")[0] as Declaration
 
@@ -95,7 +95,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-006 | Los operadores de igual precedencia asocian a izquierda (10 - 3 - 2)")
+    @DisplayName("Los operadores de igual precedencia asocian a izquierda (10 - 3 - 2)")
     fun parseExpressionLeftAssociativityForEqualPrecedence() {
         val decl = parseString("let x: number = 10 - 3 - 2;")[0] as Declaration
 
@@ -110,7 +110,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-007 | Los paréntesis cambian la precedencia ((2 + 3) * 4)")
+    @DisplayName("Los paréntesis cambian la precedencia ((2 + 3) * 4)")
     fun parseExpressionParenthesesOverridePrecedence() {
         val decl = parseString("let x: number = (2 + 3) * 4;")[0] as Declaration
 
@@ -125,7 +125,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-010 | const es inválido en 1.0")
+    @DisplayName("const es inválido en versión 1.0")
     fun constIsInvalidInVersion10() {
         val tokens =
             listOf(
@@ -145,7 +145,7 @@ class ParserV10Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-011 | if es inválido en 1.0")
+    @DisplayName("if es inválido en versión 1.0")
     fun ifIsInvalidInVersion10() {
         val tokens =
             listOf(

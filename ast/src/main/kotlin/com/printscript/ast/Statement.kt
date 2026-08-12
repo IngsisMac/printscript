@@ -2,8 +2,10 @@ package com.printscript.ast
 
 import com.printscript.common.Span
 
-sealed class Statement {
-    abstract val span: Span
+sealed class Statement : AstNode {
+    abstract override val span: Span
+
+    abstract fun <R> accept(visitor: AstVisitor<R>): R
 }
 
 data class Declaration(
@@ -12,22 +14,30 @@ data class Declaration(
     val value: Expression?,
     override val span: Span,
     val isConst: Boolean = false,
-) : Statement()
+) : Statement() {
+    override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
+}
 
 data class Assignment(
     val name: String,
     val value: Expression,
     override val span: Span,
-) : Statement()
+) : Statement() {
+    override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
+}
 
 data class PrintStatement(
     val expression: Expression,
     override val span: Span,
-) : Statement()
+) : Statement() {
+    override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
+}
 
 data class IfStatement(
     val condition: Expression,
     val thenBranch: List<Statement>,
     val elseBranch: List<Statement>?,
     override val span: Span,
-) : Statement()
+) : Statement() {
+    override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
+}

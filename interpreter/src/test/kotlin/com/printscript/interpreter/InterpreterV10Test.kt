@@ -3,11 +3,13 @@ package com.printscript.interpreter
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     @Test
-    fun `PS-INT-001 - string concatenation`() {
+    @DisplayName("Concatenación de cadenas de texto")
+    fun stringConcatenation() {
         val src =
             """
             let name: string = "Joe";
@@ -22,7 +24,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-002 - exact integer division`() {
+    @DisplayName("División entera exacta")
+    fun exactIntegerDivision() {
         val src =
             """
             let a: number = 12;
@@ -38,7 +41,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-003 - reassignment with division`() {
+    @DisplayName("Reasignación con resultado de división")
+    fun reassignmentWithDivision() {
         val src =
             """
             let a: number = 12;
@@ -54,7 +58,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-004 - emitter receives message without newline`() {
+    @DisplayName("El emisor de salida recibe el mensaje sin salto de línea al final")
+    fun emitterReceivesMessageWithoutNewline() {
         val src = "println(\"hola\");"
 
         val errors = execute(src)
@@ -65,7 +70,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-005 - decimal arithmetic precision`() {
+    @DisplayName("Precisión en la aritmética con números decimales")
+    fun decimalArithmeticPrecision() {
         val src =
             """
             let a: number = 0.1;
@@ -80,7 +86,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-006 - non-terminating division does not explode`() {
+    @DisplayName("La división periódica infinta se calcula con precisión delimitada")
+    fun nonTerminatingDivisionDoesNotExplode() {
         val src = "println(1 / 3);"
 
         val errors = execute(src)
@@ -91,7 +98,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-007 - string and number concatenation`() {
+    @DisplayName("Concatenación de cadena y número")
+    fun stringAndNumberConcatenation() {
         val src =
             """
             let n: number = 5;
@@ -105,7 +113,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-008 - using undeclared variable is an error`() {
+    @DisplayName("El uso de una variable no declarada genera error")
+    fun usingUndeclaredVariableIsAnError() {
         val src = "println(x);"
 
         val errors = execute(src)
@@ -115,7 +124,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-009 - assigning incompatible type is an error`() {
+    @DisplayName("La asignación de tipo incompatible genera error de incompatibilidad")
+    fun assigningIncompatibleTypeIsAnError() {
         val src = "let x: number = \"hola\";"
 
         val errors = execute(src)
@@ -125,7 +135,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-010 - arithmetic operations on strings is an error`() {
+    @DisplayName("Operaciones aritméticas sobre cadenas genera error")
+    fun arithmeticOperationsOnStringsIsAnError() {
         val src =
             """
             let a: string = "hola";
@@ -142,7 +153,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-011 - redeclaring variable in same scope is an error`() {
+    @DisplayName("Redeclaración de variable en el mismo scope genera error")
+    fun redeclaringVariableInSameScopeIsAnError() {
         val src =
             """
             let x: number = 1;
@@ -156,7 +168,8 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
     }
 
     @Test
-    fun `PS-INT-012 - validation mode does not execute side effects`() {
+    @DisplayName("El modo validación no ejecuta efectos secundarios de salida")
+    fun validationModeDoesNotExecuteSideEffects() {
         val src = "println(\"hola\");"
 
         val errors = execute(src, isValidationMode = true)

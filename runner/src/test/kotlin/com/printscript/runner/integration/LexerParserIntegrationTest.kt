@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.StringReader
@@ -55,7 +56,8 @@ class LexerParserIntegrationTest {
     }
 
     @Test
-    fun `lexer + parser integration - valid v1_0 declaration and assignment`() {
+    @DisplayName("Integración lexer y parser - declaración y asignación válidas en versión 1.0")
+    fun validV10DeclarationAndAssignment() {
         val lexer = Lexer(StringReader(validV10Code), Version.V1_0)
         val parser = Parser(lexer, Version.V1_0)
         val statements = parser.parse().asSequence().toList()
@@ -74,7 +76,8 @@ class LexerParserIntegrationTest {
     }
 
     @Test
-    fun `lexer + parser integration - binary operation precedence`() {
+    @DisplayName("Integración lexer y parser - precedencia de operaciones binarias")
+    fun binaryOperationPrecedence() {
         val lexer = Lexer(StringReader(operatorPrecedenceCode), Version.V1_0)
         val parser = Parser(lexer, Version.V1_0)
         val statements = parser.parse().asSequence().toList()
@@ -92,7 +95,8 @@ class LexerParserIntegrationTest {
     }
 
     @Test
-    fun `lexer + parser integration - valid v1_1 const and if statement`() {
+    @DisplayName("Integración lexer y parser - const y sentencia if válidos en versión 1.1")
+    fun validV11ConstAndIfStatement() {
         val lexer = Lexer(StringReader(validV11Code), Version.V1_1)
         val parser = Parser(lexer, Version.V1_1)
         val statements = parser.parse().asSequence().toList()
@@ -113,7 +117,8 @@ class LexerParserIntegrationTest {
     }
 
     @Test
-    fun `lexer + parser integration - v1_1 readInput function call`() {
+    @DisplayName("Integración lexer y parser - llamada a función readInput en versión 1.1")
+    fun v11ReadInputFunctionCall() {
         val code = "let name: string = readInput(\"Enter your name:\");"
         val lexer = Lexer(StringReader(code), Version.V1_1)
         val parser = Parser(lexer, Version.V1_1)
@@ -128,7 +133,8 @@ class LexerParserIntegrationTest {
     }
 
     @Test
-    fun `lexer + parser integration - edge case empty source yields zero statements`() {
+    @DisplayName("Integración lexer y parser - fuente vacía retorna cero sentencias")
+    fun emptySourceYieldsZeroStatements() {
         val lexer = Lexer(StringReader(emptyCode), Version.V1_0)
         val parser = Parser(lexer, Version.V1_0)
         val statements = parser.parse().asSequence().toList()
@@ -137,7 +143,8 @@ class LexerParserIntegrationTest {
     }
 
     @Test
-    fun `lexer + parser integration - edge cases invalid syntax throw ParseException`() {
+    @DisplayName("Integración lexer y parser - sintaxis inválida lanza ParseException")
+    fun invalidSyntaxThrowsParseException() {
         for (invalidCode in syntaxErrorCases) {
             val lexer = Lexer(StringReader(invalidCode), Version.V1_1)
             val parser = Parser(lexer, Version.V1_1)

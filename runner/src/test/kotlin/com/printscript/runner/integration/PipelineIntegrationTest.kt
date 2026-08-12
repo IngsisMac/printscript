@@ -10,6 +10,7 @@ import com.printscript.runner.PrintScriptRunner
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.StringReader
 import java.io.StringWriter
@@ -25,7 +26,8 @@ class PipelineIntegrationTest {
     }
 
     @Test
-    fun `full pipeline v1_0 - arithmetic and string concatenation`() {
+    @DisplayName("Pipeline completo v1.0 - aritmética y concatenación de cadenas")
+    fun fullPipelineV10ArithmeticAndStringConcatenation() {
         val code = """
             let a: number = 10;
             let b: number = 20;
@@ -45,7 +47,8 @@ class PipelineIntegrationTest {
     }
 
     @Test
-    fun `full pipeline v1_1 - readInput interaction and conditionals`() {
+    @DisplayName("Pipeline completo v1.1 - interacción con readInput y condicionales")
+    fun fullPipelineV11ReadInputInteractionAndConditionals() {
         val code = """
             let userAgeStr: string = readInput("Age?");
             let isAdult: boolean = true;
@@ -68,7 +71,8 @@ class PipelineIntegrationTest {
     }
 
     @Test
-    fun `full pipeline v1_1 - boolean logic and nested scopes`() {
+    @DisplayName("Pipeline completo v1.1 - lógica booleana y scopes anidados")
+    fun fullPipelineV11BooleanLogicAndNestedScopes() {
         val code = """
             const active: boolean = true;
             let result: string = "initial";
@@ -93,7 +97,8 @@ class PipelineIntegrationTest {
     }
 
     @Test
-    fun `full pipeline - edge case uninitialized variable reference error`() {
+    @DisplayName("Pipeline completo - referencia a variable no inicializada produce error")
+    fun fullPipelineUninitializedVariableReferenceError() {
         val code = """
             let x: number;
             println(x);
@@ -110,7 +115,8 @@ class PipelineIntegrationTest {
     }
 
     @Test
-    fun `full pipeline - edge case decimal floating point operations format without scientific notation`() {
+    @DisplayName("Pipeline completo - operaciones decimales sin notación científica")
+    fun fullPipelineDecimalOperationsWithoutScientificNotation() {
         val code = """
             let x: number = 0.1 + 0.2;
             println(x);
@@ -128,19 +134,23 @@ class PipelineIntegrationTest {
     }
 
     @Test
-    fun `full pipeline - PrintScriptRunner facade format integration`() {
+    @DisplayName("Pipeline completo - integración con el formateador de PrintScriptRunner")
+    fun fullPipelinePrintScriptRunnerFormatIntegration() {
         val code = "let x: number = 5;"
         val writer = StringWriter()
         val result = PrintScriptRunner.format(StringReader(code), Version.V1_0, emptyMap(), writer)
+
         assertTrue(result.errors.isEmpty())
         assertTrue(writer.toString().isNotEmpty())
     }
 
     @Test
-    fun `full pipeline - PrintScriptRunner facade format syntax error handling`() {
+    @DisplayName("Pipeline completo - formateador maneja error de sintaxis correctamente")
+    fun fullPipelinePrintScriptRunnerFormatSyntaxErrorHandling() {
         val code = "let x: number = ;"
         val writer = StringWriter()
         val result = PrintScriptRunner.format(StringReader(code), Version.V1_0, emptyMap(), writer)
+
         assertTrue(result.errors.isNotEmpty())
     }
 }

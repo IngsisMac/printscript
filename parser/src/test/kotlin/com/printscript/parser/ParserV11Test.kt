@@ -43,7 +43,7 @@ class ParserV11Test {
             .toList()
 
     @Test
-    @DisplayName("PS-PAR-014 | const es válido en 1.1")
+    @DisplayName("const es válido en versión 1.1")
     fun constIsValidInVersion11() {
         val tokens =
             listOf(
@@ -66,7 +66,7 @@ class ParserV11Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-015 | if con else produce el árbol esperado")
+    @DisplayName("if con else produce el árbol esperado")
     fun ifWithElseParsesCorrectlyInVersion11() {
         val code = "if (flag) { println(\"si\"); } else { println(\"no\"); }"
 
@@ -82,7 +82,7 @@ class ParserV11Test {
     }
 
     @Test
-    @DisplayName("PS-PAR-016 | else if no está soportado")
+    @DisplayName("else if no está soportado")
     fun elseIfIsNotSupportedInVersion11() {
         val code = "if (a) {} else if (b) {}"
 

@@ -19,6 +19,7 @@ import com.printscript.interpreter.Interpreter
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class ParserInterpreterIntegrationTest {
@@ -36,7 +37,8 @@ class ParserInterpreterIntegrationTest {
     }
 
     @Test
-    fun `parser AST + interpreter - evaluates declaration and assignment`() {
+    @DisplayName("Integración parser e intérprete - evalúa declaración y asignación")
+    fun evaluatesDeclarationAndAssignment() {
         val statements = listOf(
             Declaration("counter", "number", NumberLiteral("10", dummySpan), dummySpan, isConst = false),
             Assignment("counter", BinaryOp(Variable("counter", dummySpan), "+", NumberLiteral("5", dummySpan), dummySpan), dummySpan),
@@ -51,7 +53,8 @@ class ParserInterpreterIntegrationTest {
     }
 
     @Test
-    fun `parser AST + interpreter - throws runtime error on const re-assignment in v1_1`() {
+    @DisplayName("Integración parser e intérprete - reasignar constante genera error de ejecución en versión 1.1")
+    fun throwsRuntimeErrorOnConstReassignmentInV11() {
         val statements = listOf(
             Declaration("MAX", "number", NumberLiteral("100", dummySpan), dummySpan, isConst = true),
             Assignment("MAX", NumberLiteral("200", dummySpan), dummySpan)
@@ -65,7 +68,8 @@ class ParserInterpreterIntegrationTest {
     }
 
     @Test
-    fun `parser AST + interpreter - executes conditional block in v1_1`() {
+    @DisplayName("Integración parser e intérprete - ejecuta bloque condicional en versión 1.1")
+    fun executesConditionalBlockInV11() {
         val statements = listOf(
             Declaration("flag", "boolean", BooleanLiteral(true, dummySpan), dummySpan, isConst = false),
             IfStatement(
@@ -84,7 +88,8 @@ class ParserInterpreterIntegrationTest {
     }
 
     @Test
-    fun `parser AST + interpreter - edge case division by zero produces error`() {
+    @DisplayName("Integración parser e intérprete - división por cero genera error")
+    fun divisionByZeroProducesError() {
         val statements = listOf(
             Declaration("a", "number", NumberLiteral("10", dummySpan), dummySpan, isConst = false),
             Declaration("b", "number", NumberLiteral("0", dummySpan), dummySpan, isConst = false),
@@ -98,7 +103,8 @@ class ParserInterpreterIntegrationTest {
     }
 
     @Test
-    fun `parser AST + interpreter - edge case undeclared variable access produces error`() {
+    @DisplayName("Integración parser e intérprete - acceso a variable no declarada genera error")
+    fun undeclaredVariableAccessProducesError() {
         val statements = listOf<Statement>(
             PrintStatement(Variable("nonExistent", dummySpan), dummySpan)
         )

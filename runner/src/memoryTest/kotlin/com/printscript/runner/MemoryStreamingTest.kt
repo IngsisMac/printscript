@@ -46,7 +46,7 @@ class MemoryStreamingTest {
     }
 
     @Test
-    @DisplayName("PS-MEM-001 | Ejecución streaming en pipeline con heap de 7MB")
+    @DisplayName("Ejecución streaming en pipeline con heap de 7MB")
     fun testWithCounterStreamingPipelineExecutionWith7MBHeap() {
         val stream = MockInputStream()
         val counter = PrintCounter(MockInputStream.MESSAGE)
@@ -64,7 +64,7 @@ class MemoryStreamingTest {
     }
 
     @Test
-    @DisplayName("PS-MEM-002 | Captura de OutOfMemoryError reportando Java heap space")
+    @DisplayName("Captura de OutOfMemoryError reportando Java heap space")
     fun testWithCollectorCapturesOutOfMemoryErrorAndReportsJavaHeapSpace() {
         val stream = MockInputStream(numberOfLines = 64 * 1024)
         val collector = PrintCollector()
