@@ -35,7 +35,9 @@ class LexerLazyTest {
             return content[charactersRead++].code
         }
 
-        override fun close() {}
+        override fun close() {
+            // No-op for tracked reader
+        }
     }
 
     @Test

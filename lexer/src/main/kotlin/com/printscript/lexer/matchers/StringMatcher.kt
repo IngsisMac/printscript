@@ -20,6 +20,17 @@ class StringMatcher : TokenMatcher {
     ): Token {
         val startPos = stream.getPosition()
         val quoteChar = stream.advance()!!
+        val content = readStringContent(stream, quoteChar, startPos)
+
+        val endPos = Position(stream.line, stream.column - 1)
+        return Token(TokenType.STRING_LITERAL, content, Span(startPos, endPos))
+    }
+
+    private fun readStringContent(
+        stream: CharStream,
+        quoteChar: Char,
+        startPos: Position,
+    ): String {
         val sb = StringBuilder()
         var isClosed = false
 
@@ -38,8 +49,6 @@ class StringMatcher : TokenMatcher {
             val errPos = stream.getPosition()
             throw LexerException("Unterminated string literal", Span(startPos, errPos))
         }
-
-        val endPos = Position(stream.line, stream.column - 1)
-        return Token(TokenType.STRING_LITERAL, sb.toString(), Span(startPos, endPos))
+        return sb.toString()
     }
 }

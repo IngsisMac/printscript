@@ -15,29 +15,18 @@ class LexerV11Test {
     @Test
     @DisplayName("En versión 1.1 const, boolean, if, else, llaves y literales booleanos son keywords")
     fun enVersion11ConstIfElseYBooleanSonKeywords() {
-        val code =
-            """
-            const flag: boolean = true;
-            if (flag) { println("si"); } else { println("no"); }
-            """.trimIndent()
+        val code = "const flag: boolean = true;\nif (flag) { println(\"si\"); } else { println(\"no\"); }"
+        val tokens = createLexer(code).asSequence().toList()
+        val types = tokens.map { it.type }.toSet()
 
-        val lexer = createLexer(code)
-        val tokens = lexer.asSequence().toList()
-
-        val types = tokens.map { it.type }
         val expectedKeywords =
             listOf(
-                TokenType.CONST,
-                TokenType.BOOLEAN,
-                TokenType.TRUE,
-                TokenType.IF,
-                TokenType.LBRACE,
-                TokenType.RBRACE,
-                TokenType.ELSE,
+                TokenType.CONST, TokenType.BOOLEAN, TokenType.TRUE,
+                TokenType.IF, TokenType.LBRACE, TokenType.RBRACE, TokenType.ELSE,
             )
 
         expectedKeywords.forEach { expected ->
-            assert(types.contains(expected)) { "Expected token type $expected to be present in V1.1 lexer output" }
+            assert(types.contains(expected)) { "Expected token type $expected in V1.1 lexer output" }
         }
     }
 

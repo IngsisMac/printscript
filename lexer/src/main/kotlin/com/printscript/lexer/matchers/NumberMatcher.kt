@@ -19,6 +19,17 @@ class NumberMatcher : TokenMatcher {
         config: TokenConfig,
     ): Token {
         val startPos = stream.getPosition()
+        val lexeme = readNumberLexeme(stream, startPos)
+        validateTrailingDecimal(lexeme, startPos, stream)
+
+        val endPos = Position(stream.line, stream.column - 1)
+        return Token(TokenType.NUMBER_LITERAL, lexeme, Span(startPos, endPos))
+    }
+
+    private fun readNumberLexeme(
+        stream: CharStream,
+        startPos: Position,
+    ): String {
         val sb = StringBuilder()
         var hasDecimalPoint = false
 
@@ -28,22 +39,34 @@ class NumberMatcher : TokenMatcher {
                 sb.append(ch)
                 stream.advance()
             } else if (ch == '.') {
-                if (hasDecimalPoint) {
-                    val errPos = stream.getPosition()
-                    throw LexerException(
-                        "Invalid number literal: multiple decimal points in '$sb.'",
-                        Span(startPos, errPos),
-                    )
-                }
-                hasDecimalPoint = true
-                sb.append(ch)
-                stream.advance()
+                hasDecimalPoint = handleDecimal(hasDecimalPoint, sb, startPos, stream)
             } else {
                 break
             }
         }
+        return sb.toString()
+    }
 
-        val lexeme = sb.toString()
+    private fun handleDecimal(
+        hasDecimalPoint: Boolean,
+        sb: StringBuilder,
+        startPos: Position,
+        stream: CharStream,
+    ): Boolean {
+        if (hasDecimalPoint) {
+            val errPos = stream.getPosition()
+            throw LexerException("Invalid number literal: multiple decimal points in '$sb.'", Span(startPos, errPos))
+        }
+        sb.append('.')
+        stream.advance()
+        return true
+    }
+
+    private fun validateTrailingDecimal(
+        lexeme: String,
+        startPos: Position,
+        stream: CharStream,
+    ) {
         if (lexeme.endsWith(".")) {
             val endPos = Position(stream.line, stream.column - 1)
             throw LexerException(
@@ -51,8 +74,5 @@ class NumberMatcher : TokenMatcher {
                 Span(startPos, endPos),
             )
         }
-
-        val endPos = Position(stream.line, stream.column - 1)
-        return Token(TokenType.NUMBER_LITERAL, lexeme, Span(startPos, endPos))
     }
 }
