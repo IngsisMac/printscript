@@ -169,4 +169,89 @@ class PrintScriptRunnerTest {
         assertEquals(1, result.errors.size)
         assertEquals("Java heap space", result.errors[0].message)
     }
+
+    @Test
+    @DisplayName("Formateo exitoso en versión 1.0")
+    fun formatVersion10() {
+        val source = StringReader("let x : number = 5;")
+        val writer = java.io.StringWriter()
+
+        val result = PrintScriptRunner.format(source, Version.V1_0, emptyMap(), writer)
+
+        assertTrue(result.errors.isEmpty())
+        assertEquals("let x: number = 5;\n", writer.toString())
+    }
+
+    @Test
+    @DisplayName("Formateo con error de sintaxis retorna error")
+    fun formatSyntaxError() {
+        val source = StringReader("let x: = 5;")
+        val writer = java.io.StringWriter()
+
+        val result = PrintScriptRunner.format(source, Version.V1_0, emptyMap(), writer)
+
+        assertTrue(result.errors.isNotEmpty())
+    }
+
+    @Test
+    @DisplayName("Formateo maneja OutOfMemoryError")
+    fun formatHandlesOutOfMemoryError() {
+        val failingReader =
+            object : java.io.Reader() {
+                override fun read(
+                    cbuf: CharArray,
+                    off: Int,
+                    len: Int,
+                ): Int = throw OutOfMemoryError("Java heap space")
+
+                override fun close() {}
+            }
+        val writer = java.io.StringWriter()
+
+        val result = PrintScriptRunner.format(failingReader, Version.V1_0, emptyMap(), writer)
+
+        assertEquals(1, result.errors.size)
+        assertEquals("Java heap space", result.errors[0].message)
+    }
+
+    @Test
+    @DisplayName("Análisis exitoso en versión 1.0")
+    fun analyzeVersion10() {
+        val source = StringReader("let x: number = 5;")
+
+        val result = PrintScriptRunner.analyze(source, Version.V1_0, emptyMap())
+
+        assertTrue(result.errors.isEmpty())
+    }
+
+    @Test
+    @DisplayName("Análisis con error de sintaxis retorna error")
+    fun analyzeSyntaxError() {
+        val source = StringReader("let x: = 5;")
+
+        val result = PrintScriptRunner.analyze(source, Version.V1_0, emptyMap())
+
+        assertTrue(result.errors.isNotEmpty())
+    }
+
+    @Test
+    @DisplayName("Análisis maneja OutOfMemoryError")
+    fun analyzeHandlesOutOfMemoryError() {
+        val failingReader =
+            object : java.io.Reader() {
+                override fun read(
+                    cbuf: CharArray,
+                    off: Int,
+                    len: Int,
+                ): Int = throw OutOfMemoryError("Java heap space")
+
+                override fun close() {}
+            }
+
+        val result = PrintScriptRunner.analyze(failingReader, Version.V1_0, emptyMap())
+
+        assertEquals(1, result.errors.size)
+        assertEquals("Java heap space", result.errors[0].message)
+    }
 }
+

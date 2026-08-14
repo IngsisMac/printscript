@@ -86,4 +86,24 @@ object PrintScriptRunner {
         } catch (e: OutOfMemoryError) {
             OOM_RESULT
         }
+
+    fun analyze(
+        source: Reader,
+        version: Version,
+        config: Map<String, Any?> = emptyMap(),
+    ): ExecutionResult =
+        try {
+            val lexer = Lexer(source, version)
+            val parser = Parser(lexer, version)
+            val statements = parser.parse()
+            val linter = com.printscript.linter.DefaultLinter()
+            val linterConfig = com.printscript.linter.LinterConfig.fromMap(config)
+            val errors = linter.analyze(statements, linterConfig)
+            ExecutionResult(errors)
+        } catch (e: ParseException) {
+            ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
+        } catch (e: OutOfMemoryError) {
+            OOM_RESULT
+        }
 }
+
