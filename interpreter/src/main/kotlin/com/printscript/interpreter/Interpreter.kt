@@ -64,12 +64,11 @@ class Interpreter(
         try {
             statements.next()
         } catch (e: Exception) {
-            errors.add(
-                PrintScriptError(
-                    e.message ?: "Error",
-                    Span(Position(1, 1), Position(1, 1)),
-                ),
-            )
+            val span = (e.javaClass.methods.firstOrNull { it.name == "getSpan" }?.invoke(e) as? Span)
+                ?: Span(Position(1, 1), Position(1, 1))
+            val rawMsg = (e.javaClass.methods.firstOrNull { it.name == "getRawMessage" }?.invoke(e) as? String)
+                ?: e.message ?: "Error"
+            errors.add(PrintScriptError(rawMsg, span))
             null
         }
 

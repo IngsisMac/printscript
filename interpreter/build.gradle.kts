@@ -5,6 +5,8 @@ plugins {
 
 dependencies {
     implementation(libs.kotlin.stdlib)
-    api(project(":parser"))
+    api(project(":ast"))
     api(project(":common"))
+    testImplementation(project(":parser"))
+    testImplementation(project(":lexer"))
 }
