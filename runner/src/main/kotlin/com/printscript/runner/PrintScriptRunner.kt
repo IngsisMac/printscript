@@ -8,22 +8,28 @@ import com.printscript.common.Span
 import com.printscript.common.Version
 import com.printscript.interpreter.Interpreter
 import com.printscript.lexer.Lexer
+import com.printscript.lexer.LexerException
 import com.printscript.parser.ParseException
 import com.printscript.parser.Parser
 import java.io.Reader
 
 data class ExecutionResult(
     val errors: List<PrintScriptError>,
-)
+    val fatalError: String? = null,
+) {
+    val hasFatalError: Boolean get() = fatalError != null
+}
 
 private val OOM_RESULT =
     ExecutionResult(
-        listOf(
-            PrintScriptError(
-                "Java heap space",
-                Span(Position(1, 1), Position(1, 1)),
+        errors =
+            listOf(
+                PrintScriptError(
+                    "Java heap space",
+                    Span(Position(1, 1), Position(1, 1)),
+                ),
             ),
-        ),
+        fatalError = "Java heap space",
     )
 
 object PrintScriptRunner {
@@ -40,6 +46,8 @@ object PrintScriptRunner {
             val interpreter = Interpreter(version, output, input, isValidationMode = false)
             val errors = interpreter.execute(statements)
             ExecutionResult(errors)
+        } catch (e: LexerException) {
+            ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         } catch (e: OutOfMemoryError) {
@@ -57,6 +65,8 @@ object PrintScriptRunner {
             val interpreter = Interpreter(version, isValidationMode = true)
             val errors = interpreter.execute(statements)
             ExecutionResult(errors)
+        } catch (e: LexerException) {
+            ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         } catch (e: OutOfMemoryError) {
@@ -81,6 +91,8 @@ object PrintScriptRunner {
                 formatter.format(statement, writer, formatterConfig)
             }
             ExecutionResult(emptyList())
+        } catch (e: LexerException) {
+            ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         } catch (e: OutOfMemoryError) {
@@ -102,9 +114,12 @@ object PrintScriptRunner {
                     .fromMap(config)
             val errors = linter.analyze(statements, linterConfig)
             ExecutionResult(errors)
+        } catch (e: LexerException) {
+            ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         } catch (e: OutOfMemoryError) {
             OOM_RESULT
         }
 }
+

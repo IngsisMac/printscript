@@ -45,12 +45,19 @@ data class FormatterConfig(
             val braceSameLine = getBool("if-brace-same-line", true)
             val braceBelowLine = getBool("if-brace-below-line", false)
 
+            val singleSpace =
+                if (map.containsKey("enforce-single-space-separation")) {
+                    getBool("enforce-single-space-separation", true)
+                } else {
+                    getBool("mandatory-single-space-separation", true)
+                }
+
             return FormatterConfig(
                 enforceSpacingAroundEquals = if (enforceNoEquals) false else enforceEquals,
                 enforceNoSpacingAroundEquals = enforceNoEquals,
                 enforceSpacingBeforeColonInDeclaration = getBool("enforce-spacing-before-colon-in-declaration", false),
                 enforceSpacingAfterColonInDeclaration = getBool("enforce-spacing-after-colon-in-declaration", true),
-                mandatorySingleSpaceSeparation = getBool("mandatory-single-space-separation", true),
+                mandatorySingleSpaceSeparation = singleSpace,
                 mandatorySpaceSurroundingOperations = getBool("mandatory-space-surrounding-operations", true),
                 mandatoryLineBreakAfterStatement = getBool("mandatory-line-break-after-statement", true),
                 lineBreaksAfterPrintln = getInt("line-breaks-after-println", 1),

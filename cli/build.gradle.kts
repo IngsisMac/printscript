@@ -15,6 +15,10 @@ application {
     mainClass = "com.printscript.cli.MainKt"
 }
 
+tasks.named<JavaExec>("run") {
+    workingDir = rootDir
+}
+
 tasks.withType<JacocoReport>().configureEach {
     classDirectories.setFrom(
         files(

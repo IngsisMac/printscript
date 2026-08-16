@@ -33,8 +33,8 @@ class DefaultFormatter : Formatter {
         val keyword = if (declaration.isConst) "const" else "let"
         val spaceBeforeColon = if (config.enforceSpacingBeforeColonInDeclaration) " " else ""
         val spaceAfterColon = if (config.enforceSpacingAfterColonInDeclaration) " " else ""
-
-        val head = "$indent$keyword ${declaration.name}$spaceBeforeColon:$spaceAfterColon${declaration.type}"
+        val kwSpace = if (config.mandatorySingleSpaceSeparation) " " else ""
+        val head = "$indent$keyword$kwSpace${declaration.name}$spaceBeforeColon:$spaceAfterColon${declaration.type}"
 
         if (declaration.value != null) {
             val equalsSpace = if (config.enforceSpacingAroundEquals) " = " else "="
