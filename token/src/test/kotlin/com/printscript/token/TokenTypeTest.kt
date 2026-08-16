@@ -37,15 +37,17 @@ class TokenTypeTest {
     }
 
     @Test
-    @DisplayName("TokenType contiene todos los operadores y delimitadores del lenguaje")
-    fun contieneOperadoresYDelimitadores() {
-        val operatorsAndDelimiters =
+    @DisplayName("TokenType contiene los operadores aritméticos del lenguaje")
+    fun contieneOperadoresAritmeticos() {
+        val operators = listOf(TokenType.PLUS, TokenType.MINUS, TokenType.STAR, TokenType.SLASH, TokenType.EQUAL)
+        operators.forEach { assertTrue(allTokenTypes.contains(it)) }
+    }
+
+    @Test
+    @DisplayName("TokenType contiene los delimitadores y símbolos del lenguaje")
+    fun contieneDelimitadoresYSimbolos() {
+        val delimiters =
             listOf(
-                TokenType.PLUS,
-                TokenType.MINUS,
-                TokenType.STAR,
-                TokenType.SLASH,
-                TokenType.EQUAL,
                 TokenType.LPAREN,
                 TokenType.RPAREN,
                 TokenType.LBRACE,
@@ -54,10 +56,7 @@ class TokenTypeTest {
                 TokenType.COMMA,
                 TokenType.COLON,
             )
-
-        operatorsAndDelimiters.forEach { symbol ->
-            assertTrue(allTokenTypes.contains(symbol))
-        }
+        delimiters.forEach { assertTrue(allTokenTypes.contains(it)) }
     }
 
     @Test
