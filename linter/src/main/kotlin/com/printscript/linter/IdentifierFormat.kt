@@ -3,7 +3,8 @@ package com.printscript.linter
 enum class IdentifierFormat {
     CAMEL_CASE,
     SNAKE_CASE,
-    NONE;
+    NONE,
+    ;
 
     fun matches(identifier: String): Boolean =
         when (this) {

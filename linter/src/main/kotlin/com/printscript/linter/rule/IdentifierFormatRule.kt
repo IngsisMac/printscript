@@ -4,6 +4,7 @@ import com.printscript.ast.Assignment
 import com.printscript.ast.Declaration
 import com.printscript.ast.Statement
 import com.printscript.common.PrintScriptError
+import com.printscript.common.Span
 import com.printscript.linter.IdentifierFormat
 import com.printscript.linter.LinterConfig
 
@@ -15,34 +16,28 @@ class IdentifierFormatRule : LinterRule {
         val format = config.identifierFormat
         if (format == IdentifierFormat.NONE) return emptyList()
 
-        val errors = mutableListOf<PrintScriptError>()
+        val (name, span) = extractNameAndSpan(statement) ?: return emptyList()
+        val error = validateIdentifier(name, span, format)
+        return if (error != null) listOf(error) else emptyList()
+    }
 
+    private fun extractNameAndSpan(statement: Statement): Pair<String, Span>? =
         when (statement) {
-            is Declaration -> {
-                if (!format.matches(statement.name)) {
-                    val formatName = if (format == IdentifierFormat.CAMEL_CASE) "camelCase" else "snake_case"
-                    errors.add(
-                        PrintScriptError(
-                            "Identifier '${statement.name}' does not conform to $formatName format",
-                            statement.span,
-                        ),
-                    )
-                }
-            }
-            is Assignment -> {
-                if (!format.matches(statement.name)) {
-                    val formatName = if (format == IdentifierFormat.CAMEL_CASE) "camelCase" else "snake_case"
-                    errors.add(
-                        PrintScriptError(
-                            "Identifier '${statement.name}' does not conform to $formatName format",
-                            statement.span,
-                        ),
-                    )
-                }
-            }
-            else -> {}
+            is Declaration -> Pair(statement.name, statement.span)
+            is Assignment -> Pair(statement.name, statement.span)
+            else -> null
         }
 
-        return errors
+    private fun validateIdentifier(
+        name: String,
+        span: Span,
+        format: IdentifierFormat,
+    ): PrintScriptError? {
+        if (format.matches(name)) return null
+        val formatName = if (format == IdentifierFormat.CAMEL_CASE) "camelCase" else "snake_case"
+        return PrintScriptError(
+            "Identifier '$name' does not conform to $formatName format",
+            span,
+        )
     }
 }

@@ -21,27 +21,21 @@ class ReadInputExpressionRule : LinterRule {
         config: LinterConfig,
     ): List<PrintScriptError> {
         if (!config.mandatoryVariableOrLiteralInReadInput) return emptyList()
+        return extractExpressions(statement).flatMap { checkExpression(it) }
+    }
 
-        val expressions = extractExpressions(statement)
-        val errors = mutableListOf<PrintScriptError>()
-
-        for (expr in expressions) {
-            val readInputCalls = findReadInputCalls(expr)
-            for (call in readInputCalls) {
-                val arg = call.argument
-                if (arg != null && !isSimpleExpression(arg)) {
-                    errors.add(
-                        PrintScriptError(
-                            "readInput argument must be a simple variable or literal",
-                            call.span,
-                        ),
-                    )
-                }
+    private fun checkExpression(expr: Expression): List<PrintScriptError> =
+        findReadInputCalls(expr).mapNotNull { call ->
+            val arg = call.argument
+            if (arg != null && !isSimpleExpression(arg)) {
+                PrintScriptError(
+                    "readInput argument must be a simple variable or literal",
+                    call.span,
+                )
+            } else {
+                null
             }
         }
-
-        return errors
-    }
 
     private fun extractExpressions(statement: Statement): List<Expression> {
         val list = mutableListOf<Expression>()
@@ -56,6 +50,7 @@ class ReadInputExpressionRule : LinterRule {
 
     private fun findReadInputCalls(expression: Expression): List<CallExpression> {
         val calls = mutableListOf<CallExpression>()
+
         fun traverse(expr: Expression) {
             when (expr) {
                 is CallExpression -> {
