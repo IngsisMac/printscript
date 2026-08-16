@@ -20,7 +20,6 @@ class AstVisitorLinter(
     private val rules: List<LinterRule>,
     private val config: LinterConfig,
 ) : AstVisitor<List<PrintScriptError>> {
-
     override fun visit(node: Declaration): List<PrintScriptError> = runRules(node)
 
     override fun visit(node: Assignment): List<PrintScriptError> = runRules(node)

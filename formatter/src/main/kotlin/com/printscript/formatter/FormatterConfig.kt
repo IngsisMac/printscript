@@ -14,57 +14,54 @@ data class FormatterConfig(
     val indentInsideIf: Int = 4,
 ) {
     companion object {
-        fun fromMap(map: Map<String, Any?>): FormatterConfig {
-            fun getBool(
-                key: String,
-                default: Boolean,
-            ): Boolean {
-                val value = map[key] ?: return default
-                return when (value) {
-                    is Boolean -> value
-                    is String -> value.toBoolean()
-                    else -> default
-                }
-            }
-
-            fun getInt(
-                key: String,
-                default: Int,
-            ): Int {
-                val value = map[key] ?: return default
-                return when (value) {
-                    is Number -> value.toInt()
-                    is String -> value.toIntOrNull() ?: default
-                    else -> default
-                }
-            }
-
-            val enforceEquals = getBool("enforce-spacing-around-equals", true)
-            val enforceNoEquals = getBool("enforce-no-spacing-around-equals", false)
-
-            val braceSameLine = getBool("if-brace-same-line", true)
-            val braceBelowLine = getBool("if-brace-below-line", false)
-
-            val singleSpace =
-                if (map.containsKey("enforce-single-space-separation")) {
-                    getBool("enforce-single-space-separation", true)
-                } else {
-                    getBool("mandatory-single-space-separation", true)
-                }
-
-            return FormatterConfig(
-                enforceSpacingAroundEquals = if (enforceNoEquals) false else enforceEquals,
-                enforceNoSpacingAroundEquals = enforceNoEquals,
-                enforceSpacingBeforeColonInDeclaration = getBool("enforce-spacing-before-colon-in-declaration", false),
-                enforceSpacingAfterColonInDeclaration = getBool("enforce-spacing-after-colon-in-declaration", true),
-                mandatorySingleSpaceSeparation = singleSpace,
-                mandatorySpaceSurroundingOperations = getBool("mandatory-space-surrounding-operations", true),
-                mandatoryLineBreakAfterStatement = getBool("mandatory-line-break-after-statement", true),
-                lineBreaksAfterPrintln = getInt("line-breaks-after-println", 1),
-                ifBraceSameLine = if (braceBelowLine) false else braceSameLine,
-                ifBraceBelowLine = braceBelowLine,
-                indentInsideIf = getInt("indent-inside-if", 4),
+        fun fromMap(map: Map<String, Any?>): FormatterConfig =
+            FormatterConfig(
+                enforceSpacingAroundEquals = parseEquals(map),
+                enforceNoSpacingAroundEquals = getBool(map, "enforce-no-spacing-around-equals", false),
+                enforceSpacingBeforeColonInDeclaration = getBool(map, "enforce-spacing-before-colon-in-declaration", false),
+                enforceSpacingAfterColonInDeclaration = getBool(map, "enforce-spacing-after-colon-in-declaration", true),
+                mandatorySingleSpaceSeparation = getBool(map, getSingleSpaceKey(map), true),
+                mandatorySpaceSurroundingOperations = getBool(map, "mandatory-space-surrounding-operations", true),
+                mandatoryLineBreakAfterStatement = getBool(map, "mandatory-line-break-after-statement", true),
+                lineBreaksAfterPrintln = getInt(map, "line-breaks-after-println", 1),
+                ifBraceSameLine = parseBraceSameLine(map),
+                ifBraceBelowLine = getBool(map, "if-brace-below-line", false),
+                indentInsideIf = getInt(map, "indent-inside-if", 4),
             )
+
+        private fun parseEquals(map: Map<String, Any?>): Boolean {
+            val noEq = getBool(map, "enforce-no-spacing-around-equals", false)
+            return if (noEq) false else getBool(map, "enforce-spacing-around-equals", true)
+        }
+
+        private fun parseBraceSameLine(map: Map<String, Any?>): Boolean {
+            val below = getBool(map, "if-brace-below-line", false)
+            return if (below) false else getBool(map, "if-brace-same-line", true)
+        }
+
+        private fun getSingleSpaceKey(map: Map<String, Any?>): String =
+            if ("enforce-single-space-separation" in map) {
+                "enforce-single-space-separation"
+            } else {
+                "mandatory-single-space-separation"
+            }
+
+        private fun getBool(
+            map: Map<String, Any?>,
+            key: String,
+            default: Boolean,
+        ): Boolean {
+            val value = map[key] ?: return default
+            return (value as? Boolean) ?: (value as? String)?.toBoolean() ?: default
+        }
+
+        private fun getInt(
+            map: Map<String, Any?>,
+            key: String,
+            default: Int,
+        ): Int {
+            val value = map[key] ?: return default
+            return (value as? Number)?.toInt() ?: (value as? String)?.toIntOrNull() ?: default
         }
     }
 }

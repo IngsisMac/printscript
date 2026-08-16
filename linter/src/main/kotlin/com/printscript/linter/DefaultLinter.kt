@@ -28,4 +28,3 @@ class DefaultLinter(
         return errors
     }
 }
-

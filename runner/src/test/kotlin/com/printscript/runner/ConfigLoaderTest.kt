@@ -10,13 +10,14 @@ import java.io.StringReader
 class ConfigLoaderTest {
     @Test
     fun testParseSimpleJsonMap() {
-        val json = """
+        val json =
+            """
             {
                 "enforce-spacing-around-equals": true,
                 "line-breaks-after-println": 2,
                 "identifier-format": "camelCase"
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val map = ConfigLoader.parseJsonToMap(json)
 
@@ -27,14 +28,15 @@ class ConfigLoaderTest {
 
     @Test
     fun testParseJsonWithCommasInStrings() {
-        val json = """
+        val json =
+            """
             {
                 "message": "hello, world",
                 "enabled": false,
                 "escaped": "line1\nline2\t\"quoted\"",
                 "nullVal": null
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val map = ConfigLoader.parseJsonToMap(json)
 
@@ -45,16 +47,8 @@ class ConfigLoaderTest {
     }
 
     @Test
-    fun testParseArraysAndNumbers() {
-        val json = """
-            {
-                "numbers": [-1, 2.5, 0],
-                "items": ["a", "b"],
-                "emptyArr": [],
-                "emptyObj": {}
-            }
-        """.trimIndent()
-
+    fun testParseNumbers() {
+        val json = """{ "numbers": [-1, 2.5, 0] }"""
         val map = ConfigLoader.parseJsonToMap(json)
 
         @Suppress("UNCHECKED_CAST")
@@ -62,6 +56,12 @@ class ConfigLoaderTest {
         assertEquals(-1, numbers[0])
         assertEquals(2.5, numbers[1])
         assertEquals(0, numbers[2])
+    }
+
+    @Test
+    fun testParseArraysAndEmptyObjects() {
+        val json = """{ "items": ["a", "b"], "emptyArr": [], "emptyObj": {} }"""
+        val map = ConfigLoader.parseJsonToMap(json)
 
         @Suppress("UNCHECKED_CAST")
         val items = map["items"] as List<Any?>

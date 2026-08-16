@@ -135,4 +135,3 @@ object PrintScriptRunner {
         config: Reader,
     ): ExecutionResult = analyze(source, version, ConfigLoader.parseJsonToMap(config))
 }
-
