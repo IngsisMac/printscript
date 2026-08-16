@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class FormatterConfigTest {
-
     private lateinit var defaultConfig: FormatterConfig
 
     @BeforeEach
@@ -45,13 +44,14 @@ class FormatterConfigTest {
     @Test
     @DisplayName("Parseo desde mapa con claves personalizadas y tipos booleanos y numéricos")
     fun parseoDesdeMapaConClavesPersonalizadas() {
-        val map = mapOf(
-            "enforce-spacing-around-equals" to false,
-            "enforce-spacing-before-colon-in-declaration" to true,
-            "enforce-spacing-after-colon-in-declaration" to false,
-            "line-breaks-after-println" to 2,
-            "indent-inside-if" to 2,
-        )
+        val map =
+            mapOf(
+                "enforce-spacing-around-equals" to false,
+                "enforce-spacing-before-colon-in-declaration" to true,
+                "enforce-spacing-after-colon-in-declaration" to false,
+                "line-breaks-after-println" to 2,
+                "indent-inside-if" to 2,
+            )
 
         val config = FormatterConfig.fromMap(map)
 
@@ -65,12 +65,13 @@ class FormatterConfigTest {
     @Test
     @DisplayName("Parseo desde mapa con valores representados como String")
     fun parseoDesdeMapaConValoresString() {
-        val map = mapOf(
-            "enforce-spacing-around-equals" to "false",
-            "enforce-spacing-before-colon-in-declaration" to "true",
-            "line-breaks-after-println" to "3",
-            "indent-inside-if" to "8",
-        )
+        val map =
+            mapOf(
+                "enforce-spacing-around-equals" to "false",
+                "enforce-spacing-before-colon-in-declaration" to "true",
+                "line-breaks-after-println" to "3",
+                "indent-inside-if" to "8",
+            )
 
         val config = FormatterConfig.fromMap(map)
 
@@ -83,10 +84,11 @@ class FormatterConfigTest {
     @Test
     @DisplayName("Clave enforce-no-spacing-around-equals sobrescribe enforce-spacing-around-equals")
     fun claveEnforceNoSpacingSobrescribeEnforceSpacing() {
-        val map = mapOf(
-            "enforce-spacing-around-equals" to true,
-            "enforce-no-spacing-around-equals" to true,
-        )
+        val map =
+            mapOf(
+                "enforce-spacing-around-equals" to true,
+                "enforce-no-spacing-around-equals" to true,
+            )
 
         val config = FormatterConfig.fromMap(map)
 
@@ -97,10 +99,11 @@ class FormatterConfigTest {
     @Test
     @DisplayName("Clave if-brace-below-line sobrescribe if-brace-same-line")
     fun claveIfBraceBelowLineSobrescribeIfBraceSameLine() {
-        val map = mapOf(
-            "if-brace-same-line" to true,
-            "if-brace-below-line" to true,
-        )
+        val map =
+            mapOf(
+                "if-brace-same-line" to true,
+                "if-brace-below-line" to true,
+            )
 
         val config = FormatterConfig.fromMap(map)
 
@@ -111,10 +114,11 @@ class FormatterConfigTest {
     @Test
     @DisplayName("Manejo de valores inválidos en mapa utiliza valores por defecto")
     fun manejoDeValoresInvalidosUtilizaValoresPorDefecto() {
-        val map = mapOf<String, Any?>(
-            "enforce-spacing-around-equals" to 123,
-            "line-breaks-after-println" to "invalid-number",
-        )
+        val map =
+            mapOf<String, Any?>(
+                "enforce-spacing-around-equals" to 123,
+                "line-breaks-after-println" to "invalid-number",
+            )
 
         val config = FormatterConfig.fromMap(map)
 

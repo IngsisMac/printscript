@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test
 import java.io.StringWriter
 
 class DefaultFormatterTest {
-
     private lateinit var dummySpan: Span
     private lateinit var formatter: DefaultFormatter
     private lateinit var writer: StringWriter
@@ -64,10 +63,11 @@ class DefaultFormatterTest {
     @Test
     @DisplayName("Formateo de declaración con opciones de espaciado en dos puntos")
     fun formateoDeDeclaracionConEspaciadoEnDosPuntos() {
-        val config = FormatterConfig(
-            enforceSpacingBeforeColonInDeclaration = true,
-            enforceSpacingAfterColonInDeclaration = false,
-        )
+        val config =
+            FormatterConfig(
+                enforceSpacingBeforeColonInDeclaration = true,
+                enforceSpacingAfterColonInDeclaration = false,
+            )
         val decl = Declaration("a", "number", NumberLiteral("10", dummySpan), dummySpan, isConst = false)
 
         formatter.format(decl, writer, config)
@@ -106,11 +106,12 @@ class DefaultFormatterTest {
 
         formatter.format(ifStmt, writer, config)
 
-        val expected = """
+        val expected =
+            """
             if (cond) {
               let inside: number = 1;
             }
-        """.trimIndent() + "\n"
+            """.trimIndent() + "\n"
 
         assertEquals(expected, writer.toString())
     }
@@ -124,12 +125,13 @@ class DefaultFormatterTest {
 
         formatter.format(ifStmt, writer, config)
 
-        val expected = """
+        val expected =
+            """
             if (cond)
             {
                 let val: boolean = true;
             }
-        """.trimIndent() + "\n"
+            """.trimIndent() + "\n"
 
         assertEquals(expected, writer.toString())
     }
@@ -143,13 +145,14 @@ class DefaultFormatterTest {
 
         formatter.format(ifStmt, writer, defaultConfig)
 
-        val expected = """
+        val expected =
+            """
             if (isValid) {
                 println("Verdadero");
             } else {
                 println("Falso");
             }
-        """.trimIndent() + "\n"
+            """.trimIndent() + "\n"
 
         assertEquals(expected, writer.toString())
     }
@@ -164,7 +167,8 @@ class DefaultFormatterTest {
 
         formatter.format(ifStmt, writer, config)
 
-        val expected = """
+        val expected =
+            """
             if (isValid)
             {
                 println("Verdadero");
@@ -173,7 +177,7 @@ class DefaultFormatterTest {
             {
                 println("Falso");
             }
-        """.trimIndent() + "\n"
+            """.trimIndent() + "\n"
 
         assertEquals(expected, writer.toString())
     }

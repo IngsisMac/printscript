@@ -14,7 +14,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class ExpressionFormatterTest {
-
     private lateinit var dummySpan: Span
     private lateinit var defaultConfig: FormatterConfig
     private lateinit var noSpaceConfig: FormatterConfig

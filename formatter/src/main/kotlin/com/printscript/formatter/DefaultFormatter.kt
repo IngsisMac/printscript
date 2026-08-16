@@ -95,34 +95,44 @@ class DefaultFormatter : Formatter {
         val indent = " ".repeat(indentLevel * config.indentInsideIf)
         val condStr = ExpressionFormatter.format(ifStmt.condition, config)
 
-        if (config.ifBraceBelowLine) {
-            writer.write("${indent}if ($condStr)\n$indent{\n")
-        } else {
-            writer.write("${indent}if ($condStr) {\n")
-        }
-
-        for (stmt in ifStmt.thenBranch) {
-            format(stmt, writer, config, indentLevel + 1)
-        }
-
+        writeIfHeader(writer, indent, condStr, config.ifBraceBelowLine)
+        ifStmt.thenBranch.forEach { format(it, writer, config, indentLevel + 1) }
         writer.write("$indent}")
 
-        if (ifStmt.elseBranch != null) {
-            if (config.ifBraceBelowLine) {
-                writer.write("\n${indent}else\n$indent{\n")
-            } else {
-                writer.write(" else {\n")
-            }
-
-            for (stmt in ifStmt.elseBranch!!) {
-                format(stmt, writer, config, indentLevel + 1)
-            }
-
-            writer.write("$indent}")
-        }
+        formatElseBranch(ifStmt.elseBranch, writer, config, indent, indentLevel)
 
         if (config.mandatoryLineBreakAfterStatement) {
             writer.write("\n")
         }
+    }
+
+    private fun writeIfHeader(
+        writer: Writer,
+        indent: String,
+        condStr: String,
+        belowLine: Boolean,
+    ) {
+        if (belowLine) {
+            writer.write("${indent}if ($condStr)\n$indent{\n")
+        } else {
+            writer.write("${indent}if ($condStr) {\n")
+        }
+    }
+
+    private fun formatElseBranch(
+        elseBranch: List<com.printscript.ast.Statement>?,
+        writer: Writer,
+        config: FormatterConfig,
+        indent: String,
+        indentLevel: Int,
+    ) {
+        if (elseBranch == null) return
+        if (config.ifBraceBelowLine) {
+            writer.write("\n${indent}else\n$indent{\n")
+        } else {
+            writer.write(" else {\n")
+        }
+        elseBranch.forEach { format(it, writer, config, indentLevel + 1) }
+        writer.write("$indent}")
     }
 }

@@ -57,7 +57,9 @@ object ExpressionFormatter {
         val parentPrec = precedence(parentOp)
 
         if (childPrec < parentPrec) return true
-        if (childPrec == parentPrec && !isLeft && (parentOp == "-" || parentOp == "/")) return true
+        if (childPrec == parentPrec && !isLeft) {
+            return parentOp == "-" || parentOp == "/"
+        }
         return false
     }
 
