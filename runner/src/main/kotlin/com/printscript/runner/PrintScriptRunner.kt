@@ -97,7 +97,9 @@ object PrintScriptRunner {
             val parser = Parser(lexer, version)
             val statements = parser.parse()
             val linter = com.printscript.linter.DefaultLinter()
-            val linterConfig = com.printscript.linter.LinterConfig.fromMap(config)
+            val linterConfig =
+                com.printscript.linter.LinterConfig
+                    .fromMap(config)
             val errors = linter.analyze(statements, linterConfig)
             ExecutionResult(errors)
         } catch (e: ParseException) {
@@ -106,4 +108,3 @@ object PrintScriptRunner {
             OOM_RESULT
         }
 }
-

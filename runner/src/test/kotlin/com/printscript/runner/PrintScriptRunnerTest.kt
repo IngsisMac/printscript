@@ -204,7 +204,7 @@ class PrintScriptRunnerTest {
                     len: Int,
                 ): Int = throw OutOfMemoryError("Java heap space")
 
-                override fun close() {}
+                override fun close() = Unit
             }
         val writer = java.io.StringWriter()
 
@@ -245,7 +245,7 @@ class PrintScriptRunnerTest {
                     len: Int,
                 ): Int = throw OutOfMemoryError("Java heap space")
 
-                override fun close() {}
+                override fun close() = Unit
             }
 
         val result = PrintScriptRunner.analyze(failingReader, Version.V1_0, emptyMap())
@@ -254,4 +254,3 @@ class PrintScriptRunnerTest {
         assertEquals("Java heap space", result.errors[0].message)
     }
 }
-

@@ -68,7 +68,8 @@ class ParserInterpreterIntegrationTest {
         assertTrue(errors.isNotEmpty(), "Expected runtime error when reassigning const variable")
         assertTrue(
             errors.any {
-                it.message.contains("const", ignoreCase = true) || it.message.contains("reassign", ignoreCase = true) ||
+                it.message.contains("const", ignoreCase = true) ||
+                    it.message.contains("reassign", ignoreCase = true) ||
                     it.message.contains("MAX", ignoreCase = true)
             },
         )

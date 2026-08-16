@@ -51,22 +51,11 @@ class PipelineIntegrationTest {
     @DisplayName("Pipeline completo v1.1 - interacción con readInput y condicionales")
     fun fullPipelineV11ReadInputInteractionAndConditionals() {
         val code =
-            """
-            let userAgeStr: string = readInput("Age?");
-            let isAdult: boolean = true;
-            if (isAdult) {
-                println("User input received: " + userAgeStr);
-            } else {
-                println("No input");
-            }
-            """.trimIndent()
+            "let userAgeStr: string = readInput(\"Age?\");\nlet isAdult: boolean = true;\n" +
+                "if (isAdult) {\n    println(\"User input received: \" + userAgeStr);\n} else {\n    println(\"No input\");\n}"
 
-        val input = InputSource { "25" }
-        val lexer = Lexer(StringReader(code), Version.V1_1)
-        val parser = Parser(lexer, Version.V1_1)
-        val statements = parser.parse()
-        val interpreter = Interpreter(Version.V1_1, outputEmitter, input)
-        val errors = interpreter.execute(statements)
+        val statements = Parser(Lexer(StringReader(code), Version.V1_1), Version.V1_1).parse()
+        val errors = Interpreter(Version.V1_1, outputEmitter, InputSource { "25" }).execute(statements)
 
         assertTrue(errors.isEmpty(), "Expected clean execution but got: $errors")
         assertEquals(listOf("Age?", "User input received: 25"), outputBuffer)
@@ -76,24 +65,12 @@ class PipelineIntegrationTest {
     @DisplayName("Pipeline completo v1.1 - lógica booleana y scopes anidados")
     fun fullPipelineV11BooleanLogicAndNestedScopes() {
         val code =
-            """
-            const active: boolean = true;
-            let result: string = "initial";
-            if (active) {
-                let temp: string = "inside block";
-                result = temp;
-            } else {
-                result = "inactive";
-            }
-            println(result);
-            """.trimIndent()
+            "const active: boolean = true;\nlet result: string = \"initial\";\n" +
+                "if (active) {\n    let temp: string = \"inside block\";\n" +
+                "    result = temp;\n} else {\n    result = \"inactive\";\n}\nprintln(result);"
 
-        val input = InputSource { "" }
-        val lexer = Lexer(StringReader(code), Version.V1_1)
-        val parser = Parser(lexer, Version.V1_1)
-        val statements = parser.parse()
-        val interpreter = Interpreter(Version.V1_1, outputEmitter, input)
-        val errors = interpreter.execute(statements)
+        val statements = Parser(Lexer(StringReader(code), Version.V1_1), Version.V1_1).parse()
+        val errors = Interpreter(Version.V1_1, outputEmitter, InputSource { "" }).execute(statements)
 
         assertTrue(errors.isEmpty(), "Expected clean execution but got: $errors")
         assertEquals(listOf("inside block"), outputBuffer)
