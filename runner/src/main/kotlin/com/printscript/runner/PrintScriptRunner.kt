@@ -121,5 +121,18 @@ object PrintScriptRunner {
         } catch (e: OutOfMemoryError) {
             OOM_RESULT
         }
+
+    fun format(
+        source: Reader,
+        version: Version,
+        config: Reader,
+        writer: java.io.Writer,
+    ): ExecutionResult = format(source, version, ConfigLoader.parseJsonToMap(config), writer)
+
+    fun analyze(
+        source: Reader,
+        version: Version,
+        config: Reader,
+    ): ExecutionResult = analyze(source, version, ConfigLoader.parseJsonToMap(config))
 }
 
