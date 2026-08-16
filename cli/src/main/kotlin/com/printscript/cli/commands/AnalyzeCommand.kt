@@ -9,6 +9,7 @@ import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
 import picocli.CommandLine.Spec
 import java.io.File
+import java.io.PrintWriter
 import java.util.concurrent.Callable
 
 @Command(
@@ -30,36 +31,47 @@ class AnalyzeCommand : Callable<Int> {
     var versionStr: String = "1.0"
 
     override fun call(): Int {
-        val out = spec?.commandLine()?.out ?: java.io.PrintWriter(System.out, true)
-        val err = spec?.commandLine()?.err ?: java.io.PrintWriter(System.err, true)
+        val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
+        val targetFile = file ?: return printError(err, "Error: Archivo no encontrado ")
+        if (!targetFile.exists()) return printError(err, "Error: Archivo no encontrado ${targetFile.path}")
 
-        val targetFile = file
-        if (targetFile == null || !targetFile.exists()) {
-            err.println("Error: Archivo no encontrado ${targetFile?.path ?: ""}")
-            return 2
-        }
+        val version =
+            try {
+                Version.from(versionStr)
+            } catch (e: IllegalArgumentException) {
+                return printError(err, "Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
+            }
 
-        val version = try {
-            Version.from(versionStr)
-        } catch (e: IllegalArgumentException) {
-            err.println("Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
-            return 2
-        }
+        return analyzeScript(targetFile, version)
+    }
 
+    private fun analyzeScript(
+        targetFile: File,
+        version: Version,
+    ): Int {
+        val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
+        val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
         val config = ConfigLoader.loadConfig(configFile)
 
-        val result = targetFile.reader().use { reader ->
-            PrintScriptRunner.analyze(reader, version, config)
-        }
+        val result =
+            targetFile.reader().use { reader ->
+                PrintScriptRunner.analyze(reader, version, config)
+            }
 
         if (result.errors.isNotEmpty()) {
-            for (error in result.errors) {
-                err.println(error.render())
-            }
+            result.errors.forEach { err.println(it.render()) }
             return 1
         }
 
         out.println("Análisis completado sin violaciones de linter.")
         return 0
+    }
+
+    private fun printError(
+        err: PrintWriter,
+        message: String,
+    ): Int {
+        err.println(message)
+        return 2
     }
 }

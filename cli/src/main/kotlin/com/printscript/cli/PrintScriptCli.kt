@@ -20,7 +20,6 @@ import java.util.concurrent.Callable
     ],
 )
 class PrintScriptCli : Callable<Int> {
-
     @Spec
     var spec: CommandSpec? = null
 

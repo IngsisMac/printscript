@@ -13,7 +13,6 @@ import java.io.PrintStream
 import java.io.PrintWriter
 
 class AnalyzeCommandTest {
-
     private lateinit var outContent: ByteArrayOutputStream
     private lateinit var errContent: ByteArrayOutputStream
     private lateinit var outWriter: PrintWriter
@@ -35,10 +34,13 @@ class AnalyzeCommandTest {
 
     @Test
     @DisplayName("Análisis estático exitoso sin violaciones de linter")
-    fun analisisExitosoSinViolaciones(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "valid.ps").apply {
-            writeText("let myVar: number = 10;")
-        }
+    fun analisisExitosoSinViolaciones(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "valid.ps").apply {
+                writeText("let myVar: number = 10;")
+            }
 
         val exitCode = commandLine.execute("analyze", scriptFile.absolutePath)
 
@@ -55,10 +57,13 @@ class AnalyzeCommandTest {
 
     @Test
     @DisplayName("Retorna código de error al especificar una versión del lenguaje no soportada al analizar")
-    fun retornaErrorAlAnalizarConVersionInvalida(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "sample.ps").apply {
-            writeText("let x: number = 42;")
-        }
+    fun retornaErrorAlAnalizarConVersionInvalida(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "sample.ps").apply {
+                writeText("let x: number = 42;")
+            }
 
         val exitCode = commandLine.execute("analyze", scriptFile.absolutePath, "--version", "9.9")
 
@@ -67,13 +72,17 @@ class AnalyzeCommandTest {
 
     @Test
     @DisplayName("Análisis estático detecta y reporta violaciones de linter")
-    fun analisisReportaViolacionesDeLinter(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "invalid_linter.ps").apply {
-            writeText("let my_var: number = 10;")
-        }
-        val configFile = File(tempDir, "linter_config.json").apply {
-            writeText("{\"identifier_format\": \"camelCase\"}")
-        }
+    fun analisisReportaViolacionesDeLinter(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "invalid_linter.ps").apply {
+                writeText("let my_var: number = 10;")
+            }
+        val configFile =
+            File(tempDir, "linter_config.json").apply {
+                writeText("{\"identifier_format\": \"camelCase\"}")
+            }
 
         val exitCode = commandLine.execute("analyze", scriptFile.absolutePath, "--config", configFile.absolutePath)
 
@@ -82,10 +91,13 @@ class AnalyzeCommandTest {
 
     @Test
     @DisplayName("Retorna código de error cuando el archivo a analizar contiene errores de sintaxis")
-    fun retornaErrorAlAnalizarScriptConErroresSintacticos(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "invalid.ps").apply {
-            writeText("let x: number = ;")
-        }
+    fun retornaErrorAlAnalizarScriptConErroresSintacticos(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "invalid.ps").apply {
+                writeText("let x: number = ;")
+            }
 
         val exitCode = commandLine.execute("analyze", scriptFile.absolutePath)
 

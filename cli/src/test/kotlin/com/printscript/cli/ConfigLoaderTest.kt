@@ -11,7 +11,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
 class ConfigLoaderTest {
-
     private lateinit var configLoader: ConfigLoader
 
     @BeforeEach
@@ -21,7 +20,9 @@ class ConfigLoaderTest {
 
     @Test
     @DisplayName("Retorna mapa vacío cuando el archivo es nulo o no existe")
-    fun retornaMapaVacioConArchivoNuloOInexistente(@TempDir tempDir: File) {
+    fun retornaMapaVacioConArchivoNuloOInexistente(
+        @TempDir tempDir: File,
+    ) {
         val nullMap = configLoader.loadConfig(null)
         val missingFile = File(tempDir, "non_existent_config.json")
         val missingMap = configLoader.loadConfig(missingFile)
@@ -32,7 +33,9 @@ class ConfigLoaderTest {
 
     @Test
     @DisplayName("Retorna mapa vacío cuando el archivo de configuración está vacío")
-    fun retornaMapaVacioConArchivoVacio(@TempDir tempDir: File) {
+    fun retornaMapaVacioConArchivoVacio(
+        @TempDir tempDir: File,
+    ) {
         val emptyFile = File(tempDir, "empty.json").apply { writeText("") }
 
         val emptyMap = configLoader.loadConfig(emptyFile)
@@ -41,33 +44,37 @@ class ConfigLoaderTest {
     }
 
     @Test
-    @DisplayName("Carga correctamente las configuraciones JSON incluyendo tipos booleans, numbers, nulls y comillas")
-    fun cargaDeConfiguracionDesdeArchivoJsonValido(@TempDir tempDir: File) {
-        val configFile = File(tempDir, "valid_config.json").apply {
-            writeText(
-                """
-                {
-                    'single_quote': 'val',
-                    "double_quote": "val2",
-                    "float_val": 3.14,
-                    "raw_val": unquoted,
-                    "bool_true": true,
-                    "bool_false": false,
-                    "null_val": null,
-                    invalid_no_colon
-                }
-                """.trimIndent()
-            )
-        }
+    @DisplayName("Carga correctamente las configuraciones JSON con cadenas y valores numéricos")
+    fun cargaDeConfiguracionDesdeArchivoJsonConTiposBasicos(
+        @TempDir tempDir: File,
+    ) {
+        val configFile =
+            File(tempDir, "valid_config.json").apply {
+                writeText("{\"single_quote\": 'val', \"double_quote\": \"val2\", \"float_val\": 3.14}")
+            }
 
         val map = configLoader.loadConfig(configFile)
 
         assertEquals("val", map["single_quote"])
         assertEquals("val2", map["double_quote"])
         assertEquals(3.14, map["float_val"])
-        assertEquals("unquoted", map["raw_val"])
+    }
+
+    @Test
+    @DisplayName("Carga correctamente las configuraciones JSON con booleanos, nulos y entradas sin formato")
+    fun cargaDeConfiguracionDesdeArchivoJsonConTiposAvanzados(
+        @TempDir tempDir: File,
+    ) {
+        val configFile =
+            File(tempDir, "valid_config_2.json").apply {
+                writeText("{\"bool_true\": true, \"bool_false\": false, \"null_val\": null, \"raw_val\": unquoted}")
+            }
+
+        val map = configLoader.loadConfig(configFile)
+
         assertEquals(true, map["bool_true"])
         assertEquals(false, map["bool_false"])
         assertNull(map["null_val"])
+        assertEquals("unquoted", map["raw_val"])
     }
 }

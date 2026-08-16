@@ -11,7 +11,6 @@ import java.io.PrintStream
 import java.io.PrintWriter
 
 class PrintScriptCliTest {
-
     private lateinit var outContent: ByteArrayOutputStream
     private lateinit var errContent: ByteArrayOutputStream
     private lateinit var outWriter: PrintWriter

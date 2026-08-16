@@ -14,7 +14,6 @@ import java.io.PrintStream
 import java.io.PrintWriter
 
 class ExecuteCommandTest {
-
     private lateinit var outContent: ByteArrayOutputStream
     private lateinit var errContent: ByteArrayOutputStream
     private lateinit var outWriter: PrintWriter
@@ -36,10 +35,13 @@ class ExecuteCommandTest {
 
     @Test
     @DisplayName("Ejecución exitosa de un archivo PrintScript válido")
-    fun ejecucionExitosaDeArchivoValido(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "sample.ps").apply {
-            writeText("let x: number = 42;\nprintln(x);")
-        }
+    fun ejecucionExitosaDeArchivoValido(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "sample.ps").apply {
+                writeText("let x: number = 42;\nprintln(x);")
+            }
 
         val exitCode = commandLine.execute("execute", scriptFile.absolutePath, "--version", "1.0")
 
@@ -48,10 +50,13 @@ class ExecuteCommandTest {
 
     @Test
     @DisplayName("Ejecución emite la salida estándar mediante el OutputEmitter")
-    fun ejecucionEmiteSalidaEstandarConOutputEmitter(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "print_sample.ps").apply {
-            writeText("println(\"Hello Output\");")
-        }
+    fun ejecucionEmiteSalidaEstandarConOutputEmitter(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "print_sample.ps").apply {
+                writeText("println(\"Hello Output\");")
+            }
 
         val exitCode = commandLine.execute("execute", scriptFile.absolutePath)
         outWriter.flush()
@@ -71,10 +76,13 @@ class ExecuteCommandTest {
 
     @Test
     @DisplayName("Retorna código de error al especificar una versión del lenguaje no soportada al ejecutar")
-    fun retornaErrorAlEjecutarConVersionInvalida(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "sample.ps").apply {
-            writeText("let x: number = 42;")
-        }
+    fun retornaErrorAlEjecutarConVersionInvalida(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "sample.ps").apply {
+                writeText("let x: number = 42;")
+            }
 
         val exitCode = commandLine.execute("execute", scriptFile.absolutePath, "--version", "9.9")
 
@@ -83,10 +91,13 @@ class ExecuteCommandTest {
 
     @Test
     @DisplayName("Retorna código de error cuando el script contiene errores de sintaxis al ejecutar")
-    fun retornaErrorAlEjecutarScriptConErroresSintacticos(@TempDir tempDir: File) {
-        val scriptFile = File(tempDir, "invalid.ps").apply {
-            writeText("let x: number = ;")
-        }
+    fun retornaErrorAlEjecutarScriptConErroresSintacticos(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "invalid.ps").apply {
+                writeText("let x: number = ;")
+            }
 
         val exitCode = commandLine.execute("execute", scriptFile.absolutePath)
 

@@ -17,20 +17,24 @@ application {
 
 tasks.withType<JacocoReport>().configureEach {
     classDirectories.setFrom(
-        files(classDirectories.files.map {
-            fileTree(it) {
-                exclude("**/MainKt*")
-            }
-        })
+        files(
+            classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/MainKt*")
+                }
+            },
+        ),
     )
 }
 
 tasks.withType<JacocoCoverageVerification>().configureEach {
     classDirectories.setFrom(
-        files(classDirectories.files.map {
-            fileTree(it) {
-                exclude("**/MainKt*")
-            }
-        })
+        files(
+            classDirectories.files.map {
+                fileTree(it) {
+                    exclude("**/MainKt*")
+                }
+            },
+        ),
     )
 }

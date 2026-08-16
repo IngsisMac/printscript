@@ -9,6 +9,7 @@ import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
 import picocli.CommandLine.Spec
 import java.io.File
+import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.concurrent.Callable
 
@@ -31,38 +32,49 @@ class FormatCommand : Callable<Int> {
     var versionStr: String = "1.0"
 
     override fun call(): Int {
-        val out = spec?.commandLine()?.out ?: java.io.PrintWriter(System.out, true)
-        val err = spec?.commandLine()?.err ?: java.io.PrintWriter(System.err, true)
+        val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
+        val targetFile = file ?: return printError(err, "Error: Archivo no encontrado ")
+        if (!targetFile.exists()) return printError(err, "Error: Archivo no encontrado ${targetFile.path}")
 
-        val targetFile = file
-        if (targetFile == null || !targetFile.exists()) {
-            err.println("Error: Archivo no encontrado ${targetFile?.path ?: ""}")
-            return 2
-        }
+        val version =
+            try {
+                Version.from(versionStr)
+            } catch (e: IllegalArgumentException) {
+                return printError(err, "Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
+            }
 
-        val version = try {
-            Version.from(versionStr)
-        } catch (e: IllegalArgumentException) {
-            err.println("Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
-            return 2
-        }
+        return formatScript(targetFile, version)
+    }
 
+    private fun formatScript(
+        targetFile: File,
+        version: Version,
+    ): Int {
+        val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
+        val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
         val config = ConfigLoader.loadConfig(configFile)
         val writer = StringWriter()
 
-        val result = targetFile.reader().use { reader ->
-            PrintScriptRunner.format(reader, version, config, writer)
-        }
+        val result =
+            targetFile.reader().use { reader ->
+                PrintScriptRunner.format(reader, version, config, writer)
+            }
 
         if (result.errors.isNotEmpty()) {
-            for (error in result.errors) {
-                err.println(error.render())
-            }
+            result.errors.forEach { err.println(it.render()) }
             return 1
         }
 
         out.print(writer.toString())
         out.flush()
         return 0
+    }
+
+    private fun printError(
+        err: PrintWriter,
+        message: String,
+    ): Int {
+        err.println(message)
+        return 2
     }
 }
