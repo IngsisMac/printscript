@@ -4,22 +4,24 @@ import com.printscript.ast.Expression
 import com.printscript.ast.Statement
 import com.printscript.common.Span
 import com.printscript.common.Version
+import com.printscript.parser.statement.StatementParser
 import com.printscript.token.Token
 import com.printscript.token.TokenType
 
 class Parser(
     tokens: Iterator<Token>,
-    private val version: Version,
+    private val statementParsers: List<StatementParser>,
+    private val expressionParser: ExpressionParser,
 ) {
     private val stream = TokenStream(tokens)
-    private val expressionParser = ExpressionParser(version)
-    private val statementParsers: List<StatementParser> =
-        listOf(
-            DeclarationStatementParser(version),
-            AssignmentStatementParser(),
-            PrintStatementParser(),
-            IfStatementParser(version),
-        )
+
+    constructor(tokens: Iterator<Token>, config: ParserConfig) : this(
+        tokens,
+        config.statementParsers,
+        ExpressionParser(config.prefixParsers, config.infixParsers),
+    )
+
+    constructor(tokens: Iterator<Token>, version: Version) : this(tokens, ParserConfig.from(version))
 
     fun parse(): Iterator<Statement> =
         sequence {
@@ -38,6 +40,9 @@ class Parser(
         }
 
         val token = stream.peek()
+        if (token.lexeme == "if") {
+            throw ParseException("if statements are not supported in version 1.0", token.span)
+        }
         throw ParseException("Unexpected token '${token.lexeme}' (${token.type})", token.span)
     }
 

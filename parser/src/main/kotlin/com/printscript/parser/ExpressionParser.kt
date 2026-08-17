@@ -2,29 +2,17 @@ package com.printscript.parser
 
 import com.printscript.ast.Expression
 import com.printscript.common.Version
-import com.printscript.token.TokenType
+import com.printscript.parser.expression.infix.InfixParser
+import com.printscript.parser.expression.prefix.PrefixParser
 
 class ExpressionParser(
-    version: Version,
+    private val prefixParsers: List<PrefixParser>,
+    private val infixParsers: List<InfixParser>,
 ) {
-    private val prefixParsers: List<PrefixParser> =
-        listOf(
-            NumberLiteralPrefixParser(),
-            StringLiteralPrefixParser(),
-            BooleanLiteralPrefixParser(version),
-            ReadFunctionPrefixParser(version),
-            IdentifierOrCallPrefixParser(),
-            UnaryOperatorPrefixParser(),
-            GroupedExpressionPrefixParser(),
-        )
-
-    private val infixParsers: List<InfixParser> =
-        listOf(
-            BinaryOperatorInfixParser(TokenType.STAR, null, 30, 31, "*"),
-            BinaryOperatorInfixParser(TokenType.SLASH, null, 30, 31, "/"),
-            BinaryOperatorInfixParser(TokenType.PLUS, null, 20, 21, "+"),
-            BinaryOperatorInfixParser(TokenType.MINUS, null, 20, 21, "-"),
-        )
+    constructor(version: Version) : this(
+        ExpressionParserFactory.createPrefixParsers(version),
+        ExpressionParserFactory.createInfixParsers(),
+    )
 
     fun parseExpression(
         stream: TokenStream,
