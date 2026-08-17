@@ -23,8 +23,8 @@ class IdentifierFormatRule : LinterRule {
 
     private fun extractNameAndSpan(statement: Statement): Pair<String, Span>? =
         when (statement) {
-            is Declaration -> Pair(statement.name, statement.span)
-            is Assignment -> Pair(statement.name, statement.span)
+            is Declaration -> Pair(statement.name, statement.nameSpan)
+            is Assignment -> Pair(statement.name, statement.nameSpan)
             else -> null
         }
 

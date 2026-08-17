@@ -22,7 +22,7 @@ class NumberMatcher : TokenMatcher {
         val lexeme = readNumberLexeme(stream, startPos)
         validateTrailingDecimal(lexeme, startPos, stream)
 
-        val endPos = Position(stream.line, stream.column - 1)
+        val endPos = stream.getPreviousPosition()
         return Token(TokenType.NUMBER_LITERAL, lexeme, Span(startPos, endPos))
     }
 
@@ -68,7 +68,7 @@ class NumberMatcher : TokenMatcher {
         stream: CharStream,
     ) {
         if (lexeme.endsWith(".")) {
-            val endPos = Position(stream.line, stream.column - 1)
+            val endPos = stream.getPreviousPosition()
             throw LexerException(
                 "Invalid number literal: trailing decimal point in '$lexeme'",
                 Span(startPos, endPos),

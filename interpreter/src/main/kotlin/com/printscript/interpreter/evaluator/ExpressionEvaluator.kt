@@ -142,6 +142,6 @@ class CallExpressionEvaluator : ExpressionEvaluator<CallExpression> {
         if (context.isValidationMode) {
             return StringValue("")
         }
-        return StringValue(System.getenv(varName) ?: "")
+        return StringValue(context.env.env(varName) ?: "")
     }
 }

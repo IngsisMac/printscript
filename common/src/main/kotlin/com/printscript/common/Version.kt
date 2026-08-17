@@ -8,9 +8,14 @@ enum class Version(
     ;
 
     companion object {
-        fun from(id: String): Version =
-            entries.find { it.identifier == id }
-                ?: throw IllegalArgumentException("Unknown version: $id")
+        fun from(id: String): Result<Version> {
+            val version = entries.find { it.identifier == id }
+            return if (version != null) {
+                Result.success(version)
+            } else {
+                Result.failure(IllegalArgumentException("Unknown version: $id"))
+            }
+        }
     }
 
     override fun toString() = identifier

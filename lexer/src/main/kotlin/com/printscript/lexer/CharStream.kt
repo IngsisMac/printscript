@@ -19,6 +19,9 @@ class CharStream(
         }
     }
 
+    var lastPosition: Position = Position(1, 1)
+        private set
+
     fun peek(): Char? = currentChar?.toChar()
 
     fun hasMore(): Boolean = currentChar != null
@@ -26,6 +29,7 @@ class CharStream(
     fun advance(): Char? {
         val prev = peek()
         if (currentChar != null) {
+            lastPosition = Position(line, column)
             currentChar = source.read()
             if (currentChar == -1) {
                 currentChar = null
@@ -41,6 +45,8 @@ class CharStream(
     }
 
     fun getPosition(): Position = Position(line, column)
+
+    fun getPreviousPosition(): Position = lastPosition
 
     fun skipWhitespace() {
         while (hasMore()) {

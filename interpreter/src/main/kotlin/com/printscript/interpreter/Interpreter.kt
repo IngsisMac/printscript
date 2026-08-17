@@ -12,6 +12,7 @@ import com.printscript.ast.PrintStatement
 import com.printscript.ast.Statement
 import com.printscript.ast.StringLiteral
 import com.printscript.ast.Variable
+import com.printscript.common.EnvSource
 import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
 import com.printscript.common.Position
@@ -31,6 +32,7 @@ class Interpreter(
     override val version: Version,
     override val output: OutputEmitter = OutputEmitter { },
     override val input: InputSource = InputSource { "" },
+    override val env: EnvSource = EnvSource { System.getenv(it) },
     override val isValidationMode: Boolean = false,
 ) : InterpreterContext {
     private val globalEnv = Environment()

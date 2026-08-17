@@ -32,7 +32,7 @@ class IdentifierMatcher : TokenMatcher {
 
         val lexeme = sb.toString()
         val type = config.keywords[lexeme] ?: TokenType.IDENTIFIER
-        val endPos = Position(stream.line, stream.column - 1)
+        val endPos = stream.getPreviousPosition()
         return Token(type, lexeme, Span(startPos, endPos))
     }
 }

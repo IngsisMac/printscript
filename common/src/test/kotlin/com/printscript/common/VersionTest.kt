@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 
 class VersionTest {
     private lateinit var v10Identifier: String
@@ -22,24 +22,22 @@ class VersionTest {
         val id10 = v10Identifier
         val id11 = v11Identifier
 
-        val version10 = Version.from(id10)
-        val version11 = Version.from(id11)
+        val version10 = Version.from(id10).getOrNull()
+        val version11 = Version.from(id11).getOrNull()
 
         assertEquals(Version.V1_0, version10)
         assertEquals(Version.V1_1, version11)
     }
 
     @Test
-    @DisplayName("Version.from lanza IllegalArgumentException ante identificadores de versión no reconocidos")
-    fun versionFromLanzaIllegalArgumentExceptionAnteIdentificadoresNoReconocidos() {
+    @DisplayName("Version.from retorna Result.failure ante identificadores de versión no reconocidos")
+    fun versionFromRetornaFailureAnteIdentificadoresNoReconocidos() {
         val unknownId = "2.0"
 
-        val exception =
-            assertThrows<IllegalArgumentException> {
-                Version.from(unknownId)
-            }
+        val result = Version.from(unknownId)
 
-        assertEquals("Unknown version: 2.0", exception.message)
+        assertTrue(result.isFailure)
+        assertEquals("Unknown version: 2.0", result.exceptionOrNull()?.message)
     }
 
     @Test

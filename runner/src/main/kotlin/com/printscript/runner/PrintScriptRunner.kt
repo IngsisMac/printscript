@@ -1,5 +1,6 @@
 package com.printscript.runner
 
+import com.printscript.common.EnvSource
 import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
 import com.printscript.common.Position
@@ -38,12 +39,13 @@ object PrintScriptRunner {
         version: Version,
         output: OutputEmitter,
         input: InputSource,
+        env: EnvSource = EnvSource { System.getenv(it) },
     ): ExecutionResult =
         try {
             val lexer = Lexer(source, version)
             val parser = Parser(lexer, version)
             val statements = parser.parse()
-            val interpreter = Interpreter(version, output, input, isValidationMode = false)
+            val interpreter = Interpreter(version, output, input, env, isValidationMode = false)
             val errors = interpreter.execute(statements)
             ExecutionResult(errors)
         } catch (e: LexerException) {
@@ -103,6 +105,7 @@ object PrintScriptRunner {
         source: Reader,
         version: Version,
         config: Map<String, Any?> = emptyMap(),
+        onError: (PrintScriptError) -> Unit = {},
     ): ExecutionResult =
         try {
             val lexer = Lexer(source, version)
@@ -112,7 +115,7 @@ object PrintScriptRunner {
             val linterConfig =
                 com.printscript.linter.LinterConfig
                     .fromMap(config)
-            val errors = linter.analyze(statements, linterConfig)
+            val errors = linter.analyze(statements, linterConfig, onError)
             ExecutionResult(errors)
         } catch (e: LexerException) {
             ExecutionResult(listOf(e.toError()))
@@ -133,5 +136,6 @@ object PrintScriptRunner {
         source: Reader,
         version: Version,
         config: Reader,
-    ): ExecutionResult = analyze(source, version, ConfigLoader.parseJsonToMap(config))
+        onError: (PrintScriptError) -> Unit = {},
+    ): ExecutionResult = analyze(source, version, ConfigLoader.parseJsonToMap(config), onError)
 }

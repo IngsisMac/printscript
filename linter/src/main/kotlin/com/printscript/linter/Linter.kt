@@ -7,5 +7,6 @@ interface Linter {
     fun analyze(
         statements: Iterator<Statement>,
         config: LinterConfig = LinterConfig(),
+        onError: (PrintScriptError) -> Unit = {},
     ): List<PrintScriptError>
 }

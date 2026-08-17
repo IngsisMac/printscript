@@ -36,9 +36,7 @@ class AnalyzeCommand : Callable<Int> {
         if (!targetFile.exists()) return printError(err, "Error: Archivo no encontrado ${targetFile.path}")
 
         val version =
-            try {
-                Version.from(versionStr)
-            } catch (e: IllegalArgumentException) {
+            Version.from(versionStr).getOrElse {
                 return printError(err, "Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
             }
 

@@ -44,4 +44,17 @@ class LexerPositionTest {
         assertEquals(Position(2, 1), secondLetToken.span.start)
         assertEquals(Position(2, 3), secondLetToken.span.end)
     }
+
+    @Test
+    @DisplayName("Las posiciones de un string multilínea son correctas")
+    fun posicionesCorrectasEnStringMultiline() {
+        val code = "\"hola\nmundo\""
+        val lexer = createLexer(code)
+
+        val token = lexer.next()
+
+        assertEquals(TokenType.STRING_LITERAL, token.type)
+        assertEquals(Position(1, 1), token.span.start)
+        assertEquals(Position(2, 6), token.span.end)
+    }
 }

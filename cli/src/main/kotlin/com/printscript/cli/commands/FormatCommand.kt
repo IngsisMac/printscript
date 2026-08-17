@@ -37,9 +37,7 @@ class FormatCommand : Callable<Int> {
         if (!targetFile.exists()) return printError(err, "Error: Archivo no encontrado ${targetFile.path}")
 
         val version =
-            try {
-                Version.from(versionStr)
-            } catch (e: IllegalArgumentException) {
+            Version.from(versionStr).getOrElse {
                 return printError(err, "Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
             }
 
@@ -53,11 +51,10 @@ class FormatCommand : Callable<Int> {
         val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
         val config = ConfigLoader.loadConfig(configFile)
-        val writer = StringWriter()
 
         val result =
             targetFile.reader().use { reader ->
-                PrintScriptRunner.format(reader, version, config, writer)
+                PrintScriptRunner.format(reader, version, config, out)
             }
 
         if (result.errors.isNotEmpty()) {
@@ -65,7 +62,6 @@ class FormatCommand : Callable<Int> {
             return 1
         }
 
-        out.print(writer.toString())
         out.flush()
         return 0
     }

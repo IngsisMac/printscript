@@ -36,7 +36,7 @@ class SymbolMatcher : TokenMatcher {
         val startPos = stream.getPosition()
         val ch = stream.advance()!!
         val type = symbols[ch]!!
-        val endPos = Position(stream.line, stream.column - 1)
+        val endPos = stream.getPreviousPosition()
         return Token(type, ch.toString(), Span(startPos, endPos))
     }
 }

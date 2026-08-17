@@ -19,11 +19,16 @@ class DefaultLinter(
     override fun analyze(
         statements: Iterator<Statement>,
         config: LinterConfig,
+        onError: (PrintScriptError) -> Unit,
     ): List<PrintScriptError> {
         val visitor = AstVisitorLinter(rules, config)
         val errors = mutableListOf<PrintScriptError>()
         for (statement in statements) {
-            errors.addAll(statement.accept(visitor))
+            val stmtErrors = statement.accept(visitor)
+            for (error in stmtErrors) {
+                onError(error)
+                errors.add(error)
+            }
         }
         return errors
     }

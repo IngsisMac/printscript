@@ -22,7 +22,7 @@ class StringMatcher : TokenMatcher {
         val quoteChar = stream.advance()!!
         val content = readStringContent(stream, quoteChar, startPos)
 
-        val endPos = Position(stream.line, stream.column - 1)
+        val endPos = stream.getPreviousPosition()
         return Token(TokenType.STRING_LITERAL, content, Span(startPos, endPos))
     }
 

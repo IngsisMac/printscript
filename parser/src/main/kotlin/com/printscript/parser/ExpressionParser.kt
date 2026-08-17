@@ -24,9 +24,6 @@ class ExpressionParser(
             BinaryOperatorInfixParser(TokenType.SLASH, null, 30, 31, "/"),
             BinaryOperatorInfixParser(TokenType.PLUS, null, 20, 21, "+"),
             BinaryOperatorInfixParser(TokenType.MINUS, null, 20, 21, "-"),
-            BinaryOperatorInfixParser(null, "==", 10, 11, "=="),
-            BinaryOperatorInfixParser(null, "&&", 5, 6, "&&"),
-            BinaryOperatorInfixParser(null, "||", 3, 4, "||"),
         )
 
     fun parseExpression(
