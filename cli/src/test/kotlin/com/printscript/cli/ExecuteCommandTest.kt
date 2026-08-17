@@ -114,4 +114,30 @@ class ExecuteCommandTest {
 
         assertEquals(2, code)
     }
+
+    @Test
+    @DisplayName("Manejo de archivo con versión inválida directamente en ExecuteCommand")
+    fun manejoDeVersionInvalidaEnExecuteCommandDirecto(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile = File(tempDir, "sample.ps").apply { writeText("let x: number = 42;") }
+        val cmd = ExecuteCommand()
+        cmd.file = scriptFile
+        cmd.versionStr = "9.9"
+
+        val code = cmd.call()
+
+        assertEquals(2, code)
+    }
+
+    @Test
+    @DisplayName("Manejo de archivo no existente directamente en ExecuteCommand")
+    fun manejoDeArchivoInexistenteEnExecuteCommandDirecto() {
+        val cmd = ExecuteCommand()
+        cmd.file = File("non_existent_file.ps")
+
+        val code = cmd.call()
+
+        assertEquals(2, code)
+    }
 }

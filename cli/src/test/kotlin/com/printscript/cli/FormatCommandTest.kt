@@ -99,4 +99,30 @@ class FormatCommandTest {
 
         assertEquals(2, code)
     }
+
+    @Test
+    @DisplayName("Manejo de archivo con versión inválida directamente en FormatCommand")
+    fun manejoDeVersionInvalidaEnFormatCommandDirecto(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile = File(tempDir, "sample.ps").apply { writeText("let x: number = 42;") }
+        val cmd = FormatCommand()
+        cmd.file = scriptFile
+        cmd.versionStr = "9.9"
+
+        val code = cmd.call()
+
+        assertEquals(2, code)
+    }
+
+    @Test
+    @DisplayName("Manejo de archivo no existente directamente en FormatCommand")
+    fun manejoDeArchivoInexistenteEnFormatCommandDirecto() {
+        val cmd = FormatCommand()
+        cmd.file = File("non_existent_file.ps")
+
+        val code = cmd.call()
+
+        assertEquals(2, code)
+    }
 }

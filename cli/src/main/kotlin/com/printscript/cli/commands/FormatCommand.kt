@@ -10,7 +10,6 @@ import picocli.CommandLine.Parameters
 import picocli.CommandLine.Spec
 import java.io.File
 import java.io.PrintWriter
-import java.io.StringWriter
 import java.util.concurrent.Callable
 
 @Command(

@@ -1,6 +1,5 @@
 package com.printscript.lexer.matchers
 
-import com.printscript.common.Position
 import com.printscript.common.Span
 import com.printscript.lexer.CharStream
 import com.printscript.lexer.TokenConfig
