@@ -1,0 +1,106 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.ast" {
+
+    interface AstNode {
+        + span : Span
+        + accept(visitor : AstVisitor<R>) : R
+    }
+
+    interface AstVisitor<R> {
+        + visit(node : Declaration) : R
+        + visit(node : Assignment) : R
+        + visit(node : PrintStatement) : R
+        + visit(node : IfStatement) : R
+        + visit(node : NumberLiteral) : R
+        + visit(node : StringLiteral) : R
+        + visit(node : BooleanLiteral) : R
+        + visit(node : Variable) : R
+        + visit(node : BinaryOp) : R
+        + visit(node : CallExpression) : R
+    }
+
+    abstract class Statement implements AstNode {
+        + span : Span
+    }
+
+    abstract class Expression implements AstNode {
+        + span : Span
+    }
+
+    class Declaration extends Statement {
+        + name : String
+        + type : String
+        + value : Expression?
+        + isConst : Boolean
+        + span : Span
+        + nameSpan : Span
+    }
+
+    class Assignment extends Statement {
+        + name : String
+        + value : Expression
+        + span : Span
+        + nameSpan : Span
+    }
+
+    class PrintStatement extends Statement {
+        + expression : Expression
+        + span : Span
+    }
+
+    class IfStatement extends Statement {
+        + condition : Expression
+        + thenBranch : List<Statement>
+        + elseBranch : List<Statement>?
+        + span : Span
+    }
+
+    class NumberLiteral extends Expression {
+        + value : String
+        + span : Span
+    }
+
+    class StringLiteral extends Expression {
+        + value : String
+        + span : Span
+    }
+
+    class BooleanLiteral extends Expression {
+        + value : Boolean
+        + span : Span
+    }
+
+    class Variable extends Expression {
+        + name : String
+        + span : Span
+    }
+
+    class BinaryOp extends Expression {
+        + left : Expression
+        + operator : String
+        + right : Expression
+        + span : Span
+    }
+
+    class CallExpression extends Expression {
+        + name : String
+        + argument : Expression?
+        + span : Span
+    }
+
+    Declaration --> "0..1" Expression : value
+    Assignment --> "1" Expression : value
+    PrintStatement --> "1" Expression : expression
+    IfStatement --> "1" Expression : condition
+    IfStatement --> "*" Statement : thenBranch
+    IfStatement --> "0..*" Statement : elseBranch
+    BinaryOp --> "1" Expression : left
+    BinaryOp --> "1" Expression : right
+    CallExpression --> "0..1" Expression : argument
+    Statement ..> AstVisitor
+    Expression ..> AstVisitor
+}
+
+@enduml

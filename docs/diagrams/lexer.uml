@@ -1,0 +1,69 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.lexer" {
+
+    class Lexer implements Iterator {
+        - stream : CharStream
+        - version : Version
+        - config : TokenConfig
+        - matchers : List<TokenMatcher>
+        - nextToken : Token?
+        + hasNext() : Boolean
+        + next() : Token
+        - readNextToken() : Token?
+    }
+
+    class CharStream {
+        - reader : Reader
+        - position : Position
+        - buffer : StringBuilder
+        + hasMore() : Boolean
+        + peek() : Char?
+        + advance() : Char?
+        + skipWhitespace()
+        + getPosition() : Position
+    }
+
+    interface TokenMatcher {
+        + canMatch(stream : CharStream) : Boolean
+        + match(stream : CharStream, config : TokenConfig) : Token
+    }
+
+    class SymbolMatcher implements TokenMatcher {
+        + canMatch(stream : CharStream) : Boolean
+        + match(stream : CharStream, config : TokenConfig) : Token
+    }
+
+    class IdentifierMatcher implements TokenMatcher {
+        + canMatch(stream : CharStream) : Boolean
+        + match(stream : CharStream, config : TokenConfig) : Token
+    }
+
+    class NumberMatcher implements TokenMatcher {
+        + canMatch(stream : CharStream) : Boolean
+        + match(stream : CharStream, config : TokenConfig) : Token
+    }
+
+    class StringMatcher implements TokenMatcher {
+        + canMatch(stream : CharStream) : Boolean
+        + match(stream : CharStream, config : TokenConfig) : Token
+    }
+
+    class TokenConfig {
+        + keywords : Map<String, TokenType>
+        + version : Version
+        + {static} from(version : Version) : TokenConfig
+    }
+
+    class LexerException {
+        + message : String
+        + span : Span
+    }
+
+    Lexer --> "1" CharStream : stream
+    Lexer --> "*" TokenMatcher : matchers
+    Lexer --> "1" TokenConfig : config
+}
+
+@enduml

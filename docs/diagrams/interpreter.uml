@@ -1,0 +1,76 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+package "com.printscript.interpreter" {
+
+    interface InterpreterContext {
+        + version : Version
+        + output : OutputEmitter
+        + input : InputSource
+        + env : EnvSource
+        + isValidationMode : Boolean
+        + executeStatement(stmt : Statement, env : Environment)
+        + evaluateExpression(expr : Expression, env : Environment) : Value
+    }
+
+    class Interpreter implements InterpreterContext {
+        - globalEnv : Environment
+        - errors : List<PrintScriptError>
+        - declarationEvaluator : DeclarationEvaluator
+        - assignmentEvaluator : AssignmentEvaluator
+        - printEvaluator : PrintStatementEvaluator
+        - ifEvaluator : IfStatementEvaluator
+        - literalEvaluator : LiteralEvaluator
+        - variableEvaluator : VariableEvaluator
+        - binaryOpEvaluator : BinaryOpEvaluator
+        - callExprEvaluator : CallExpressionEvaluator
+        + execute(statements : Iterator<Statement>) : List<PrintScriptError>
+    }
+
+    class Environment {
+        - parent : Environment?
+        - variables : Map<String, Symbol>
+        + define(name : String, type : String, isConst : Boolean, value : Value?, span : Span)
+        + set(name : String, value : Value, span : Span)
+        + get(name : String, span : Span) : Value
+        + getSymbol(name : String) : Symbol?
+        + child() : Environment
+    }
+
+    class Symbol {
+        + name : String
+        + type : String
+        + isConst : Boolean
+        + isInitialized : Boolean
+        + value : Value?
+    }
+
+    abstract class Value {
+        + typeName : String
+        + toNumber(span : Span) : BigDecimal
+    }
+
+    class NumberValue extends Value {
+        + value : BigDecimal
+    }
+
+    class StringValue extends Value {
+        + value : String
+    }
+
+    class BooleanValue extends Value {
+        + value : Boolean
+    }
+
+    class InterpreterException {
+        + message : String
+        + span : Span
+    }
+
+    Interpreter --> "1" Environment : globalEnv
+    Environment --> "0..1" Environment : parent
+    Environment *-- "*" Symbol : variables
+    Symbol --> "0..1" Value : value
+}
+
+@enduml
