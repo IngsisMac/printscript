@@ -5,6 +5,7 @@ plugins {
 
 allprojects {
     group = "com.printscript"
+    version = "1.0.0-SNAPSHOT"
 }
 
 tasks.register<Copy>("installGitHooks") {

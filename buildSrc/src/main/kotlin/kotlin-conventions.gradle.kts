@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     `java-library`
+    `maven-publish`
     id("com.diffplug.spotless")
     id("io.gitlab.arturbosch.detekt")
     jacoco
@@ -13,9 +14,29 @@ kotlin {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
 }
 
-version = "0.1.0"
+version = "1.0.0-SNAPSHOT"
+
+configure<PublishingExtension> {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            val targetRepo = System.getenv("GITHUB_REPOSITORY") ?: "IngsisMac/printscript"
+            url = uri("https://maven.pkg.github.com/$targetRepo")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: "git"
+                password = System.getenv("GITHUB_TOKEN") ?: ""
+            }
+        }
+    }
+}
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {

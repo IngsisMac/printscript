@@ -3,52 +3,98 @@ skinparam classAttributeIconSize 0
 
 package "com.printscript.parser" {
 
-    interface Parser {
-        + hasNext() : Boolean
-        + next() : Statement
+    class Parser {
+        - tokenStream : TokenStream
+        - statementParsers : List<StatementParser>
+        - expressionParser : ExpressionParser
+        + parse() : Iterator<Statement>
+        + parseNextStatement() : Statement
+        + parseExpression(minBp : Int) : Expression
     }
 
-    class DefaultParser {
-        - tokenStream : TokenStream
-        - statementParser : StatementParser
-        + hasNext() : Boolean
-        + next() : Statement
+    class ParserConfig {
+        + statementParsers : List<StatementParser>
+        + prefixParsers : List<PrefixParser>
+        + infixParsers : List<InfixParser>
+        + version : Version
+        + {static} from(version : Version) : ParserConfig
+    }
+
+    class StatementParserFactory {
+        + {static} create(version : Version) : List<StatementParser>
+    }
+
+    class ExpressionParserFactory {
+        + {static} createPrefixParsers(version : Version) : List<PrefixParser>
+        + {static} createInfixParsers() : List<InfixParser>
+        + {static} create(version : Version) : ExpressionParser
     }
 
     class TokenStream {
         - tokenIterator : Iterator<Token>
         + peek() : Token
         + consume() : Token
-        + consumeIf(type : TokenType) : Token
         + expect(type : TokenType) : Token
-    }
-
-    class StatementParser {
-        - expressionParser : ExpressionParser
-        + parseStatement(tokens : TokenStream) : Statement
+        + match(type : TokenType) : Boolean
     }
 
     class ExpressionParser {
-        - prefixParsers : Map<TokenType, PrefixParser>
-        - infixParsers : Map<TokenType, InfixParser>
-        + parseExpression(tokens : TokenStream, precedence : Int) : Expression
+        - prefixParsers : List<PrefixParser>
+        - infixParsers : List<InfixParser>
+        + parseExpression(stream : TokenStream, minBp : Int) : Expression
+        + parseUnaryExpression(stream : TokenStream) : Expression
     }
-
-    interface PrefixParser {
-        + parse(tokens : TokenStream, parser : ExpressionParser) : Expression
-    }
-
-    interface InfixParser {
-        + getPrecedence() : Int
-        + parse(tokens : TokenStream, left : Expression, parser : ExpressionParser) : Expression
-    }
-
-    Parser <|.. DefaultParser
-    DefaultParser --> "1" TokenStream : tokenStream
-    DefaultParser --> "1" StatementParser : statementParser
-    StatementParser --> "1" ExpressionParser : expressionParser
-    ExpressionParser --> "*" PrefixParser : prefixParsers
-    ExpressionParser --> "*" InfixParser : infixParsers
 }
+
+package "com.printscript.parser.statement" {
+    interface StatementParser {
+        + matches(stream : TokenStream) : Boolean
+        + parse(stream : TokenStream, parser : Parser) : Statement
+    }
+    class DeclarationStatementParser implements StatementParser
+    class AssignmentStatementParser implements StatementParser
+    class PrintStatementParser implements StatementParser
+    class IfStatementParser implements StatementParser
+}
+
+package "com.printscript.parser.expression.prefix" {
+    interface PrefixParser {
+        + matches(token : Token) : Boolean
+        + parse(token : Token, stream : TokenStream, parser : ExpressionParser) : Expression
+    }
+    class NumberLiteralPrefixParser implements PrefixParser
+    class StringLiteralPrefixParser implements PrefixParser
+    class BooleanLiteralPrefixParser implements PrefixParser
+    class IdentifierOrCallPrefixParser implements PrefixParser
+    class ReadFunctionPrefixParser implements PrefixParser
+    class UnaryOperatorPrefixParser implements PrefixParser
+    class GroupedExpressionPrefixParser implements PrefixParser
+}
+
+package "com.printscript.parser.expression.infix" {
+    interface InfixParser {
+        + leftBindingPower : Int
+        + rightBindingPower : Int
+        + matches(token : Token) : Boolean
+        + parse(left : Expression, opToken : Token, stream : TokenStream, parser : ExpressionParser) : Expression
+    }
+    class BinaryOperatorInfixParser implements InfixParser
+}
+
+Parser --> TokenStream
+Parser --> "1..*" StatementParser
+Parser --> ExpressionParser
+Parser ..> ParserConfig
+
+ParserConfig --> "1..*" StatementParser
+ParserConfig --> "1..*" PrefixParser
+ParserConfig --> "1..*" InfixParser
+
+StatementParserFactory ..> StatementParser
+ExpressionParserFactory ..> PrefixParser
+ExpressionParserFactory ..> InfixParser
+
+ExpressionParser --> "1..*" PrefixParser
+ExpressionParser --> "1..*" InfixParser
 
 @enduml
