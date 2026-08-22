@@ -12,6 +12,8 @@ data class FormatterConfig(
     val ifBraceSameLine: Boolean = true,
     val ifBraceBelowLine: Boolean = false,
     val indentInsideIf: Int = 4,
+    val enforceNoSpaceBeforeSemicolon: Boolean = true,
+    val maxBlankLinesBetweenStatements: Int = 1,
 ) {
     companion object {
         fun fromMap(map: Map<String, Any?>): FormatterConfig =
@@ -37,6 +39,8 @@ data class FormatterConfig(
                 ifBraceSameLine = parseBraceSameLine(map),
                 ifBraceBelowLine = getBool(map, "if-brace-below-line", false),
                 indentInsideIf = getInt(map, "indent-inside-if", 4),
+                enforceNoSpaceBeforeSemicolon = getBool(map, "enforce-no-space-before-semicolon", true),
+                maxBlankLinesBetweenStatements = getInt(map, "max-blank-lines-between-statements", 1),
             )
 
         private fun parseEquals(map: Map<String, Any?>): Boolean {

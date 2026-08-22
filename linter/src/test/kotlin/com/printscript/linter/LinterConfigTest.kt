@@ -19,6 +19,8 @@ class LinterConfigTest {
                 "identifier_format" to "camel case",
                 "mandatory-variable-or-literal-in-println" to true,
                 "mandatory-variable-or-literal-in-readInput" to true,
+                "no-unused-variables" to true,
+                "no-empty-println" to true,
             )
     }
 
@@ -30,6 +32,8 @@ class LinterConfigTest {
         assertEquals(IdentifierFormat.NONE, config.identifierFormat)
         assertFalse(config.mandatoryVariableOrLiteralInPrintln)
         assertFalse(config.mandatoryVariableOrLiteralInReadInput)
+        assertFalse(config.noUnusedVariables)
+        assertFalse(config.noEmptyPrintln)
     }
 
     @Test
@@ -40,6 +44,8 @@ class LinterConfigTest {
         assertEquals(IdentifierFormat.CAMEL_CASE, config.identifierFormat)
         assertTrue(config.mandatoryVariableOrLiteralInPrintln)
         assertTrue(config.mandatoryVariableOrLiteralInReadInput)
+        assertTrue(config.noUnusedVariables)
+        assertTrue(config.noEmptyPrintln)
     }
 
     @Test
@@ -50,6 +56,8 @@ class LinterConfigTest {
                 "identifier_format" to "snake case",
                 "mandatory-variable-or-literal-in-println" to "true",
                 "mandatory-variable-or-literal-in-readInput" to "false",
+                "no-unused-variables" to "true",
+                "no-empty-println" to "false",
             )
 
         val config = LinterConfig.fromMap(stringConfigMap)
@@ -57,5 +65,7 @@ class LinterConfigTest {
         assertEquals(IdentifierFormat.SNAKE_CASE, config.identifierFormat)
         assertTrue(config.mandatoryVariableOrLiteralInPrintln)
         assertFalse(config.mandatoryVariableOrLiteralInReadInput)
+        assertTrue(config.noUnusedVariables)
+        assertFalse(config.noEmptyPrintln)
     }
 }

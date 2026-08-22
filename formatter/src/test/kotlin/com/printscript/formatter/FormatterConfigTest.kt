@@ -29,6 +29,8 @@ class FormatterConfigTest {
         assertTrue(defaultConfig.ifBraceSameLine)
         assertFalse(defaultConfig.ifBraceBelowLine)
         assertEquals(4, defaultConfig.indentInsideIf)
+        assertTrue(defaultConfig.enforceNoSpaceBeforeSemicolon)
+        assertEquals(1, defaultConfig.maxBlankLinesBetweenStatements)
     }
 
     @Test

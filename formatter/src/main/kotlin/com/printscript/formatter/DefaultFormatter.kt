@@ -36,12 +36,13 @@ class DefaultFormatter : Formatter {
         val kwSpace = if (config.mandatorySingleSpaceSeparation) " " else ""
         val head = "$indent$keyword$kwSpace${declaration.name}$spaceBeforeColon:$spaceAfterColon${declaration.type}"
 
+        val semi = if (config.enforceNoSpaceBeforeSemicolon) ";" else " ;"
         if (declaration.value != null) {
             val equalsSpace = if (config.enforceSpacingAroundEquals) " = " else "="
             val valueStr = ExpressionFormatter.format(declaration.value!!, config)
-            writer.write("$head$equalsSpace$valueStr;")
+            writer.write("$head$equalsSpace$valueStr$semi")
         } else {
-            writer.write("$head;")
+            writer.write("$head$semi")
         }
 
         if (config.mandatoryLineBreakAfterStatement) {
@@ -57,8 +58,9 @@ class DefaultFormatter : Formatter {
     ) {
         val equalsSpace = if (config.enforceSpacingAroundEquals) " = " else "="
         val valueStr = ExpressionFormatter.format(assignment.value, config)
+        val semi = if (config.enforceNoSpaceBeforeSemicolon) ";" else " ;"
 
-        writer.write("$indent${assignment.name}$equalsSpace$valueStr;")
+        writer.write("$indent${assignment.name}$equalsSpace$valueStr$semi")
 
         if (config.mandatoryLineBreakAfterStatement) {
             writer.write("\n")
@@ -72,15 +74,19 @@ class DefaultFormatter : Formatter {
         indent: String,
     ) {
         val exprStr = ExpressionFormatter.format(printStmt.expression, config)
-        writer.write("${indent}println($exprStr);")
+        val semi = if (config.enforceNoSpaceBeforeSemicolon) ";" else " ;"
+        writer.write("${indent}println($exprStr)$semi")
 
         // Mandatory line break for the statement itself
         if (config.mandatoryLineBreakAfterStatement) {
             writer.write("\n")
         }
 
-        // Additional line breaks configured for println
-        val extraNewlines = (config.lineBreaksAfterPrintln - 1).coerceAtLeast(0)
+        // Additional line breaks configured for println capped by maxBlankLinesBetweenStatements
+        val extraNewlines =
+            (config.lineBreaksAfterPrintln - 1)
+                .coerceAtLeast(0)
+                .coerceAtMost(config.maxBlankLinesBetweenStatements)
         repeat(extraNewlines) {
             writer.write("\n")
         }

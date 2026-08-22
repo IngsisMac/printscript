@@ -9,4 +9,8 @@ interface LinterRule {
         statement: Statement,
         config: LinterConfig,
     ): List<PrintScriptError>
+
+    fun finish(config: LinterConfig): List<PrintScriptError> = emptyList()
+
+    fun reset() {}
 }

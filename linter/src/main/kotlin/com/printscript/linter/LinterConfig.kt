@@ -4,6 +4,8 @@ data class LinterConfig(
     val identifierFormat: IdentifierFormat = IdentifierFormat.NONE,
     val mandatoryVariableOrLiteralInPrintln: Boolean = false,
     val mandatoryVariableOrLiteralInReadInput: Boolean = false,
+    val noUnusedVariables: Boolean = false,
+    val noEmptyPrintln: Boolean = false,
 ) {
     companion object {
         fun fromMap(map: Map<String, Any?>): LinterConfig {
@@ -26,6 +28,8 @@ data class LinterConfig(
                 identifierFormat = identifierFormat,
                 mandatoryVariableOrLiteralInPrintln = getBool("mandatory-variable-or-literal-in-println"),
                 mandatoryVariableOrLiteralInReadInput = getBool("mandatory-variable-or-literal-in-readInput"),
+                noUnusedVariables = getBool("no-unused-variables"),
+                noEmptyPrintln = getBool("no-empty-println"),
             )
         }
     }
