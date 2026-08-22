@@ -123,7 +123,8 @@ class IfStatementEvaluator : StatementEvaluator<IfStatement> {
     }
 }
 
-private fun isReadInputCall(expr: com.printscript.ast.Expression?): Boolean = expr is CallExpression && expr.name == "readInput"
+private fun isReadInputCall(expr: com.printscript.ast.Expression?): Boolean =
+    expr is CallExpression && expr.name == "readInput"
 
 private fun coerceStringValue(
     strValue: String,

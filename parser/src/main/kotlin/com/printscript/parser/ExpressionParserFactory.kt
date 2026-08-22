@@ -50,5 +50,6 @@ object ExpressionParserFactory {
             BinaryOperatorInfixParser(TokenType.MINUS, null, 20, 21, "-"),
         )
 
-    fun create(version: Version): ExpressionParser = ExpressionParser(createPrefixParsers(version), createInfixParsers())
+    fun create(version: Version): ExpressionParser =
+        ExpressionParser(createPrefixParsers(version), createInfixParsers())
 }

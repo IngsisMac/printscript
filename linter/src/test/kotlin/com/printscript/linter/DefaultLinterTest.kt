@@ -32,7 +32,8 @@ class DefaultLinterTest {
                 Declaration("x", "number", NumberLiteral("5", span), span),
                 PrintStatement(Variable("x", span), span),
             )
-        val config = LinterConfig(identifierFormat = IdentifierFormat.CAMEL_CASE, mandatoryVariableOrLiteralInPrintln = true)
+        val config =
+            LinterConfig(identifierFormat = IdentifierFormat.CAMEL_CASE, mandatoryVariableOrLiteralInPrintln = true)
 
         val errors = linter.analyze(statements.iterator(), config)
 
@@ -47,7 +48,8 @@ class DefaultLinterTest {
                 Declaration("my_variable", "number", NumberLiteral("5", span), span),
                 PrintStatement(BinaryOp(Variable("a", span), "+", Variable("b", span), span), span),
             )
-        val config = LinterConfig(identifierFormat = IdentifierFormat.CAMEL_CASE, mandatoryVariableOrLiteralInPrintln = true)
+        val config =
+            LinterConfig(identifierFormat = IdentifierFormat.CAMEL_CASE, mandatoryVariableOrLiteralInPrintln = true)
 
         val errors = linter.analyze(statements.iterator(), config)
 
@@ -60,7 +62,8 @@ class DefaultLinterTest {
         val invalidThenStmt = Declaration("invalid_name", "number", NumberLiteral("1", span), span)
         val invalidElseStmt = PrintStatement(BinaryOp(Variable("a", span), "+", Variable("b", span), span), span)
         val ifStmt = IfStatement(Variable("cond", span), listOf(invalidThenStmt), listOf(invalidElseStmt), span)
-        val config = LinterConfig(identifierFormat = IdentifierFormat.CAMEL_CASE, mandatoryVariableOrLiteralInPrintln = true)
+        val config =
+            LinterConfig(identifierFormat = IdentifierFormat.CAMEL_CASE, mandatoryVariableOrLiteralInPrintln = true)
 
         val errors = linter.analyze(listOf(ifStmt).iterator(), config)
 

@@ -42,7 +42,11 @@ class ParserInterpreterIntegrationTest {
         val statements =
             listOf(
                 Declaration("counter", "number", NumberLiteral("10", dummySpan), dummySpan, isConst = false),
-                Assignment("counter", BinaryOp(Variable("counter", dummySpan), "+", NumberLiteral("5", dummySpan), dummySpan), dummySpan),
+                Assignment(
+                    "counter",
+                    BinaryOp(Variable("counter", dummySpan), "+", NumberLiteral("5", dummySpan), dummySpan),
+                    dummySpan
+                ),
                 PrintStatement(Variable("counter", dummySpan), dummySpan),
             )
 

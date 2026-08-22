@@ -8,7 +8,8 @@ import com.printscript.parser.TokenStream
 import com.printscript.token.TokenType
 
 class AssignmentStatementParser : StatementParser {
-    override fun matches(stream: TokenStream): Boolean = stream.check(TokenType.IDENTIFIER) && stream.peekNext().type == TokenType.EQUAL
+    override fun matches(stream: TokenStream): Boolean =
+        stream.check(TokenType.IDENTIFIER) && stream.peekNext().type == TokenType.EQUAL
 
     override fun parse(
         stream: TokenStream,

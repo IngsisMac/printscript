@@ -18,8 +18,18 @@ data class FormatterConfig(
             FormatterConfig(
                 enforceSpacingAroundEquals = parseEquals(map),
                 enforceNoSpacingAroundEquals = getBool(map, "enforce-no-spacing-around-equals", false),
-                enforceSpacingBeforeColonInDeclaration = getBool(map, "enforce-spacing-before-colon-in-declaration", false),
-                enforceSpacingAfterColonInDeclaration = getBool(map, "enforce-spacing-after-colon-in-declaration", true),
+                enforceSpacingBeforeColonInDeclaration =
+                    getBool(
+                        map,
+                        "enforce-spacing-before-colon-in-declaration",
+                        false
+                    ),
+                enforceSpacingAfterColonInDeclaration =
+                    getBool(
+                        map,
+                        "enforce-spacing-after-colon-in-declaration",
+                        true
+                    ),
                 mandatorySingleSpaceSeparation = getBool(map, getSingleSpaceKey(map), true),
                 mandatorySpaceSurroundingOperations = getBool(map, "mandatory-space-surrounding-operations", true),
                 mandatoryLineBreakAfterStatement = getBool(map, "mandatory-line-break-after-statement", true),
