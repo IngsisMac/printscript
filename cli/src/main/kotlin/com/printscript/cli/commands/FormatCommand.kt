@@ -14,6 +14,7 @@ import java.util.concurrent.Callable
 
 @Command(
     name = "format",
+    aliases = ["formatting"],
     description = ["Formatea un archivo fuente PrintScript de acuerdo a reglas de estilo."],
     mixinStandardHelpOptions = true,
 )
@@ -29,6 +30,21 @@ class FormatCommand : Callable<Int> {
 
     @Option(names = ["-v", "--version"], defaultValue = "1.0", description = ["Versión del lenguaje (1.0 o 1.1)"])
     var versionStr: String = "1.0"
+
+    @Option(
+        names = ["-o", "--output"],
+        description = ["Ruta de salida para guardar el código formateado en un nuevo archivo"],
+    )
+    var outputFile: File? = null
+
+    @Option(
+        names = ["-p", "--preview"],
+        description = ["Muestra el código formateado en consola sin modificar archivos en disco"],
+    )
+    var preview: Boolean = false
+
+    @Option(names = ["--progress"], description = ["Muestra el progreso durante el parsing en pantalla"])
+    var showProgress: Boolean = false
 
     override fun call(): Int {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
@@ -51,18 +67,72 @@ class FormatCommand : Callable<Int> {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
         val config = ConfigLoader.loadConfig(configFile)
 
-        val result =
-            targetFile.reader().use { reader ->
-                PrintScriptRunner.format(reader, version, config, out)
+        val progressCallback: (Int, com.printscript.ast.Statement) -> Unit = { count, stmt ->
+            if (showProgress) {
+                out.println("[Progreso] Sentencia #$count parseada (Línea ${stmt.span.start.line})")
             }
-
-        if (result.errors.isNotEmpty()) {
-            result.errors.forEach { err.println(it.render()) }
-            return 1
         }
 
-        out.flush()
-        return 0
+        when {
+            preview -> {
+                val result =
+                    targetFile.reader().use { reader ->
+                        PrintScriptRunner.format(reader, version, config, out, progressCallback)
+                    }
+
+                if (result.errors.isNotEmpty()) {
+                    result.errors.forEach { err.println(it.render()) }
+                    return 1
+                }
+
+                out.flush()
+                return 0
+            }
+            outputFile != null -> {
+                val outDest = outputFile!!
+                outDest.parentFile?.mkdirs()
+                val tempFile = File.createTempFile("ps_fmt_out", ".tmp", outDest.parentFile ?: targetFile.parentFile)
+                val result =
+                    tempFile.bufferedWriter().use { writer ->
+                        targetFile.reader().use { reader ->
+                            PrintScriptRunner.format(reader, version, config, writer, progressCallback)
+                        }
+                    }
+
+                if (result.errors.isNotEmpty()) {
+                    tempFile.delete()
+                    result.errors.forEach { err.println(it.render()) }
+                    return 1
+                }
+
+                if (!tempFile.renameTo(outDest)) {
+                    tempFile.copyTo(outDest, overwrite = true)
+                    tempFile.delete()
+                }
+                return 0
+            }
+            else -> {
+                val tempFile = File.createTempFile("ps_fmt_inplace", ".tmp", targetFile.parentFile)
+                val result =
+                    tempFile.bufferedWriter().use { writer ->
+                        targetFile.reader().use { reader ->
+                            PrintScriptRunner.format(reader, version, config, writer, progressCallback)
+                        }
+                    }
+
+                if (result.errors.isNotEmpty()) {
+                    tempFile.delete()
+                    result.errors.forEach { err.println(it.render()) }
+                    return 1
+                }
+
+                if (!tempFile.renameTo(targetFile)) {
+                    tempFile.copyTo(targetFile, overwrite = true)
+                    tempFile.delete()
+                }
+                return 0
+            }
+        }
     }
 
     private fun printError(

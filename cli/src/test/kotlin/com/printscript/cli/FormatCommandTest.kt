@@ -2,6 +2,7 @@ package com.printscript.cli
 
 import com.printscript.cli.commands.FormatCommand
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -33,8 +34,8 @@ class FormatCommandTest {
     }
 
     @Test
-    @DisplayName("Formateo exitoso de un archivo PrintScript con configuración válida")
-    fun formateoExitosoDeArchivoValido(
+    @DisplayName("Formateo por defecto sobrescribe el archivo original in-place")
+    fun formateoPorDefectoModificaElMismoArchivoInPlace(
         @TempDir tempDir: File,
     ) {
         val scriptFile =
@@ -43,12 +44,88 @@ class FormatCommandTest {
             }
         val configFile =
             File(tempDir, "config.json").apply {
-                writeText("{\"enforce-spacing-around-equals\": true}")
+                writeText(
+                    "{\"enforce-spacing-around-equals\": true, \"enforce-spacing-after-colon-in-declaration\": true}"
+                )
             }
 
         val exitCode = commandLine.execute("format", scriptFile.absolutePath, "--config", configFile.absolutePath)
 
         assertEquals(0, exitCode)
+        assertEquals("let x: number = 10;\n", scriptFile.readText())
+    }
+
+    @Test
+    @DisplayName("Formateo con flag --output escribe en un nuevo archivo y no modifica el original")
+    fun formateoConFlagOutputGuardaEnNuevoArchivo(
+        @TempDir tempDir: File,
+    ) {
+        val originalText = "let a:number=5;"
+        val scriptFile =
+            File(tempDir, "source.ps").apply {
+                writeText(originalText)
+            }
+        val outputFile = File(tempDir, "formatted_output.ps")
+
+        val exitCode = commandLine.execute("format", scriptFile.absolutePath, "-o", outputFile.absolutePath)
+
+        assertEquals(0, exitCode)
+        assertEquals(originalText, scriptFile.readText())
+        assertEquals("let a: number = 5;\n", outputFile.readText())
+    }
+
+    @Test
+    @DisplayName("Formateo con flag --preview emite el resultado a consola y no modifica el archivo en disco")
+    fun formateoConFlagPreviewMuestraEnConsola(
+        @TempDir tempDir: File,
+    ) {
+        val originalText = "let a:number=99;"
+        val scriptFile =
+            File(tempDir, "preview_source.ps").apply {
+                writeText(originalText)
+            }
+
+        val exitCode = commandLine.execute("format", scriptFile.absolutePath, "--preview")
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertEquals(originalText, scriptFile.readText())
+        assertTrue(output.contains("let a: number = 99;"))
+    }
+
+    @Test
+    @DisplayName("Formateo funciona mediante el alias formatting de la consigna")
+    fun formateoFuncionaMedianteAliasFormatting(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "alias_format.ps").apply {
+                writeText("let z:number=1;")
+            }
+
+        val exitCode = commandLine.execute("formatting", scriptFile.absolutePath)
+
+        assertEquals(0, exitCode)
+        assertEquals("let z: number = 1;\n", scriptFile.readText())
+    }
+
+    @Test
+    @DisplayName("Formateo con flag --progress emite indicador de progreso en consola")
+    fun formateoConFlagProgressEmiteProgreso(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "progress_format.ps").apply {
+                writeText("let x: number = 1;\nprintln(x);")
+            }
+
+        val exitCode = commandLine.execute("format", scriptFile.absolutePath, "--progress")
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertTrue(output.contains("[Progreso] Sentencia #1 parseada"))
     }
 
     @Test
@@ -85,6 +162,37 @@ class FormatCommandTest {
             }
 
         val exitCode = commandLine.execute("format", scriptFile.absolutePath)
+
+        assertEquals(1, exitCode)
+    }
+
+    @Test
+    @DisplayName("Retorna código de error cuando el archivo en modo preview contiene errores de sintaxis")
+    fun retornaErrorAlFormatearConPreviewScriptInvalido(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "invalid_preview.ps").apply {
+                writeText("let x: number = ;")
+            }
+
+        val exitCode = commandLine.execute("format", scriptFile.absolutePath, "--preview")
+
+        assertEquals(1, exitCode)
+    }
+
+    @Test
+    @DisplayName("Retorna código de error cuando el archivo en modo output contiene errores de sintaxis")
+    fun retornaErrorAlFormatearConOutputScriptInvalido(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "invalid_out.ps").apply {
+                writeText("let x: number = ;")
+            }
+        val outFile = File(tempDir, "out.ps")
+
+        val exitCode = commandLine.execute("format", scriptFile.absolutePath, "-o", outFile.absolutePath)
 
         assertEquals(1, exitCode)
     }

@@ -40,11 +40,12 @@ object PrintScriptRunner {
         output: OutputEmitter,
         input: InputSource,
         env: EnvSource = EnvSource { System.getenv(it) },
+        onProgress: (Int, com.printscript.ast.Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
         try {
             val lexer = Lexer(source, version)
             val parser = Parser(lexer, version)
-            val statements = parser.parse()
+            val statements = trackProgress(parser.parse(), onProgress)
             val interpreter = Interpreter(version, output, input, env, isValidationMode = false)
             val errors = interpreter.execute(statements)
             ExecutionResult(errors)
@@ -59,11 +60,12 @@ object PrintScriptRunner {
     fun validate(
         source: Reader,
         version: Version,
+        onProgress: (Int, com.printscript.ast.Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
         try {
             val lexer = Lexer(source, version)
             val parser = Parser(lexer, version)
-            val statements = parser.parse()
+            val statements = trackProgress(parser.parse(), onProgress)
             val interpreter = Interpreter(version, isValidationMode = true)
             val errors = interpreter.execute(statements)
             ExecutionResult(errors)
@@ -80,11 +82,12 @@ object PrintScriptRunner {
         version: Version,
         config: Map<String, Any?> = emptyMap(),
         writer: java.io.Writer,
+        onProgress: (Int, com.printscript.ast.Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
         try {
             val lexer = Lexer(source, version)
             val parser = Parser(lexer, version)
-            val statements = parser.parse()
+            val statements = trackProgress(parser.parse(), onProgress)
             val formatter = com.printscript.formatter.DefaultFormatter()
             val formatterConfig =
                 com.printscript.formatter.FormatterConfig
@@ -106,11 +109,12 @@ object PrintScriptRunner {
         version: Version,
         config: Map<String, Any?> = emptyMap(),
         onError: (PrintScriptError) -> Unit = {},
+        onProgress: (Int, com.printscript.ast.Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
         try {
             val lexer = Lexer(source, version)
             val parser = Parser(lexer, version)
-            val statements = parser.parse()
+            val statements = trackProgress(parser.parse(), onProgress)
             val linter = com.printscript.linter.DefaultLinter()
             val linterConfig =
                 com.printscript.linter.LinterConfig
@@ -130,12 +134,28 @@ object PrintScriptRunner {
         version: Version,
         config: Reader,
         writer: java.io.Writer,
-    ): ExecutionResult = format(source, version, ConfigLoader.parseJsonToMap(config), writer)
+        onProgress: (Int, com.printscript.ast.Statement) -> Unit = { _, _ -> },
+    ): ExecutionResult = format(source, version, ConfigLoader.parseJsonToMap(config), writer, onProgress)
 
     fun analyze(
         source: Reader,
         version: Version,
         config: Reader,
         onError: (PrintScriptError) -> Unit = {},
-    ): ExecutionResult = analyze(source, version, ConfigLoader.parseJsonToMap(config), onError)
+        onProgress: (Int, com.printscript.ast.Statement) -> Unit = { _, _ -> },
+    ): ExecutionResult = analyze(source, version, ConfigLoader.parseJsonToMap(config), onError, onProgress)
+
+    private fun trackProgress(
+        statements: Iterator<com.printscript.ast.Statement>,
+        onProgress: (Int, com.printscript.ast.Statement) -> Unit,
+    ): Iterator<com.printscript.ast.Statement> {
+        var count = 0
+        return sequence {
+            for (statement in statements) {
+                count++
+                onProgress(count, statement)
+                yield(statement)
+            }
+        }.iterator()
+    }
 }

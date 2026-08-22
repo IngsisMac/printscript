@@ -49,6 +49,42 @@ class ExecuteCommandTest {
     }
 
     @Test
+    @DisplayName("Ejecución funciona mediante el alias execution de la consigna")
+    fun ejecucionFuncionaMedianteAliasExecution(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "alias_exec.ps").apply {
+                writeText("println(\"Exec Alias\");")
+            }
+
+        val exitCode = commandLine.execute("execution", scriptFile.absolutePath)
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertTrue(output.contains("Exec Alias"))
+    }
+
+    @Test
+    @DisplayName("Ejecución con flag --progress emite indicador de progreso en consola")
+    fun ejecucionConFlagProgressEmiteProgreso(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "progress_exec.ps").apply {
+                writeText("let a: number = 10;\nprintln(a);")
+            }
+
+        val exitCode = commandLine.execute("execute", scriptFile.absolutePath, "--progress")
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertTrue(output.contains("[Progreso] Sentencia #1 parseada"))
+    }
+
+    @Test
     @DisplayName("Ejecución emite la salida estándar mediante el OutputEmitter")
     fun ejecucionEmiteSalidaEstandarConOutputEmitter(
         @TempDir tempDir: File,

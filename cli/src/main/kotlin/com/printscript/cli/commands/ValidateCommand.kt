@@ -1,6 +1,5 @@
 package com.printscript.cli.commands
 
-import com.printscript.cli.util.ConfigLoader
 import com.printscript.common.Version
 import com.printscript.runner.PrintScriptRunner
 import picocli.CommandLine.Command
@@ -13,20 +12,17 @@ import java.io.PrintWriter
 import java.util.concurrent.Callable
 
 @Command(
-    name = "analyze",
-    aliases = ["analyzing", "lint"],
-    description = ["Ejecuta el análisis estático (linter) sobre un archivo fuente PrintScript."],
+    name = "validate",
+    aliases = ["validation", "check"],
+    description = ["Valida la sintaxis y semántica de un archivo PrintScript sin ejecutarlo."],
     mixinStandardHelpOptions = true,
 )
-class AnalyzeCommand : Callable<Int> {
+class ValidateCommand : Callable<Int> {
     @Spec
     var spec: CommandSpec? = null
 
     @Parameters(index = "0", description = ["Ruta al archivo fuente .ps"])
     var file: File? = null
-
-    @Option(names = ["-c", "--config"], description = ["Ruta al archivo de configuración JSON del linter"])
-    var configFile: File? = null
 
     @Option(names = ["-v", "--version"], defaultValue = "1.0", description = ["Versión del lenguaje (1.0 o 1.1)"])
     var versionStr: String = "1.0"
@@ -44,16 +40,15 @@ class AnalyzeCommand : Callable<Int> {
                 return printError(err, "Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
             }
 
-        return analyzeScript(targetFile, version)
+        return validateScript(targetFile, version)
     }
 
-    private fun analyzeScript(
+    private fun validateScript(
         targetFile: File,
         version: Version,
     ): Int {
         val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
-        val config = ConfigLoader.loadConfig(configFile)
 
         val progressCallback: (Int, com.printscript.ast.Statement) -> Unit = { count, stmt ->
             if (showProgress) {
@@ -63,7 +58,7 @@ class AnalyzeCommand : Callable<Int> {
 
         val result =
             targetFile.reader().use { reader ->
-                PrintScriptRunner.analyze(reader, version, config, onProgress = progressCallback)
+                PrintScriptRunner.validate(reader, version, progressCallback)
             }
 
         if (result.errors.isNotEmpty()) {
@@ -71,7 +66,7 @@ class AnalyzeCommand : Callable<Int> {
             return 1
         }
 
-        out.println("Análisis completado sin violaciones de linter.")
+        out.println("Validación completada sin errores.")
         return 0
     }
 

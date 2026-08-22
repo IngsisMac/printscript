@@ -39,6 +39,7 @@ class PrintScriptCliTest {
 
         assertEquals(0, exitCode)
         assertTrue(output.contains("PrintScript"))
+        assertTrue(output.contains("validate"))
         assertTrue(output.contains("execute"))
         assertTrue(output.contains("format"))
         assertTrue(output.contains("analyze"))

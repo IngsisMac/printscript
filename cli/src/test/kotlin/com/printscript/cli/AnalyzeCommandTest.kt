@@ -48,6 +48,40 @@ class AnalyzeCommandTest {
     }
 
     @Test
+    @DisplayName("Análisis estático funciona mediante el alias analyzing de la consigna")
+    fun analisisFuncionaMedianteAliasAnalyzing(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "alias_test.ps").apply {
+                writeText("let myVar: number = 10;")
+            }
+
+        val exitCode = commandLine.execute("analyzing", scriptFile.absolutePath)
+
+        assertEquals(0, exitCode)
+    }
+
+    @Test
+    @DisplayName("Análisis estático con flag --progress emite indicador de progreso en consola")
+    fun analisisConFlagProgressEmiteProgreso(
+        @TempDir tempDir: File,
+    ) {
+        val scriptFile =
+            File(tempDir, "progress_test.ps").apply {
+                writeText("let x: number = 10;\nprintln(x);")
+            }
+
+        val exitCode = commandLine.execute("analyze", scriptFile.absolutePath, "--progress")
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        org.junit.jupiter.api.Assertions
+            .assertTrue(output.contains("[Progreso] Sentencia #1 parseada"))
+    }
+
+    @Test
     @DisplayName("Retorna código de error cuando el archivo a analizar no existe")
     fun retornaErrorAlAnalizarArchivoInexistente() {
         val exitCode = commandLine.execute("analyze", "missing.ps")

@@ -16,6 +16,7 @@ import java.util.concurrent.Callable
 
 @Command(
     name = "execute",
+    aliases = ["execution", "run"],
     description = ["Ejecuta un archivo fuente PrintScript."],
     mixinStandardHelpOptions = true,
 )
@@ -28,6 +29,9 @@ class ExecuteCommand : Callable<Int> {
 
     @Option(names = ["-v", "--version"], defaultValue = "1.0", description = ["Versión del lenguaje (1.0 o 1.1)"])
     var versionStr: String = "1.0"
+
+    @Option(names = ["--progress"], description = ["Muestra el progreso durante el parsing en pantalla"])
+    var showProgress: Boolean = false
 
     override fun call(): Int {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
@@ -51,9 +55,15 @@ class ExecuteCommand : Callable<Int> {
         val outputEmitter = OutputEmitter { line -> out.println(line) }
         val inputSource = createInputSource(out)
 
+        val progressCallback: (Int, com.printscript.ast.Statement) -> Unit = { count, stmt ->
+            if (showProgress) {
+                out.println("[Progreso] Sentencia #$count parseada (Línea ${stmt.span.start.line})")
+            }
+        }
+
         val result =
             targetFile.reader().use { reader ->
-                PrintScriptRunner.execute(reader, version, outputEmitter, inputSource)
+                PrintScriptRunner.execute(reader, version, outputEmitter, inputSource, onProgress = progressCallback)
             }
 
         if (result.errors.isNotEmpty()) {
