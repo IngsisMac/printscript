@@ -6,11 +6,11 @@ El sistema implementa análisis léxico, parsing con algoritmo Pratt, ejecución
 
 ---
 
-## 📑 Índice
+## Índice
 
-1. [🚀 Demostración End-to-End (E2E) y Ejecución del Main](#-demostración-end-to-end-e2e-y-ejecución-del-main)
-2. [Arquitectura General y Pipeline de Streaming](#-arquitectura-general-y-pipeline-de-streaming)
-3. [Desglose de Diseño por Módulo](#-desglose-de-diseño-por-módulo)
+1. [Demostración End-to-End (E2E) y Ejecución del Main](#demostración-end-to-end-e2e-y-ejecución-del-main)
+2. [Arquitectura General y Pipeline de Streaming](#arquitectura-general-y-pipeline-de-streaming)
+3. [Desglose de Diseño por Módulo](#desglose-de-diseño-por-módulo)
    - [`common`](#1-common)
    - [`token`](#2-token)
    - [`ast`](#3-ast)
@@ -21,15 +21,15 @@ El sistema implementa análisis léxico, parsing con algoritmo Pratt, ejecución
    - [`linter`](#8-linter)
    - [`runner`](#9-runner)
    - [`cli`](#10-cli)
-4. [Catálogo de Patrones de Diseño](#-catálogo-de-patrones-de-diseño)
-5. [PrintScript CLI — Comandos y Uso](#-printscript-cli--comandos-y-uso)
-6. [Comandos de Build y Testing (Gradle)](#-comandos-de-build-y-testing-gradle)
-7. [Especificación del Lenguaje y Versiones](#-especificación-del-lenguaje-y-versiones)
-8. [Estructura del Proyecto y Ejemplos](#-estructura-del-proyecto-y-ejemplos)
+4. [Catálogo de Patrones de Diseño](#catálogo-de-patrones-de-diseño)
+5. [PrintScript CLI — Comandos y Uso](#printscript-cli--comandos-y-uso)
+6. [Comandos de Build y Testing (Gradle)](#comandos-de-build-y-testing-gradle)
+7. [Especificación del Lenguaje y Versiones](#especificación-del-lenguaje-y-versiones)
+8. [Estructura del Proyecto y Ejemplos](#estructura-del-proyecto-y-ejemplos)
 
 ---
 
-## 🚀 Demostración End-to-End (E2E) y Ejecución del Main
+## Demostración End-to-End (E2E) y Ejecución del Main
 
 El proyecto incluye un punto de entrada principal (`Main.kt`) y un comando interactivo `demo` (alias `e2e`) que ejecuta **toda la implementación real de PrintScript** (Lexer, Parser Pratt, Intérprete semántico, Formatter, Linter con reglas oficiales y reporte posicionado con Spans).
 
@@ -69,7 +69,7 @@ El repositorio incluye una suite de scripts listos para probar ante los profesor
 
 ---
 
-## 🏗 Arquitectura General y Pipeline de Streaming
+## Arquitectura General y Pipeline de Streaming
 
 El sistema se estructura en **10 módulos desacoplados**, donde cada etapa del pipeline depende únicamente del **contrato formal** de la etapa anterior y nunca de su implementación concreta:
 
@@ -103,7 +103,7 @@ El sistema se estructura en **10 módulos desacoplados**, donde cada etapa del p
 
 ---
 
-## 🧩 Desglose de Diseño por Módulo
+## Desglose de Diseño por Módulo
 
 ### 1. `common`
 *El vocabulario compartido y los contratos fundamentales del sistema.*
@@ -260,7 +260,7 @@ El sistema se estructura en **10 módulos desacoplados**, donde cada etapa del p
 
 ---
 
-## 🏛 Catálogo de Patrones de Diseño
+## Catálogo de Patrones de Diseño
 
 | Patrón | Módulos y Clases Principales | Problema que Resuelve |
 |---|---|---|
@@ -275,7 +275,7 @@ El sistema se estructura en **10 módulos desacoplados**, donde cada etapa del p
 
 ---
 
-## 💻 PrintScript CLI — Comandos y Uso
+## PrintScript CLI — Comandos y Uso
 
 ### 1. Sintaxis General
 
@@ -358,7 +358,7 @@ printscript analyze src/app.ps --config config/linter.json --version 1.1
 
 ---
 
-## ⚙ Comandos de Build y Testing (Gradle)
+## Comandos de Build y Testing (Gradle)
 
 El monorrepo utiliza plugins de convención en `buildSrc` para estandarizar toolchains, suites de testeo, análisis estático y cobertura.
 
@@ -410,7 +410,7 @@ El monorrepo utiliza plugins de convención en `buildSrc` para estandarizar tool
 
 ---
 
-## 📖 Especificación del Lenguaje y Versiones
+## Especificación del Lenguaje y Versiones
 
 | Característica | PrintScript 1.0 | PrintScript 1.1 |
 |---|---|---|
@@ -423,7 +423,7 @@ El monorrepo utiliza plugins de convención en `buildSrc` para estandarizar tool
 
 ---
 
-## 📂 Estructura del Proyecto y Ejemplos
+## Estructura del Proyecto y Ejemplos
 
 ```
 printscript/
