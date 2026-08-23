@@ -9,6 +9,7 @@ import com.printscript.ast.Statement
 import com.printscript.common.Span
 import com.printscript.interpreter.BooleanValue
 import com.printscript.interpreter.Environment
+import com.printscript.interpreter.Evaluator
 import com.printscript.interpreter.InterpreterContext
 import com.printscript.interpreter.InterpreterException
 import com.printscript.interpreter.NumberValue
@@ -16,9 +17,9 @@ import com.printscript.interpreter.StringValue
 import com.printscript.interpreter.Value
 import java.math.BigDecimal
 
-fun interface StatementEvaluator<T : Statement> {
-    fun evaluate(
-        stmt: T,
+fun interface StatementEvaluator<in T : Statement> : Evaluator<T, Unit> {
+    override fun evaluate(
+        node: T,
         env: Environment,
         context: InterpreterContext,
     )

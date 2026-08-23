@@ -9,6 +9,7 @@ import com.printscript.ast.StringLiteral
 import com.printscript.ast.Variable
 import com.printscript.common.Span
 import com.printscript.interpreter.Environment
+import com.printscript.interpreter.Evaluator
 import com.printscript.interpreter.InterpreterContext
 import com.printscript.interpreter.InterpreterException
 import com.printscript.interpreter.NumberValue
@@ -17,9 +18,9 @@ import com.printscript.interpreter.Value
 import java.math.BigDecimal
 import java.math.MathContext
 
-fun interface ExpressionEvaluator<T : Expression> {
-    fun evaluate(
-        expr: T,
+fun interface ExpressionEvaluator<in T : Expression> : Evaluator<T, Value> {
+    override fun evaluate(
+        node: T,
         env: Environment,
         context: InterpreterContext,
     ): Value

@@ -1,17 +1,7 @@
 package com.printscript.interpreter
 
-import com.printscript.ast.Assignment
-import com.printscript.ast.BinaryOp
-import com.printscript.ast.BooleanLiteral
-import com.printscript.ast.CallExpression
-import com.printscript.ast.Declaration
 import com.printscript.ast.Expression
-import com.printscript.ast.IfStatement
-import com.printscript.ast.NumberLiteral
-import com.printscript.ast.PrintStatement
 import com.printscript.ast.Statement
-import com.printscript.ast.StringLiteral
-import com.printscript.ast.Variable
 import com.printscript.common.EnvSource
 import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
@@ -19,14 +9,8 @@ import com.printscript.common.Position
 import com.printscript.common.PrintScriptError
 import com.printscript.common.Span
 import com.printscript.common.Version
-import com.printscript.interpreter.evaluator.AssignmentEvaluator
-import com.printscript.interpreter.evaluator.BinaryOpEvaluator
-import com.printscript.interpreter.evaluator.CallExpressionEvaluator
-import com.printscript.interpreter.evaluator.DeclarationEvaluator
-import com.printscript.interpreter.evaluator.IfStatementEvaluator
-import com.printscript.interpreter.evaluator.LiteralEvaluator
-import com.printscript.interpreter.evaluator.PrintStatementEvaluator
-import com.printscript.interpreter.evaluator.VariableEvaluator
+import com.printscript.interpreter.evaluator.ExpressionEvaluator
+import com.printscript.interpreter.evaluator.StatementEvaluator
 
 class Interpreter(
     override val version: Version,
@@ -34,19 +18,10 @@ class Interpreter(
     override val input: InputSource = InputSource { "" },
     override val env: EnvSource = EnvSource { System.getenv(it) },
     override val isValidationMode: Boolean = false,
+    private val config: InterpreterConfig = InterpreterConfig.from(version),
 ) : InterpreterContext {
     private val globalEnv = Environment()
     private val errors = mutableListOf<PrintScriptError>()
-
-    private val declarationEvaluator = DeclarationEvaluator()
-    private val assignmentEvaluator = AssignmentEvaluator()
-    private val printEvaluator = PrintStatementEvaluator()
-    private val ifEvaluator = IfStatementEvaluator()
-
-    private val literalEvaluator = LiteralEvaluator()
-    private val variableEvaluator = VariableEvaluator()
-    private val binaryOpEvaluator = BinaryOpEvaluator()
-    private val callExprEvaluator = CallExpressionEvaluator()
 
     fun execute(statements: Iterator<Statement>): List<PrintScriptError> {
         while (statements.hasNext()) {
@@ -88,26 +63,31 @@ class Interpreter(
         )
             ?: e.message ?: "Error"
 
+    @Suppress("UNCHECKED_CAST")
     override fun executeStatement(
         stmt: Statement,
         env: Environment,
     ) {
-        when (stmt) {
-            is Declaration -> declarationEvaluator.evaluate(stmt, env, this)
-            is Assignment -> assignmentEvaluator.evaluate(stmt, env, this)
-            is PrintStatement -> printEvaluator.evaluate(stmt, env, this)
-            is IfStatement -> ifEvaluator.evaluate(stmt, env, this)
-        }
+        val evaluator =
+            config.statementEvaluators[stmt::class] as? StatementEvaluator<Statement>
+                ?: throw InterpreterException(
+                    "Statement type '${stmt::class.simpleName}' is not supported in version $version",
+                    stmt.span,
+                )
+        evaluator.evaluate(stmt, env, this)
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun evaluateExpression(
         expr: Expression,
         env: Environment,
-    ): Value =
-        when (expr) {
-            is NumberLiteral, is StringLiteral, is BooleanLiteral -> literalEvaluator.evaluate(expr, env, this)
-            is Variable -> variableEvaluator.evaluate(expr, env, this)
-            is BinaryOp -> binaryOpEvaluator.evaluate(expr, env, this)
-            is CallExpression -> callExprEvaluator.evaluate(expr, env, this)
-        }
+    ): Value {
+        val evaluator =
+            config.expressionEvaluators[expr::class] as? ExpressionEvaluator<Expression>
+                ?: throw InterpreterException(
+                    "Expression type '${expr::class.simpleName}' is not supported in version $version",
+                    expr.span,
+                )
+        return evaluator.evaluate(expr, env, this)
+    }
 }
