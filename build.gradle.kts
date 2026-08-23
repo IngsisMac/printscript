@@ -3,9 +3,18 @@ plugins {
     id("testing-conventions") apply false
 }
 
+val baseVersion = providers.gradleProperty("baseVersion").getOrElse("1.0")
+val buildNumber = System.getenv("GITHUB_RUN_NUMBER")
+val releaseVersion =
+    if (!buildNumber.isNullOrBlank()) {
+        "$baseVersion.$buildNumber"
+    } else {
+        "$baseVersion.0-SNAPSHOT"
+    }
+
 allprojects {
     group = "com.printscript"
-    version = "1.0.0-SNAPSHOT"
+    version = releaseVersion
 }
 
 tasks.register<Copy>("installGitHooks") {
@@ -29,4 +38,3 @@ tasks.register<Copy>("installGitHooks") {
         }
     }
 }
-

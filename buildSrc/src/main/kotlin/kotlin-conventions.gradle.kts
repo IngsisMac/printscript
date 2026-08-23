@@ -17,8 +17,6 @@ java {
     withSourcesJar()
 }
 
-version = "1.0.0-SNAPSHOT"
-
 configure<PublishingExtension> {
     publications {
         create<MavenPublication>("mavenJava") {
