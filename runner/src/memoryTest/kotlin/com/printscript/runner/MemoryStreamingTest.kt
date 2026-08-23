@@ -66,25 +66,28 @@ class MemoryStreamingTest {
     }
 
     @Test
-    @DisplayName("Ejecución agota la memoria y reporta Java heap space usando PrintCollector")
+    @DisplayName("Ejecución agota la memoria y lanza OutOfMemoryError usando PrintCollector")
     fun executionReportsJavaHeapSpaceErrorWhenMemoryIsExhaustedWithPrintCollector() {
         val stream = MockInputStream()
         var collector: PrintCollector? = PrintCollector()
 
         val reader = BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8), BUFFER_SIZE_CHARS)
-        val result =
+        var oomThrown = false
+        try {
             PrintScriptRunner.execute(
                 source = reader,
                 version = version,
                 output = collector!!,
                 input = input,
             )
+        } catch (e: OutOfMemoryError) {
+            oomThrown = true
+        } finally {
+            collector = null
+            System.gc()
+        }
 
-        collector = null
-        System.gc()
-
-        assertEquals(1, result.errors.size, "Expected exactly 1 error on OOM, got: ${result.errors}")
-        assertEquals("Java heap space", result.errors[0].message)
+        assertTrue(oomThrown, "Expected OutOfMemoryError to be thrown")
     }
 
     companion object {

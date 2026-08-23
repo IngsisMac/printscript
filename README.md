@@ -236,10 +236,10 @@ El sistema se estructura en **10 módulos desacoplados**, donde cada etapa del p
 - **Responsabilidad:** Expone los métodos de alto nivel para ejecutar, validar, formatear y analizar código PrintScript, unificando el montaje del pipeline.
 - **Componentes Clave:**
   - `PrintScriptRunner`: Singleton (`object`) sin estado con métodos `execute()`, `validate()`, `format()` y `analyze()`.
-  - `ExecutionResult`: Contenedor unificado de errores y diagnóstico de fallos fatales.
-  - `OOM_RESULT`: Instancia preasignada para captura y reporte seguro de `OutOfMemoryError` sin incurrir en nuevas asignaciones de memoria.
+  - `ExecutionResult`: Contenedor unificado de errores de dominio del pipeline (`List<PrintScriptError>`).
 - **Decisiones de Diseño:**
   - **API agnóstica:** Totalmente desacoplada de librerías externas o frameworks de test; recibe `Reader`, `Writer` e interfaces I/O funcionales.
+  - Los errores de infraestructura JVM (`OutOfMemoryError`) se propagan limpiamente hacia los adaptadores/hosts (ADR-0012).
   - Soporta sobrecargas directas para recibir configuraciones como `Map<String, Any?>` o como streams `Reader` en formato JSON.
 
 ---

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.StringReader
 
 class PrintScriptRunnerTest {
@@ -142,10 +143,9 @@ class PrintScriptRunnerTest {
                 }
             }
 
-        val result = PrintScriptRunner.execute(failingReader, Version.V1_0, emitter, input)
-
-        assertEquals(1, result.errors.size)
-        assertEquals("Java heap space", result.errors[0].message)
+        assertThrows<OutOfMemoryError> {
+            PrintScriptRunner.execute(failingReader, Version.V1_0, emitter, input)
+        }
     }
 
     @Test
@@ -164,10 +164,9 @@ class PrintScriptRunnerTest {
                 }
             }
 
-        val result = PrintScriptRunner.validate(failingReader, Version.V1_0)
-
-        assertEquals(1, result.errors.size)
-        assertEquals("Java heap space", result.errors[0].message)
+        assertThrows<OutOfMemoryError> {
+            PrintScriptRunner.validate(failingReader, Version.V1_0)
+        }
     }
 
     @Test
@@ -208,10 +207,9 @@ class PrintScriptRunnerTest {
             }
         val writer = java.io.StringWriter()
 
-        val result = PrintScriptRunner.format(failingReader, Version.V1_0, emptyMap(), writer)
-
-        assertEquals(1, result.errors.size)
-        assertEquals("Java heap space", result.errors[0].message)
+        assertThrows<OutOfMemoryError> {
+            PrintScriptRunner.format(failingReader, Version.V1_0, emptyMap(), writer)
+        }
     }
 
     @Test
@@ -248,9 +246,8 @@ class PrintScriptRunnerTest {
                 override fun close() = Unit
             }
 
-        val result = PrintScriptRunner.analyze(failingReader, Version.V1_0, emptyMap())
-
-        assertEquals(1, result.errors.size)
-        assertEquals("Java heap space", result.errors[0].message)
+        assertThrows<OutOfMemoryError> {
+            PrintScriptRunner.analyze(failingReader, Version.V1_0, emptyMap())
+        }
     }
 }

@@ -5,9 +5,7 @@ import com.printscript.ast.Statement
 import com.printscript.common.EnvSource
 import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
-import com.printscript.common.Position
 import com.printscript.common.PrintScriptError
-import com.printscript.common.Span
 import com.printscript.common.Version
 import com.printscript.formatter.DefaultFormatter
 import com.printscript.formatter.FormatterConfig
@@ -22,25 +20,10 @@ import java.io.Reader
 import java.io.Writer
 
 data class ExecutionResult(
-    val errors: List<PrintScriptError>,
-    val fatalError: String? = null,
-) {
-    val hasFatalError: Boolean get() = fatalError != null
-}
+    val errors: List<PrintScriptError> = emptyList(),
+)
 
 object PrintScriptRunner {
-    private val OOM_RESULT =
-        ExecutionResult(
-            errors =
-                listOf(
-                    PrintScriptError(
-                        "Java heap space",
-                        Span(Position(1, 1), Position(1, 1)),
-                    ),
-                ),
-            fatalError = "Java heap space",
-        )
-
     @JvmOverloads
     fun execute(
         source: Reader,
@@ -58,8 +41,6 @@ object PrintScriptRunner {
             ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
-        } catch (e: OutOfMemoryError) {
-            OOM_RESULT
         }
 
     @JvmOverloads
@@ -76,8 +57,6 @@ object PrintScriptRunner {
             ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
-        } catch (e: OutOfMemoryError) {
-            OOM_RESULT
         }
 
     @JvmOverloads
@@ -97,8 +76,6 @@ object PrintScriptRunner {
             ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
-        } catch (e: OutOfMemoryError) {
-            OOM_RESULT
         }
 
     private fun formatStatements(
@@ -137,8 +114,6 @@ object PrintScriptRunner {
             ExecutionResult(listOf(e.toError()))
         } catch (e: ParseException) {
             ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
-        } catch (e: OutOfMemoryError) {
-            OOM_RESULT
         }
 
     @JvmOverloads
