@@ -13,6 +13,11 @@ import com.printscript.parser.expression.prefix.StringLiteralPrefixParser
 import com.printscript.parser.expression.prefix.UnaryOperatorPrefixParser
 import com.printscript.token.TokenType
 
+private const val MULTIPLICATIVE_PRECEDENCE = 30
+private const val MULTIPLICATIVE_RIGHT_PRECEDENCE = 31
+private const val ADDITIVE_PRECEDENCE = 20
+private const val ADDITIVE_RIGHT_PRECEDENCE = 21
+
 object ExpressionParserFactory {
     fun createPrefixParsers(version: Version): List<PrefixParser> =
         when (version) {
@@ -44,11 +49,18 @@ object ExpressionParserFactory {
 
     fun createInfixParsers(): List<InfixParser> =
         listOf(
-            BinaryOperatorInfixParser(TokenType.STAR, null, 30, 31, "*"),
-            BinaryOperatorInfixParser(TokenType.SLASH, null, 30, 31, "/"),
-            BinaryOperatorInfixParser(TokenType.PLUS, null, 20, 21, "+"),
-            BinaryOperatorInfixParser(TokenType.MINUS, null, 20, 21, "-"),
+            createBinaryParser(TokenType.STAR, "*", MULTIPLICATIVE_PRECEDENCE, MULTIPLICATIVE_RIGHT_PRECEDENCE),
+            createBinaryParser(TokenType.SLASH, "/", MULTIPLICATIVE_PRECEDENCE, MULTIPLICATIVE_RIGHT_PRECEDENCE),
+            createBinaryParser(TokenType.PLUS, "+", ADDITIVE_PRECEDENCE, ADDITIVE_RIGHT_PRECEDENCE),
+            createBinaryParser(TokenType.MINUS, "-", ADDITIVE_PRECEDENCE, ADDITIVE_RIGHT_PRECEDENCE),
         )
+
+    private fun createBinaryParser(
+        type: TokenType,
+        symbol: String,
+        leftBp: Int,
+        rightBp: Int,
+    ): InfixParser = BinaryOperatorInfixParser(type, null, leftBp, rightBp, symbol)
 
     fun create(version: Version): ExpressionParser =
         ExpressionParser(createPrefixParsers(version), createInfixParsers())

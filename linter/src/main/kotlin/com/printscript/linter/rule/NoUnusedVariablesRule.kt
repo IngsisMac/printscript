@@ -29,19 +29,11 @@ class NoUnusedVariablesRule : LinterRule {
 
     override fun finish(config: LinterConfig): List<PrintScriptError> {
         if (!config.noUnusedVariables) return emptyList()
-
-        val errors = mutableListOf<PrintScriptError>()
-        for ((name, span) in declaredVariables) {
-            if (name !in usedVariables) {
-                errors.add(
-                    PrintScriptError(
-                        "Variable '$name' is declared but never used",
-                        span,
-                    ),
-                )
+        return declaredVariables
+            .filterKeys { it !in usedVariables }
+            .map { (name, span) ->
+                PrintScriptError("Variable '$name' is declared but never used", span)
             }
-        }
-        return errors
     }
 
     override fun reset() {
@@ -53,14 +45,10 @@ class NoUnusedVariablesRule : LinterRule {
         when (statement) {
             is Declaration -> {
                 declaredVariables[statement.name] = statement.nameSpan
-                statement.value?.let { collectUsedVariables(it) }
+                statement.value?.let(::collectUsedVariables)
             }
-            is Assignment -> {
-                collectUsedVariables(statement.value)
-            }
-            is PrintStatement -> {
-                collectUsedVariables(statement.expression)
-            }
+            is Assignment -> collectUsedVariables(statement.value)
+            is PrintStatement -> collectUsedVariables(statement.expression)
             is IfStatement -> {
                 collectUsedVariables(statement.condition)
                 statement.thenBranch.forEach { processStatement(it) }

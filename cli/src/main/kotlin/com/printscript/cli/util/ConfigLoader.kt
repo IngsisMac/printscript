@@ -6,9 +6,12 @@ object ConfigLoader {
     fun loadConfig(file: File?): Map<String, Any?> {
         if (file == null || !file.exists()) return emptyMap()
         val content = file.readText().trim()
-        if (content.isEmpty()) return emptyMap()
-        return com.printscript.runner.ConfigLoader
-            .parseJsonToMap(content)
+        return if (content.isEmpty()) {
+            emptyMap()
+        } else {
+            com.printscript.runner.ConfigLoader
+                .parseJsonToMap(content)
+        }
     }
 
     fun parseJsonToMap(json: String): Map<String, Any?> =

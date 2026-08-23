@@ -48,15 +48,23 @@ class FormatCommand : Callable<Int> {
 
     override fun call(): Int {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
-        val targetFile = file ?: return printError(err, "Error: Archivo no encontrado ")
-        if (!targetFile.exists()) return printError(err, "Error: Archivo no encontrado ${targetFile.path}")
+        val target = resolveTargetAndVersion(err) ?: return 2
+        return formatScript(target.first, target.second)
+    }
 
+    private fun resolveTargetAndVersion(err: PrintWriter): Pair<File, Version>? {
+        val targetFile = file
+        if (targetFile == null || !targetFile.exists()) {
+            val path = targetFile?.path?.let { " $it" } ?: " "
+            err.println("Error: Archivo no encontrado$path")
+            return null
+        }
         val version =
             Version.from(versionStr).getOrElse {
-                return printError(err, "Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
+                err.println("Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
+                return null
             }
-
-        return formatScript(targetFile, version)
+        return targetFile to version
     }
 
     private fun formatScript(
@@ -67,79 +75,86 @@ class FormatCommand : Callable<Int> {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
         val config = ConfigLoader.loadConfig(configFile)
 
-        val progressCallback: (Int, com.printscript.ast.Statement) -> Unit = { count, stmt ->
+        return when {
+            preview -> formatPreview(targetFile, version, config, out)
+            outputFile != null -> formatToFile(targetFile, outputFile!!, version, config, err)
+            else -> formatToFile(targetFile, targetFile, version, config, err)
+        }
+    }
+
+    private fun formatPreview(
+        targetFile: File,
+        version: Version,
+        config: Map<String, Any?>,
+        out: PrintWriter,
+    ): Int {
+        val result =
+            targetFile.reader().use { reader ->
+                PrintScriptRunner.format(reader, version, config, out, createProgressCallback())
+            }
+
+        if (result.errors.isNotEmpty()) {
+            val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
+            result.errors.forEach { err.println(it.render()) }
+            return 1
+        }
+        out.flush()
+        return 0
+    }
+
+    private fun formatToFile(
+        source: File,
+        target: File,
+        version: Version,
+        config: Map<String, Any?>,
+        err: PrintWriter,
+    ): Int {
+        val temp = createTempForTarget(source, target)
+        val result = writeFormattedToTemp(source, temp, version, config)
+        if (result.errors.isNotEmpty()) {
+            temp.delete()
+            result.errors.forEach { err.println(it.render()) }
+            return 1
+        }
+        replaceTargetFile(temp, target)
+        return 0
+    }
+
+    private fun createTempForTarget(
+        source: File,
+        target: File,
+    ): File {
+        target.parentFile?.mkdirs()
+        return File.createTempFile("ps_fmt", ".tmp", target.parentFile ?: source.parentFile)
+    }
+
+    private fun writeFormattedToTemp(
+        source: File,
+        temp: File,
+        version: Version,
+        config: Map<String, Any?>,
+    ) = temp.bufferedWriter().use { writer ->
+        source.reader().use { reader ->
+            PrintScriptRunner.format(reader, version, config, writer, createProgressCallback())
+        }
+    }
+
+    private fun replaceTargetFile(
+        temp: File,
+        target: File,
+    ) {
+        if (!temp.renameTo(target)) {
+            temp.copyTo(target, overwrite = true)
+            temp.delete()
+        }
+    }
+
+    private fun createProgressCallback(): (Int, com.printscript.ast.Statement) -> Unit {
+        val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
+        return { count, stmt ->
             if (showProgress) {
                 out.println("[Progreso] Sentencia #$count parseada (Línea ${stmt.span.start.line})")
             }
         }
-
-        when {
-            preview -> {
-                val result =
-                    targetFile.reader().use { reader ->
-                        PrintScriptRunner.format(reader, version, config, out, progressCallback)
-                    }
-
-                if (result.errors.isNotEmpty()) {
-                    result.errors.forEach { err.println(it.render()) }
-                    return 1
-                }
-
-                out.flush()
-                return 0
-            }
-            outputFile != null -> {
-                val outDest = outputFile!!
-                outDest.parentFile?.mkdirs()
-                val tempFile = File.createTempFile("ps_fmt_out", ".tmp", outDest.parentFile ?: targetFile.parentFile)
-                val result =
-                    tempFile.bufferedWriter().use { writer ->
-                        targetFile.reader().use { reader ->
-                            PrintScriptRunner.format(reader, version, config, writer, progressCallback)
-                        }
-                    }
-
-                if (result.errors.isNotEmpty()) {
-                    tempFile.delete()
-                    result.errors.forEach { err.println(it.render()) }
-                    return 1
-                }
-
-                if (!tempFile.renameTo(outDest)) {
-                    tempFile.copyTo(outDest, overwrite = true)
-                    tempFile.delete()
-                }
-                return 0
-            }
-            else -> {
-                val tempFile = File.createTempFile("ps_fmt_inplace", ".tmp", targetFile.parentFile)
-                val result =
-                    tempFile.bufferedWriter().use { writer ->
-                        targetFile.reader().use { reader ->
-                            PrintScriptRunner.format(reader, version, config, writer, progressCallback)
-                        }
-                    }
-
-                if (result.errors.isNotEmpty()) {
-                    tempFile.delete()
-                    result.errors.forEach { err.println(it.render()) }
-                    return 1
-                }
-
-                if (!tempFile.renameTo(targetFile)) {
-                    tempFile.copyTo(targetFile, overwrite = true)
-                    tempFile.delete()
-                }
-                return 0
-            }
-        }
-    }
-
-    private fun printError(
-        err: PrintWriter,
-        message: String,
-    ): Int {
-        err.println(message)
-        return 2
     }
 }

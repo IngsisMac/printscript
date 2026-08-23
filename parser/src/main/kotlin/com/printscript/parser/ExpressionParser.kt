@@ -22,8 +22,10 @@ class ExpressionParser(
 
         while (true) {
             val token = stream.peek()
-            val infixParser = infixParsers.firstOrNull { it.matches(token) } ?: break
-            if (infixParser.leftBindingPower < minBp) break
+            val infixParser = infixParsers.firstOrNull { it.matches(token) }
+            if (infixParser == null || infixParser.leftBindingPower < minBp) {
+                break
+            }
 
             stream.consume() // consume op token
             left = infixParser.parse(left, token, stream, this)

@@ -27,21 +27,24 @@ class CharStream(
     fun hasMore(): Boolean = currentChar != null
 
     fun advance(): Char? {
-        val prev = peek()
-        if (currentChar != null) {
-            lastPosition = Position(line, column)
-            currentChar = source.read()
-            if (currentChar == -1) {
-                currentChar = null
-            }
-            if (prev == '\n') {
-                line++
-                column = 1
-            } else {
-                column++
-            }
-        }
+        val prev = peek() ?: return null
+        lastPosition = Position(line, column)
+        readNextChar()
+        updatePosition(prev)
         return prev
+    }
+
+    private fun readNextChar() {
+        currentChar = source.read().takeIf { it != -1 }
+    }
+
+    private fun updatePosition(prev: Char) {
+        if (prev == '\n') {
+            line++
+            column = 1
+        } else {
+            column++
+        }
     }
 
     fun getPosition(): Position = Position(line, column)

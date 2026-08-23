@@ -70,23 +70,23 @@ class Interpreter(
             null
         }
 
-    private fun extractError(e: Exception): PrintScriptError {
-        val span =
-            (
-                e.javaClass.methods
-                    .firstOrNull { it.name == "getSpan" }
-                    ?.invoke(e) as? Span
-            )
-                ?: Span(Position(1, 1), Position(1, 1))
-        val rawMsg =
-            (
-                e.javaClass.methods
-                    .firstOrNull { it.name == "getRawMessage" }
-                    ?.invoke(e) as? String
-            )
-                ?: e.message ?: "Error"
-        return PrintScriptError(rawMsg, span)
-    }
+    private fun extractError(e: Exception): PrintScriptError = PrintScriptError(extractRawMessage(e), extractSpan(e))
+
+    private fun extractSpan(e: Exception): Span =
+        (
+            e.javaClass.methods
+                .firstOrNull { it.name == "getSpan" }
+                ?.invoke(e) as? Span
+        )
+            ?: Span(Position(1, 1), Position(1, 1))
+
+    private fun extractRawMessage(e: Exception): String =
+        (
+            e.javaClass.methods
+                .firstOrNull { it.name == "getRawMessage" }
+                ?.invoke(e) as? String
+        )
+            ?: e.message ?: "Error"
 
     override fun executeStatement(
         stmt: Statement,

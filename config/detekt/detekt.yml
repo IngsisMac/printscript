@@ -4,7 +4,7 @@ build:
 
 complexity:
   CyclomaticComplexMethod:
-    active: false
+    active: true
   TooManyFunctions:
     active: false
   LargeClass:
@@ -12,6 +12,15 @@ complexity:
   LongMethod:
     active: true
     threshold: 20
+    ignoreAnnotated:
+      - 'Test'
+      - 'DisplayName'
+      - 'ParameterizedTest'
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 7
+    ignoreDefaultParameters: true
 
 exceptions:
   TooGenericExceptionThrown:
@@ -42,16 +51,22 @@ style:
   ThrowsCount:
     active: false
   ReturnCount:
-    active: false
+    active: true
+    max: 3
+    excludeGuardClauses: true
+    excludeReturnFromLambda: true
   MaxLineLength:
     active: true
     maxLineLength: 140
   UnusedPrivateProperty:
-    active: false
+    active: true
   MagicNumber:
-    active: false
+    active: true
+    ignoreNumbers: ['-1', '0', '1', '2']
+    ignorePropertyDeclaration: true
+    ignoreAnnotation: true
   LoopWithTooManyJumpStatements:
-    active: false
+    active: true
   WildcardImport:
     active: true
   SpacingBetweenPackageAndImports:

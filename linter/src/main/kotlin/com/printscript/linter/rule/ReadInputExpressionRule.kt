@@ -50,24 +50,25 @@ class ReadInputExpressionRule : LinterRule {
 
     private fun findReadInputCalls(expression: Expression): List<CallExpression> {
         val calls = mutableListOf<CallExpression>()
-
-        fun traverse(expr: Expression) {
-            when (expr) {
-                is CallExpression -> {
-                    if (expr.name == "readInput") {
-                        calls.add(expr)
-                    }
-                    expr.argument?.let { traverse(it) }
-                }
-                is BinaryOp -> {
-                    traverse(expr.left)
-                    traverse(expr.right)
-                }
-                else -> {}
-            }
-        }
-        traverse(expression)
+        collectReadInputCalls(expression, calls)
         return calls
+    }
+
+    private fun collectReadInputCalls(
+        expr: Expression,
+        calls: MutableList<CallExpression>,
+    ) {
+        when (expr) {
+            is CallExpression -> {
+                if (expr.name == "readInput") calls.add(expr)
+                expr.argument?.let { collectReadInputCalls(it, calls) }
+            }
+            is BinaryOp -> {
+                collectReadInputCalls(expr.left, calls)
+                collectReadInputCalls(expr.right, calls)
+            }
+            else -> {}
+        }
     }
 
     private fun isSimpleExpression(expression: Expression): Boolean =

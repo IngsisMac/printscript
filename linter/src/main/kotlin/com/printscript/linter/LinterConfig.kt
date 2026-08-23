@@ -9,28 +9,27 @@ data class LinterConfig(
 ) {
     companion object {
         fun fromMap(map: Map<String, Any?>): LinterConfig {
-            fun getBool(
-                key: String,
-                default: Boolean = false,
-            ): Boolean {
-                val value = map[key] ?: return default
-                return when (value) {
-                    is Boolean -> value
-                    is String -> value.toBoolean()
-                    else -> default
-                }
-            }
-
             val formatRaw = map["identifier_format"]?.toString()
-            val identifierFormat = IdentifierFormat.fromString(formatRaw)
-
             return LinterConfig(
-                identifierFormat = identifierFormat,
-                mandatoryVariableOrLiteralInPrintln = getBool("mandatory-variable-or-literal-in-println"),
-                mandatoryVariableOrLiteralInReadInput = getBool("mandatory-variable-or-literal-in-readInput"),
-                noUnusedVariables = getBool("no-unused-variables"),
-                noEmptyPrintln = getBool("no-empty-println"),
+                identifierFormat = IdentifierFormat.fromString(formatRaw),
+                mandatoryVariableOrLiteralInPrintln = getBool(map, "mandatory-variable-or-literal-in-println"),
+                mandatoryVariableOrLiteralInReadInput = getBool(map, "mandatory-variable-or-literal-in-readInput"),
+                noUnusedVariables = getBool(map, "no-unused-variables"),
+                noEmptyPrintln = getBool(map, "no-empty-println"),
             )
+        }
+
+        private fun getBool(
+            map: Map<String, Any?>,
+            key: String,
+            default: Boolean = false,
+        ): Boolean {
+            val value = map[key] ?: return default
+            return when (value) {
+                is Boolean -> value
+                is String -> value.toBoolean()
+                else -> default
+            }
         }
     }
 }

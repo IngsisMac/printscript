@@ -43,15 +43,13 @@ class Lexer(
 
     private fun readNextToken(): Token? {
         stream.skipWhitespace()
-
         if (!stream.hasMore()) return null
+        return matchToken() ?: throwUnexpectedChar()
+    }
 
-        for (matcher in matchers) {
-            if (matcher.canMatch(stream)) {
-                return matcher.match(stream, config)
-            }
-        }
+    private fun matchToken(): Token? = matchers.firstOrNull { it.canMatch(stream) }?.match(stream, config)
 
+    private fun throwUnexpectedChar(): Nothing {
         val startPos = stream.getPosition()
         val badChar = stream.peek()!!
         stream.advance()

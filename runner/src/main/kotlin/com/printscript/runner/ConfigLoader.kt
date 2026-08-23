@@ -148,10 +148,10 @@ object ConfigLoader {
 
         private fun parseBoolean(): Boolean =
             if (json.startsWith("true", index)) {
-                index += 4
+                index += "true".length
                 true
             } else if (json.startsWith("false", index)) {
-                index += 5
+                index += "false".length
                 false
             } else {
                 parseUnquotedString().toBoolean()
@@ -159,7 +159,7 @@ object ConfigLoader {
 
         private fun parseNull(): Any? =
             if (json.startsWith("null", index)) {
-                index += 4
+                index += "null".length
                 null
             } else {
                 parseUnquotedString()

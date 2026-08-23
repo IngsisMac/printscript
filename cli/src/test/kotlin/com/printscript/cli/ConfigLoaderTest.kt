@@ -77,4 +77,11 @@ class ConfigLoaderTest {
         assertNull(map["null_val"])
         assertEquals("unquoted", map["raw_val"])
     }
+
+    @Test
+    @DisplayName("Parseo directo de JSON a Map con parseJsonToMap")
+    fun parseoDirectoDeJsonAMap() {
+        val map = configLoader.parseJsonToMap("{\"key\": \"value\"}")
+        assertEquals("value", map["key"])
+    }
 }

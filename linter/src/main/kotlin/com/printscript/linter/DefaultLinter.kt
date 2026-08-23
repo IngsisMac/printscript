@@ -28,20 +28,35 @@ class DefaultLinter(
         rules.forEach { it.reset() }
         val visitor = AstVisitorLinter(rules, config)
         val errors = mutableListOf<PrintScriptError>()
-        for (statement in statements) {
-            val stmtErrors = statement.accept(visitor)
-            for (error in stmtErrors) {
-                onError(error)
-                errors.add(error)
-            }
-        }
-        for (rule in rules) {
-            val endErrors = rule.finish(config)
-            for (error in endErrors) {
-                onError(error)
-                errors.add(error)
-            }
-        }
+        processStatements(statements, visitor, errors, onError)
+        collectFinishedErrors(config, errors, onError)
         return errors
+    }
+
+    private fun processStatements(
+        statements: Iterator<Statement>,
+        visitor: AstVisitorLinter,
+        errors: MutableList<PrintScriptError>,
+        onError: (PrintScriptError) -> Unit,
+    ) {
+        for (statement in statements) {
+            for (error in statement.accept(visitor)) {
+                onError(error)
+                errors.add(error)
+            }
+        }
+    }
+
+    private fun collectFinishedErrors(
+        config: LinterConfig,
+        errors: MutableList<PrintScriptError>,
+        onError: (PrintScriptError) -> Unit,
+    ) {
+        for (rule in rules) {
+            for (error in rule.finish(config)) {
+                onError(error)
+                errors.add(error)
+            }
+        }
     }
 }

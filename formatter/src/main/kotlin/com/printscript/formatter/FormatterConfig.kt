@@ -1,5 +1,7 @@
 package com.printscript.formatter
 
+private const val DEFAULT_INDENT_INSIDE_IF = 4
+
 data class FormatterConfig(
     val enforceSpacingAroundEquals: Boolean = true,
     val enforceNoSpacingAroundEquals: Boolean = false,
@@ -11,35 +13,39 @@ data class FormatterConfig(
     val lineBreaksAfterPrintln: Int = 1,
     val ifBraceSameLine: Boolean = true,
     val ifBraceBelowLine: Boolean = false,
-    val indentInsideIf: Int = 4,
+    val indentInsideIf: Int = DEFAULT_INDENT_INSIDE_IF,
     val enforceNoSpaceBeforeSemicolon: Boolean = true,
     val maxBlankLinesBetweenStatements: Int = 1,
 ) {
     companion object {
-        fun fromMap(map: Map<String, Any?>): FormatterConfig =
+        fun fromMap(map: Map<String, Any?>): FormatterConfig {
+            val base = parseSpacingConfig(map)
+            return parseStructureConfig(map, base)
+        }
+
+        private fun parseSpacingConfig(map: Map<String, Any?>): FormatterConfig =
             FormatterConfig(
                 enforceSpacingAroundEquals = parseEquals(map),
                 enforceNoSpacingAroundEquals = getBool(map, "enforce-no-spacing-around-equals", false),
                 enforceSpacingBeforeColonInDeclaration =
-                    getBool(
-                        map,
-                        "enforce-spacing-before-colon-in-declaration",
-                        false
-                    ),
+                    getBool(map, "enforce-spacing-before-colon-in-declaration", false),
                 enforceSpacingAfterColonInDeclaration =
-                    getBool(
-                        map,
-                        "enforce-spacing-after-colon-in-declaration",
-                        true
-                    ),
+                    getBool(map, "enforce-spacing-after-colon-in-declaration", true),
                 mandatorySingleSpaceSeparation = getBool(map, getSingleSpaceKey(map), true),
                 mandatorySpaceSurroundingOperations = getBool(map, "mandatory-space-surrounding-operations", true),
+                enforceNoSpaceBeforeSemicolon = getBool(map, "enforce-no-space-before-semicolon", true),
+            )
+
+        private fun parseStructureConfig(
+            map: Map<String, Any?>,
+            base: FormatterConfig,
+        ): FormatterConfig =
+            base.copy(
                 mandatoryLineBreakAfterStatement = getBool(map, "mandatory-line-break-after-statement", true),
                 lineBreaksAfterPrintln = getInt(map, "line-breaks-after-println", 1),
                 ifBraceSameLine = parseBraceSameLine(map),
                 ifBraceBelowLine = getBool(map, "if-brace-below-line", false),
-                indentInsideIf = getInt(map, "indent-inside-if", 4),
-                enforceNoSpaceBeforeSemicolon = getBool(map, "enforce-no-space-before-semicolon", true),
+                indentInsideIf = getInt(map, "indent-inside-if", DEFAULT_INDENT_INSIDE_IF),
                 maxBlankLinesBetweenStatements = getInt(map, "max-blank-lines-between-statements", 1),
             )
 
