@@ -1,6 +1,7 @@
 package com.printscript.cli
 
 import com.printscript.cli.commands.AnalyzeCommand
+import com.printscript.cli.commands.DemoCommand
 import com.printscript.cli.commands.ExecuteCommand
 import com.printscript.cli.commands.FormatCommand
 import com.printscript.cli.commands.ValidateCommand
@@ -19,6 +20,7 @@ import java.util.concurrent.Callable
         ExecuteCommand::class,
         FormatCommand::class,
         AnalyzeCommand::class,
+        DemoCommand::class,
     ],
 )
 class PrintScriptCli : Callable<Int> {
@@ -26,8 +28,8 @@ class PrintScriptCli : Callable<Int> {
     var spec: CommandSpec? = null
 
     override fun call(): Int {
-        val out = spec?.commandLine()?.out ?: java.io.PrintWriter(System.out, true)
-        out.println("PrintScript CLI - Usar --help para ver los comandos disponibles.")
-        return 0
+        val demo = DemoCommand()
+        demo.spec = spec
+        return demo.call()
     }
 }

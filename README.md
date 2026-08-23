@@ -8,8 +8,9 @@ El sistema implementa análisis léxico, parsing con algoritmo Pratt, ejecución
 
 ## 📑 Índice
 
-1. [Arquitectura General y Pipeline de Streaming](#-arquitectura-general-y-pipeline-de-streaming)
-2. [Desglose de Diseño por Módulo](#-desglose-de-diseño-por-módulo)
+1. [🚀 Demostración End-to-End (E2E) y Ejecución del Main](#-demostración-end-to-end-e2e-y-ejecución-del-main)
+2. [Arquitectura General y Pipeline de Streaming](#-arquitectura-general-y-pipeline-de-streaming)
+3. [Desglose de Diseño por Módulo](#-desglose-de-diseño-por-módulo)
    - [`common`](#1-common)
    - [`token`](#2-token)
    - [`ast`](#3-ast)
@@ -20,11 +21,51 @@ El sistema implementa análisis léxico, parsing con algoritmo Pratt, ejecución
    - [`linter`](#8-linter)
    - [`runner`](#9-runner)
    - [`cli`](#10-cli)
-3. [Catálogo de Patrones de Diseño](#-catálogo-de-patrones-de-diseño)
-4. [PrintScript CLI — Comandos y Uso](#-printscript-cli--comandos-y-uso)
-5. [Comandos de Build y Testing (Gradle)](#-comandos-de-build-y-testing-gradle)
-6. [Especificación del Lenguaje y Versiones](#-especificación-del-lenguaje-y-versiones)
-7. [Estructura del Proyecto](#-estructura-del-proyecto)
+4. [Catálogo de Patrones de Diseño](#-catálogo-de-patrones-de-diseño)
+5. [PrintScript CLI — Comandos y Uso](#-printscript-cli--comandos-y-uso)
+6. [Comandos de Build y Testing (Gradle)](#-comandos-de-build-y-testing-gradle)
+7. [Especificación del Lenguaje y Versiones](#-especificación-del-lenguaje-y-versiones)
+8. [Estructura del Proyecto y Ejemplos](#-estructura-del-proyecto-y-ejemplos)
+
+---
+
+## 🚀 Demostración End-to-End (E2E) y Ejecución del Main
+
+El proyecto incluye un punto de entrada principal (`Main.kt`) y un comando interactivo `demo` (alias `e2e`) que ejecuta **toda la implementación real de PrintScript** (Lexer, Parser Pratt, Intérprete semántico, Formatter, Linter con reglas oficiales y reporte posicionado con Spans).
+
+### 1. Ejecución Directa desde el IDE (IntelliJ IDEA)
+- Abrir el archivo [`cli/src/main/kotlin/com/printscript/cli/Main.kt`](cli/src/main/kotlin/com/printscript/cli/Main.kt).
+- Presionar el botón verde **Run / Play** (`Shift + F10`) junto a `fun main(args: Array<String>)`.
+- Al ejecutarse sin argumentos, el CLI corre automáticamente la **Demostración E2E completa** mostrando cada etapa en consola.
+
+### 2. Ejecución desde Terminal con Gradle
+```bash
+# Ejecutar la Demostración E2E completa (vía tarea run por defecto)
+./gradlew run
+
+# O explícitamente mediante el subcomando demo
+./gradlew run --args="demo"
+```
+
+### 3. Ejecución de Archivos de Ejemplo (`examples/`)
+El repositorio incluye una suite de scripts listos para probar ante los profesores:
+
+```bash
+# 1. Ejecutar script PrintScript 1.0 (aritmética, variables y strings)
+./gradlew run --args="execute examples/1.0/01_math_and_strings.ps"
+
+# 2. Ejecutar script PrintScript 1.1 (constantes, booleanos y condicionales if/else)
+./gradlew run --args="execute examples/1.1/01_conditionals_and_booleans.ps -v 1.1"
+
+# 3. Formatear script desordenado en consola (preview)
+./gradlew run --args="format examples/1.0/02_messy_format.ps --config examples/configs/formatter_rules.json --preview"
+
+# 4. Analizar script con violaciones de Linter (camelCase y expresiones en println)
+./gradlew run --args="analyze examples/1.0/03_linter_issues.ps --config examples/configs/linter_rules.json"
+
+# 5. Validar script con error sintáctico (reporta fila:columna con Spans)
+./gradlew run --args="validate examples/invalid/01_syntax_error.ps"
+```
 
 ---
 
@@ -382,7 +423,7 @@ El monorrepo utiliza plugins de convención en `buildSrc` para estandarizar tool
 
 ---
 
-## 📂 Estructura del Proyecto
+## 📂 Estructura del Proyecto y Ejemplos
 
 ```
 printscript/
@@ -396,6 +437,7 @@ printscript/
 ├── linter/               # DefaultLinter, AstVisitorLinter y LinterRules (Strategy)
 ├── runner/               # PrintScriptRunner (Fachada de la API pública)
 ├── cli/                  # PrintScriptCli con subcomandos PicoCLI y ConfigLoader
+├── examples/             # Scripts .ps y configuraciones JSON listos para pruebas y demo
 ├── buildSrc/             # Plugins de convención de Gradle (Kotlin, Testing, Calidad)
 └── docs/specs/           # Escenarios vivos de especificación
 ```
