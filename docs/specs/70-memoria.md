@@ -9,7 +9,7 @@ Estos escenarios corren en la suite `memoryTest`, con `minHeapSize = "5m"` y
 ---
 
 ### PS-MEM-001 — Archivo grande con emitter que no acumula
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una fuente compuesta por 32768 repeticiones de:
@@ -32,7 +32,7 @@ And la lista de errores está vacía
 ---
 
 ### PS-MEM-002 — Archivo grande con emitter que acumula
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una fuente compuesta por 32768 repeticiones de:
@@ -57,7 +57,7 @@ And ese error es el string "Java heap space"
 ---
 
 ### PS-MEM-003 — El mensaje del OOM se reporta sin decorar
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given las condiciones de PS-MEM-002
@@ -69,7 +69,7 @@ And no lleva prefijo de posición ni de severidad
 ---
 
 ### PS-MEM-004 — No se emiten mensajes espurios por el handler de errores
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given las condiciones de PS-MEM-001
@@ -83,7 +83,7 @@ Then el ErrorHandler no recibe ningún mensaje de progreso, warning ni diagnóst
 ---
 
 ### PS-MEM-005 — Los lexemes no se comparten entre tokens
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la fuente:
@@ -101,7 +101,7 @@ Then los dos STRING_LITERAL son instancias distintas de String
 ---
 
 ### PS-MEM-006 — El formatter escribe incrementalmente
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una fuente de 32768 sentencias

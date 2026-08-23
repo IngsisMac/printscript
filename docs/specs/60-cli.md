@@ -13,7 +13,7 @@ operation ∈ { Validation, Execution, Formatting, Analyzing }
 ---
 
 ### PS-CLI-001 — Ejecución de un archivo
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo válido en el file system
@@ -25,7 +25,7 @@ And el código de salida es 0
 ---
 
 ### PS-CLI-002 — Validación sin ejecutar
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo válido que contiene un println
@@ -37,7 +37,7 @@ And el código de salida es 0
 ---
 
 ### PS-CLI-003 — Un error muestra el mensaje y la ubicación completa
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo con "let x: number = 5" (sin punto y coma)
@@ -53,7 +53,7 @@ And el código de salida es distinto de 0
 ---
 
 ### PS-CLI-004 — Se muestra el progreso durante el parsing
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo grande
@@ -68,7 +68,7 @@ And el avance no se emite por el canal de errores
 ---
 
 ### PS-CLI-005 — La versión es opcional y por defecto es 1.0
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo válido de PrintScript 1.0
@@ -79,7 +79,7 @@ Then se ejecuta como versión 1.0
 ---
 
 ### PS-CLI-006 — Usar funcionalidad de una versión superior a la elegida es un error
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo que usa "const"
@@ -91,7 +91,7 @@ And el código de salida es distinto de 0
 ---
 
 ### PS-CLI-007 — Una versión desconocida es un error claro
-**Nivel:** integración · **Versión:** — · **Estado:** ⬜
+**Nivel:** integración · **Versión:** — · **Estado:** ✅
 
 ```gherkin
 Given cualquier archivo
@@ -103,7 +103,7 @@ And no se lanza ninguna excepción sin manejar
 ---
 
 ### PS-CLI-008 — Formatting escribe el resultado
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo desformateado y un archivo de configuración
@@ -114,7 +114,7 @@ Then se produce la versión formateada del archivo
 ---
 
 ### PS-CLI-009 — Analyzing reporta las violaciones con su posición
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given un archivo que viola una regla de linteo y su configuración
@@ -126,7 +126,7 @@ And el código de salida es distinto de 0
 ---
 
 ### PS-CLI-010 — Un archivo inexistente da un mensaje claro
-**Nivel:** integración · **Versión:** — · **Estado:** ⬜
+**Nivel:** integración · **Versión:** — · **Estado:** ✅
 
 ```gherkin
 Given una ruta que no existe
@@ -138,7 +138,7 @@ And no se muestra un stack trace
 ---
 
 ### PS-CLI-011 — Una operación inválida muestra la ayuda
-**Nivel:** integración · **Versión:** — · **Estado:** ⬜
+**Nivel:** integración · **Versión:** — · **Estado:** ✅
 
 ```gherkin
 Given una operación que no es Validation, Execution, Formatting ni Analyzing
@@ -149,7 +149,7 @@ Then se muestra el uso esperado con las cuatro operaciones válidas
 ---
 
 ### PS-CLI-012 — `readInput` lee de standard input
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given un archivo que usa readInput

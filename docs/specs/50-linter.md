@@ -11,7 +11,7 @@ posición exacta, igual que un error (lo pide la consigna explícitamente).
 ---
 
 ### PS-LNT-001 — Configuración vacía no reporta nada
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una configuración sin ninguna regla activa
@@ -26,7 +26,7 @@ Then no se reporta ninguna violación
 ---
 
 ### PS-LNT-002 — Identificadores en camel case, válido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración de identificadores en "camel case"
@@ -42,7 +42,7 @@ Then no se reporta ninguna violación
 ---
 
 ### PS-LNT-003 — Identificadores en camel case, inválido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración de identificadores en "camel case"
@@ -59,7 +59,7 @@ And la posición señala el identificador "my_variable"
 ---
 
 ### PS-LNT-004 — Identificadores en snake case, válido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración de identificadores en "snake case"
@@ -72,7 +72,7 @@ Then no se reporta ninguna violación
 ---
 
 ### PS-LNT-005 — Identificadores en snake case, inválido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración de identificadores en "snake case"
@@ -85,7 +85,7 @@ Then se reporta una violación con la posición del identificador
 ---
 
 ### PS-LNT-006 — `println` con una expresión, prohibido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la regla de argumento simple en println prendida
@@ -104,7 +104,7 @@ And la posición señala el argumento del println
 ---
 
 ### PS-LNT-007 — `println` con un identificador o un literal, permitido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la regla de argumento simple en println prendida
@@ -122,7 +122,7 @@ Then no se reporta ninguna violación
 ---
 
 ### PS-LNT-008 — La regla de println se puede apagar
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la regla de argumento simple en println apagada
@@ -134,7 +134,7 @@ Then no se reporta ninguna violación
 ---
 
 ### PS-LNT-009 — Se acumulan todas las violaciones, no solo la primera
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración de identificadores en "camel case"
@@ -153,7 +153,7 @@ And cada una señala su propio identificador
 ---
 
 ### PS-LNT-010 — Una regla desconocida en la configuración es un error claro
-**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** unitario · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una configuración con una clave que no corresponde a ninguna regla
@@ -164,7 +164,7 @@ Then se reporta un error indicando la clave desconocida
 ---
 
 ### PS-LNT-011 — `readInput` con una expresión, prohibido
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given la regla de argumento simple en readInput prendida
@@ -177,7 +177,7 @@ Then se reporta una violación con su posición
 ---
 
 ### PS-LNT-012 — El linter no acumula el programa en memoria
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given una fuente de 32768 sentencias válidas

@@ -14,7 +14,7 @@ con golden files en `runner/src/integrationTest/resources/cases/formatter/`.
 ---
 
 ### PS-FMT-001 — Espacio antes de los dos puntos, prendido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con la regla de espacio antes de ":" en true
@@ -27,7 +27,7 @@ Then la salida es "let x : number = 5;"
 ---
 
 ### PS-FMT-002 — Espacio después de los dos puntos, prendido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con la regla de espacio después de ":" en true
@@ -40,7 +40,7 @@ Then la salida es "let x: number = 5;"
 ---
 
 ### PS-FMT-003 — Espacio alrededor del igual, prendido
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con la regla de espacio alrededor de "=" en true
@@ -53,7 +53,7 @@ Then la salida es "let x: number = 5;"
 ---
 
 ### PS-FMT-004 — Espacio alrededor del igual, apagado
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con la regla de espacio alrededor de "=" en false
@@ -66,7 +66,7 @@ Then la salida es "let x: number=5;"
 ---
 
 ### PS-FMT-005 — Saltos de línea antes de println: 0, 1 y 2
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con n saltos de línea antes de println
@@ -81,7 +81,7 @@ Se escribe como escenario parametrizado con n ∈ {0, 1, 2}.
 ---
 
 ### PS-FMT-006 — Salto de línea después de cada punto y coma (no configurable)
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la fuente "let a: number = 1; let b: number = 2;"
@@ -93,7 +93,7 @@ Then cada sentencia queda en su propia línea
 ---
 
 ### PS-FMT-007 — Un solo espacio entre tokens (no configurable)
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la fuente "let     x  :  number   =   5;"
@@ -105,7 +105,7 @@ Then nunca hay dos espacios consecutivos entre tokens
 ---
 
 ### PS-FMT-008 — Espacio alrededor de los operadores (no configurable)
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given la fuente "let x: number = 1+2*3;"
@@ -117,7 +117,7 @@ Then la salida es "let x: number = 1 + 2 * 3;"
 ---
 
 ### PS-FMT-009 — Formatear dos veces da el mismo resultado (idempotencia)
-**Nivel:** integración · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.0 · **Estado:** ✅
 
 ```gherkin
 Given cualquier fuente y cualquier configuración
@@ -131,7 +131,7 @@ Then el resultado es idéntico
 ---
 
 ### PS-FMT-010 — Indentación configurable dentro de un bloque if
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con indentación de 2 espacios
@@ -144,7 +144,7 @@ Then el contenido del bloque está indentado 2 espacios respecto del if
 ---
 
 ### PS-FMT-011 — La llave del if en la misma línea
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con la llave en la misma línea
@@ -157,7 +157,7 @@ Then la "{" queda en la misma línea que el if
 ---
 
 ### PS-FMT-012 — La llave del if en la línea siguiente
-**Nivel:** integración · **Versión:** 1.1 · **Estado:** ⬜
+**Nivel:** integración · **Versión:** 1.1 · **Estado:** ✅
 
 ```gherkin
 Given la configuración con la llave en la línea siguiente
@@ -173,6 +173,6 @@ Then la "{" queda en la línea siguiente al if
 ---
 
 ### PS-FMT-013 — El formatter escribe a un Writer, no devuelve un String
-**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ⬜
+**Nivel:** memoria · **Versión:** 1.0 · **Estado:** ✅
 
 Ver [`70-memoria.md`](70-memoria.md), escenario PS-MEM-006.
