@@ -6,12 +6,13 @@ import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.util.ArrayList
 
-@Disabled("Desactivado temporalmente a pedido del usuario hasta implementar mas alla de los happy paths")
 class MemoryStreamingTest {
     private lateinit var input: InputSource
     private lateinit var version: Version
@@ -46,14 +47,15 @@ class MemoryStreamingTest {
     }
 
     @Test
-    @DisplayName("Ejecución streaming en pipeline con heap de 7MB")
-    fun testWithCounterStreamingPipelineExecutionWith7MBHeap() {
+    @DisplayName("Ejecución streaming procesa todas las líneas sin errores usando PrintCounter")
+    fun executionCompletesSuccessfullyWithPrintCounterAndNoErrors() {
         val stream = MockInputStream()
         val counter = PrintCounter(MockInputStream.MESSAGE)
 
+        val reader = BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8), BUFFER_SIZE_CHARS)
         val result =
             PrintScriptRunner.execute(
-                source = stream.reader(),
+                source = reader,
                 version = version,
                 output = counter,
                 input = input,
@@ -64,20 +66,34 @@ class MemoryStreamingTest {
     }
 
     @Test
-    @DisplayName("Captura de OutOfMemoryError reportando Java heap space")
-    fun testWithCollectorCapturesOutOfMemoryErrorAndReportsJavaHeapSpace() {
-        val stream = MockInputStream(numberOfLines = 64 * 1024)
-        val collector = PrintCollector()
+    @DisplayName("Ejecución agota la memoria y reporta Java heap space usando PrintCollector")
+    fun executionReportsJavaHeapSpaceErrorWhenMemoryIsExhaustedWithPrintCollector() {
+        val stream = MockInputStream()
+        var collector: PrintCollector? = PrintCollector()
 
+        val reader = BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8), BUFFER_SIZE_CHARS)
         val result =
             PrintScriptRunner.execute(
-                source = stream.reader(),
+                source = reader,
                 version = version,
-                output = collector,
+                output = collector!!,
                 input = input,
             )
 
+        collector = null
+        System.gc()
+
         assertEquals(1, result.errors.size, "Expected exactly 1 error on OOM, got: ${result.errors}")
         assertEquals("Java heap space", result.errors[0].message)
+    }
+
+    companion object {
+        // En JUnit 5 (Jupiter), el piso de la JVM antes de ejecutar el test es ~4,52 MB (frente a los
+        // 4,02 MB medidos con JUnit 4 en el fork de validación).
+        // Con heap de 7 MB (-Xmx7m, redondeado por G1 a 8 MB) y un punto de quiebre de ~7,3 MB:
+        //   - Borde inferior medido: 256 K chars (512 KB) -> por debajo, PrintCollector no agota el heap.
+        //   - Borde superior medido: 504 K chars (1008 KB) -> por encima, PrintCounter agota el heap.
+        // Se elige el centro exacto de la ventana: 384 K chars (768 KB en memoria).
+        const val BUFFER_SIZE_CHARS = 384 * 1024
     }
 }

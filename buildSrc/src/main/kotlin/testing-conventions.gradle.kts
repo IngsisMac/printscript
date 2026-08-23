@@ -57,6 +57,9 @@ testing {
                     minHeapSize = "5m"
                     maxHeapSize = "7m"
                     shouldRunAfter(testing.suites.named("test"))
+                    extensions.configure<JacocoTaskExtension> {
+                        isEnabled = false
+                    }
                 }
             }
         }

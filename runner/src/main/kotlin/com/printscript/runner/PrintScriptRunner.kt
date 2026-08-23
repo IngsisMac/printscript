@@ -28,19 +28,19 @@ data class ExecutionResult(
     val hasFatalError: Boolean get() = fatalError != null
 }
 
-private val OOM_RESULT =
-    ExecutionResult(
-        errors =
-            listOf(
-                PrintScriptError(
-                    "Java heap space",
-                    Span(Position(1, 1), Position(1, 1)),
-                ),
-            ),
-        fatalError = "Java heap space",
-    )
-
 object PrintScriptRunner {
+    private val OOM_RESULT =
+        ExecutionResult(
+            errors =
+                listOf(
+                    PrintScriptError(
+                        "Java heap space",
+                        Span(Position(1, 1), Position(1, 1)),
+                    ),
+                ),
+            fatalError = "Java heap space",
+        )
+
     @JvmOverloads
     fun execute(
         source: Reader,
