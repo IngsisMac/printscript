@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib)
+    api(libs.kotlin.stdlib)
     api(project(":lexer"))
     api(project(":parser"))
     api(project(":interpreter"))
