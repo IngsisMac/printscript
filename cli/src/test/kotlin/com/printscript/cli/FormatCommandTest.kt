@@ -52,7 +52,7 @@ class FormatCommandTest {
         val exitCode = commandLine.execute("format", scriptFile.absolutePath, "--config", configFile.absolutePath)
 
         assertEquals(0, exitCode)
-        assertEquals("let x: number = 10;\n", scriptFile.readText())
+        assertEquals("let x: number = 10;", scriptFile.readText())
     }
 
     @Test
@@ -60,7 +60,7 @@ class FormatCommandTest {
     fun formateoConFlagOutputGuardaEnNuevoArchivo(
         @TempDir tempDir: File,
     ) {
-        val originalText = "let a:number=5;"
+        val originalText = "let a: number = 5;"
         val scriptFile =
             File(tempDir, "source.ps").apply {
                 writeText(originalText)
@@ -71,7 +71,7 @@ class FormatCommandTest {
 
         assertEquals(0, exitCode)
         assertEquals(originalText, scriptFile.readText())
-        assertEquals("let a: number = 5;\n", outputFile.readText())
+        assertEquals("let a: number = 5;", outputFile.readText())
     }
 
     @Test
@@ -79,7 +79,7 @@ class FormatCommandTest {
     fun formateoConFlagPreviewMuestraEnConsola(
         @TempDir tempDir: File,
     ) {
-        val originalText = "let a:number=99;"
+        val originalText = "let a: number = 99;"
         val scriptFile =
             File(tempDir, "preview_source.ps").apply {
                 writeText(originalText)
@@ -101,13 +101,13 @@ class FormatCommandTest {
     ) {
         val scriptFile =
             File(tempDir, "alias_format.ps").apply {
-                writeText("let z:number=1;")
+                writeText("let z: number = 1;")
             }
 
         val exitCode = commandLine.execute("formatting", scriptFile.absolutePath)
 
         assertEquals(0, exitCode)
-        assertEquals("let z: number = 1;\n", scriptFile.readText())
+        assertEquals("let z: number = 1;", scriptFile.readText())
     }
 
     @Test

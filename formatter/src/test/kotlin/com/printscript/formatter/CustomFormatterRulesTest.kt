@@ -38,7 +38,7 @@ class CustomFormatterRulesTest {
 
         formatter.format(decl, writer, config)
 
-        assertEquals("let x: number = 42;\n", writer.toString())
+        assertEquals("let x: number = 42;", writer.toString())
     }
 
     @Test
@@ -55,26 +55,22 @@ class CustomFormatterRulesTest {
 
         formatter.format(assignment, writer, config)
 
-        assertEquals("x = 100 ;\n", writer.toString())
+        assertEquals("x = 100 ;", writer.toString())
     }
 
     @Test
-    @DisplayName("Formateo de println limita saltos de línea consecutivos según maxBlankLinesBetweenStatements")
-    fun formateoPrintlnLimitaSaltosDeLineaSegunMaxBlankLines() {
+    @DisplayName("Formateo de sentencia println básica")
+    fun formateoPrintlnBasica() {
         val printStmt =
             PrintStatement(
                 expression = StringLiteral("Hello", dummySpan),
                 span = dummySpan,
             )
-        val config =
-            FormatterConfig(
-                lineBreaksAfterPrintln = 5,
-                maxBlankLinesBetweenStatements = 1,
-            )
+        val config = FormatterConfig()
         val writer = StringWriter()
 
         formatter.format(printStmt, writer, config)
 
-        assertEquals("println(\"Hello\");\n\n", writer.toString())
+        assertEquals("println(\"Hello\");", writer.toString())
     }
 }

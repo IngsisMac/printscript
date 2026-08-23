@@ -15,7 +15,6 @@ class DefaultFormatter : Formatter {
         indentLevel: Int,
     ) {
         val indent = " ".repeat(indentLevel * config.indentInsideIf)
-
         when (statement) {
             is Declaration -> formatDeclaration(statement, writer, config, indent)
             is Assignment -> formatAssignment(statement, writer, config, indent)
@@ -30,24 +29,17 @@ class DefaultFormatter : Formatter {
         config: FormatterConfig,
         indent: String,
     ) {
-        val keyword = if (declaration.isConst) "const" else "let"
-        val spaceBeforeColon = if (config.enforceSpacingBeforeColonInDeclaration) " " else ""
-        val spaceAfterColon = if (config.enforceSpacingAfterColonInDeclaration) " " else ""
-        val kwSpace = if (config.mandatorySingleSpaceSeparation) " " else ""
-        val head = "$indent$keyword$kwSpace${declaration.name}$spaceBeforeColon:$spaceAfterColon${declaration.type}"
-
-        val semi = if (config.enforceNoSpaceBeforeSemicolon) ";" else " ;"
-        if (declaration.value != null) {
-            val equalsSpace = if (config.enforceSpacingAroundEquals) " = " else "="
-            val valueStr = ExpressionFormatter.format(declaration.value!!, config)
-            writer.write("$head$equalsSpace$valueStr$semi")
-        } else {
-            writer.write("$head$semi")
-        }
-
-        if (config.mandatoryLineBreakAfterStatement) {
-            writer.write("\n")
-        }
+        val kw = if (declaration.isConst) "const" else "let"
+        val b =
+            getColonSpacing(config.enforceSpacingBeforeColonInDeclaration, declaration.spaceBeforeColon, false, config)
+        val a = getColonSpacing(config.enforceSpacingAfterColonInDeclaration, declaration.spaceAfterColon, true, config)
+        val head = "$indent$kw ${declaration.name}$b:$a${declaration.type}"
+        val valuePart =
+            declaration.value?.let {
+                val eq = getEqualsSpacing(config.enforceSpacingAroundEquals, declaration.spaceAroundEquals, config)
+                "$eq${ExpressionFormatter.format(it, config)}"
+            } ?: ""
+        writer.write("$head$valuePart${getSemicolon(config)}")
     }
 
     private fun formatAssignment(
@@ -56,15 +48,9 @@ class DefaultFormatter : Formatter {
         config: FormatterConfig,
         indent: String,
     ) {
-        val equalsSpace = if (config.enforceSpacingAroundEquals) " = " else "="
+        val eq = getEqualsSpacing(config.enforceSpacingAroundEquals, assignment.spaceAroundEquals, config)
         val valueStr = ExpressionFormatter.format(assignment.value, config)
-        val semi = if (config.enforceNoSpaceBeforeSemicolon) ";" else " ;"
-
-        writer.write("$indent${assignment.name}$equalsSpace$valueStr$semi")
-
-        if (config.mandatoryLineBreakAfterStatement) {
-            writer.write("\n")
-        }
+        writer.write("$indent${assignment.name}$eq$valueStr${getSemicolon(config)}")
     }
 
     private fun formatPrintStatement(
@@ -74,22 +60,9 @@ class DefaultFormatter : Formatter {
         indent: String,
     ) {
         val exprStr = ExpressionFormatter.format(printStmt.expression, config)
-        val semi = if (config.enforceNoSpaceBeforeSemicolon) ";" else " ;"
-        writer.write("${indent}println($exprStr)$semi")
-
-        // Mandatory line break for the statement itself
-        if (config.mandatoryLineBreakAfterStatement) {
-            writer.write("\n")
-        }
-
-        // Additional line breaks configured for println capped by maxBlankLinesBetweenStatements
-        val extraNewlines =
-            (config.lineBreaksAfterPrintln - 1)
-                .coerceAtLeast(0)
-                .coerceAtMost(config.maxBlankLinesBetweenStatements)
-        repeat(extraNewlines) {
-            writer.write("\n")
-        }
+        val semi = getSemicolon(config)
+        val fnCall = if (config.mandatorySingleSpaceSeparation) "println ( $exprStr )" else "println($exprStr)"
+        writer.write("$indent$fnCall$semi")
     }
 
     private fun formatIfStatement(
@@ -100,16 +73,10 @@ class DefaultFormatter : Formatter {
     ) {
         val indent = " ".repeat(indentLevel * config.indentInsideIf)
         val condStr = ExpressionFormatter.format(ifStmt.condition, config)
-
         writeIfHeader(writer, indent, condStr, config.ifBraceBelowLine)
-        ifStmt.thenBranch.forEach { format(it, writer, config, indentLevel + 1) }
-        writer.write("$indent}")
-
+        formatBlock(ifStmt.thenBranch, writer, config, indentLevel)
+        writer.write("\n$indent}")
         formatElseBranch(ifStmt.elseBranch, writer, config, indent, indentLevel)
-
-        if (config.mandatoryLineBreakAfterStatement) {
-            writer.write("\n")
-        }
     }
 
     private fun writeIfHeader(
@@ -118,27 +85,63 @@ class DefaultFormatter : Formatter {
         condStr: String,
         belowLine: Boolean,
     ) {
-        if (belowLine) {
-            writer.write("${indent}if ($condStr)\n$indent{\n")
-        } else {
-            writer.write("${indent}if ($condStr) {\n")
-        }
+        val header = if (belowLine) "${indent}if ($condStr)\n$indent{\n" else "${indent}if ($condStr) {\n"
+        writer.write(header)
     }
 
     private fun formatElseBranch(
-        elseBranch: List<com.printscript.ast.Statement>?,
+        elseBranch: List<Statement>?,
         writer: Writer,
         config: FormatterConfig,
         indent: String,
         indentLevel: Int,
     ) {
         if (elseBranch == null) return
-        if (config.ifBraceBelowLine) {
-            writer.write("\n${indent}else\n$indent{\n")
-        } else {
-            writer.write(" else {\n")
-        }
-        elseBranch.forEach { format(it, writer, config, indentLevel + 1) }
-        writer.write("$indent}")
+        val prefix = if (config.ifBraceBelowLine) "\n${indent}else\n$indent{\n" else " else {\n"
+        writer.write(prefix)
+        formatBlock(elseBranch, writer, config, indentLevel)
+        writer.write("\n$indent}")
     }
+
+    private fun formatBlock(
+        statements: List<Statement>,
+        writer: Writer,
+        config: FormatterConfig,
+        indentLevel: Int,
+    ) {
+        var isFirst = true
+        var prevStmt: Statement? = null
+        for (stmt in statements) {
+            if (!isFirst) {
+                val extra = if (prevStmt is PrintStatement) config.lineBreaksAfterPrintln else 0
+                repeat(1 + extra) { writer.write("\n") }
+            }
+            format(stmt, writer, config, indentLevel + 1)
+            isFirst = false
+            prevStmt = stmt
+        }
+    }
+
+    private fun getColonSpacing(
+        enforceConfig: Boolean?,
+        astSpace: Boolean?,
+        defaultSpace: Boolean,
+        config: FormatterConfig,
+    ): String {
+        if (config.mandatorySingleSpaceSeparation) return " "
+        val space = enforceConfig ?: astSpace ?: defaultSpace
+        return if (space) " " else ""
+    }
+
+    private fun getEqualsSpacing(
+        enforceConfig: Boolean?,
+        astSpace: Boolean?,
+        config: FormatterConfig,
+    ): String {
+        if (config.mandatorySingleSpaceSeparation) return " = "
+        val space = enforceConfig ?: astSpace ?: true
+        return if (space) " = " else "="
+    }
+
+    private fun getSemicolon(config: FormatterConfig): String = if (config.enforceNoSpaceBeforeSemicolon) ";" else " ;"
 }

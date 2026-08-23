@@ -37,7 +37,7 @@ class DefaultFormatterTest {
 
         formatter.format(decl, writer, defaultConfig)
 
-        assertEquals("let a: number = 5;\n", writer.toString())
+        assertEquals("let a: number = 5;", writer.toString())
     }
 
     @Test
@@ -47,7 +47,7 @@ class DefaultFormatterTest {
 
         formatter.format(decl, writer, defaultConfig)
 
-        assertEquals("const b: string = \"hola\";\n", writer.toString())
+        assertEquals("const b: string = \"hola\";", writer.toString())
     }
 
     @Test
@@ -57,7 +57,7 @@ class DefaultFormatterTest {
 
         formatter.format(decl, writer, defaultConfig)
 
-        assertEquals("let x: number;\n", writer.toString())
+        assertEquals("let x: number;", writer.toString())
     }
 
     @Test
@@ -72,7 +72,7 @@ class DefaultFormatterTest {
 
         formatter.format(decl, writer, config)
 
-        assertEquals("let a :number = 10;\n", writer.toString())
+        assertEquals("let a :number = 10;", writer.toString())
     }
 
     @Test
@@ -83,7 +83,7 @@ class DefaultFormatterTest {
 
         formatter.format(assignment, writer, configNoSpace)
 
-        assertEquals("x=20;\n", writer.toString())
+        assertEquals("x=20;", writer.toString())
     }
 
     @Test
@@ -94,7 +94,7 @@ class DefaultFormatterTest {
 
         formatter.format(printStmt, writer, config)
 
-        assertEquals("println(\"Test\");\n\n", writer.toString())
+        assertEquals("println(\"Test\");", writer.toString())
     }
 
     @Test
@@ -111,7 +111,7 @@ class DefaultFormatterTest {
             if (cond) {
               let inside: number = 1;
             }
-            """.trimIndent() + "\n"
+            """.trimIndent()
 
         assertEquals(expected, writer.toString())
     }
@@ -131,7 +131,7 @@ class DefaultFormatterTest {
             {
                 let val: boolean = true;
             }
-            """.trimIndent() + "\n"
+            """.trimIndent()
 
         assertEquals(expected, writer.toString())
     }
@@ -148,11 +148,11 @@ class DefaultFormatterTest {
         val expected =
             """
             if (isValid) {
-                println("Verdadero");
+              println("Verdadero");
             } else {
-                println("Falso");
+              println("Falso");
             }
-            """.trimIndent() + "\n"
+            """.trimIndent()
 
         assertEquals(expected, writer.toString())
     }
@@ -177,7 +177,7 @@ class DefaultFormatterTest {
             {
                 println("Falso");
             }
-            """.trimIndent() + "\n"
+            """.trimIndent()
 
         assertEquals(expected, writer.toString())
     }

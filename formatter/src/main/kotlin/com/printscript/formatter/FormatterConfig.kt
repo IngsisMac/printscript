@@ -1,16 +1,16 @@
 package com.printscript.formatter
 
-private const val DEFAULT_INDENT_INSIDE_IF = 4
+private const val DEFAULT_INDENT_INSIDE_IF = 2
 
 data class FormatterConfig(
-    val enforceSpacingAroundEquals: Boolean = true,
+    val enforceSpacingAroundEquals: Boolean? = null,
     val enforceNoSpacingAroundEquals: Boolean = false,
-    val enforceSpacingBeforeColonInDeclaration: Boolean = false,
-    val enforceSpacingAfterColonInDeclaration: Boolean = true,
-    val mandatorySingleSpaceSeparation: Boolean = true,
+    val enforceSpacingBeforeColonInDeclaration: Boolean? = null,
+    val enforceSpacingAfterColonInDeclaration: Boolean? = null,
+    val mandatorySingleSpaceSeparation: Boolean = false,
     val mandatorySpaceSurroundingOperations: Boolean = true,
     val mandatoryLineBreakAfterStatement: Boolean = true,
-    val lineBreaksAfterPrintln: Int = 1,
+    val lineBreaksAfterPrintln: Int = 0,
     val ifBraceSameLine: Boolean = true,
     val ifBraceBelowLine: Boolean = false,
     val indentInsideIf: Int = DEFAULT_INDENT_INSIDE_IF,
@@ -28,10 +28,18 @@ data class FormatterConfig(
                 enforceSpacingAroundEquals = parseEquals(map),
                 enforceNoSpacingAroundEquals = getBool(map, "enforce-no-spacing-around-equals", false),
                 enforceSpacingBeforeColonInDeclaration =
-                    getBool(map, "enforce-spacing-before-colon-in-declaration", false),
+                    if ("enforce-spacing-before-colon-in-declaration" in map) {
+                        getBool(map, "enforce-spacing-before-colon-in-declaration", false)
+                    } else {
+                        null
+                    },
                 enforceSpacingAfterColonInDeclaration =
-                    getBool(map, "enforce-spacing-after-colon-in-declaration", true),
-                mandatorySingleSpaceSeparation = getBool(map, getSingleSpaceKey(map), true),
+                    if ("enforce-spacing-after-colon-in-declaration" in map) {
+                        getBool(map, "enforce-spacing-after-colon-in-declaration", true)
+                    } else {
+                        null
+                    },
+                mandatorySingleSpaceSeparation = getBool(map, getSingleSpaceKey(map), false),
                 mandatorySpaceSurroundingOperations = getBool(map, "mandatory-space-surrounding-operations", true),
                 enforceNoSpaceBeforeSemicolon = getBool(map, "enforce-no-space-before-semicolon", true),
             )
@@ -42,16 +50,21 @@ data class FormatterConfig(
         ): FormatterConfig =
             base.copy(
                 mandatoryLineBreakAfterStatement = getBool(map, "mandatory-line-break-after-statement", true),
-                lineBreaksAfterPrintln = getInt(map, "line-breaks-after-println", 1),
+                lineBreaksAfterPrintln = getInt(map, "line-breaks-after-println", 0),
                 ifBraceSameLine = parseBraceSameLine(map),
                 ifBraceBelowLine = getBool(map, "if-brace-below-line", false),
                 indentInsideIf = getInt(map, "indent-inside-if", DEFAULT_INDENT_INSIDE_IF),
                 maxBlankLinesBetweenStatements = getInt(map, "max-blank-lines-between-statements", 1),
             )
 
-        private fun parseEquals(map: Map<String, Any?>): Boolean {
-            val noEq = getBool(map, "enforce-no-spacing-around-equals", false)
-            return if (noEq) false else getBool(map, "enforce-spacing-around-equals", true)
+        private fun parseEquals(map: Map<String, Any?>): Boolean? {
+            if ("enforce-no-spacing-around-equals" in map && getBool(map, "enforce-no-spacing-around-equals", false)) {
+                return false
+            }
+            if ("enforce-spacing-around-equals" in map) {
+                return getBool(map, "enforce-spacing-around-equals", true)
+            }
+            return null
         }
 
         private fun parseBraceSameLine(map: Map<String, Any?>): Boolean {

@@ -2,6 +2,7 @@ package com.printscript.formatter
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -18,17 +19,17 @@ class FormatterConfigTest {
     @Test
     @DisplayName("Configuración por defecto tiene los valores esperados")
     fun configuracionPorDefectoTieneValoresEsperados() {
-        assertTrue(defaultConfig.enforceSpacingAroundEquals)
+        assertNull(defaultConfig.enforceSpacingAroundEquals)
         assertFalse(defaultConfig.enforceNoSpacingAroundEquals)
-        assertFalse(defaultConfig.enforceSpacingBeforeColonInDeclaration)
-        assertTrue(defaultConfig.enforceSpacingAfterColonInDeclaration)
-        assertTrue(defaultConfig.mandatorySingleSpaceSeparation)
+        assertNull(defaultConfig.enforceSpacingBeforeColonInDeclaration)
+        assertNull(defaultConfig.enforceSpacingAfterColonInDeclaration)
+        assertFalse(defaultConfig.mandatorySingleSpaceSeparation)
         assertTrue(defaultConfig.mandatorySpaceSurroundingOperations)
         assertTrue(defaultConfig.mandatoryLineBreakAfterStatement)
-        assertEquals(1, defaultConfig.lineBreaksAfterPrintln)
+        assertEquals(0, defaultConfig.lineBreaksAfterPrintln)
         assertTrue(defaultConfig.ifBraceSameLine)
         assertFalse(defaultConfig.ifBraceBelowLine)
-        assertEquals(4, defaultConfig.indentInsideIf)
+        assertEquals(2, defaultConfig.indentInsideIf)
         assertTrue(defaultConfig.enforceNoSpaceBeforeSemicolon)
         assertEquals(1, defaultConfig.maxBlankLinesBetweenStatements)
     }
@@ -57,9 +58,9 @@ class FormatterConfigTest {
 
         val config = FormatterConfig.fromMap(map)
 
-        assertFalse(config.enforceSpacingAroundEquals)
-        assertTrue(config.enforceSpacingBeforeColonInDeclaration)
-        assertFalse(config.enforceSpacingAfterColonInDeclaration)
+        assertEquals(false, config.enforceSpacingAroundEquals)
+        assertEquals(true, config.enforceSpacingBeforeColonInDeclaration)
+        assertEquals(false, config.enforceSpacingAfterColonInDeclaration)
         assertEquals(2, config.lineBreaksAfterPrintln)
         assertEquals(2, config.indentInsideIf)
     }
@@ -77,8 +78,8 @@ class FormatterConfigTest {
 
         val config = FormatterConfig.fromMap(map)
 
-        assertFalse(config.enforceSpacingAroundEquals)
-        assertTrue(config.enforceSpacingBeforeColonInDeclaration)
+        assertEquals(false, config.enforceSpacingAroundEquals)
+        assertEquals(true, config.enforceSpacingBeforeColonInDeclaration)
         assertEquals(3, config.lineBreaksAfterPrintln)
         assertEquals(8, config.indentInsideIf)
     }
@@ -94,7 +95,7 @@ class FormatterConfigTest {
 
         val config = FormatterConfig.fromMap(map)
 
-        assertFalse(config.enforceSpacingAroundEquals)
+        assertEquals(false, config.enforceSpacingAroundEquals)
         assertTrue(config.enforceNoSpacingAroundEquals)
     }
 
@@ -124,7 +125,7 @@ class FormatterConfigTest {
 
         val config = FormatterConfig.fromMap(map)
 
-        assertTrue(config.enforceSpacingAroundEquals)
-        assertEquals(1, config.lineBreaksAfterPrintln)
+        assertEquals(true, config.enforceSpacingAroundEquals)
+        assertEquals(0, config.lineBreaksAfterPrintln)
     }
 }

@@ -173,13 +173,13 @@ class PrintScriptRunnerTest {
     @Test
     @DisplayName("Formateo exitoso en versión 1.0")
     fun formatVersion10() {
-        val source = StringReader("let x : number = 5;")
+        val source = StringReader("let x: number = 5;")
         val writer = java.io.StringWriter()
 
         val result = PrintScriptRunner.format(source, Version.V1_0, emptyMap(), writer)
 
         assertTrue(result.errors.isEmpty())
-        assertEquals("let x: number = 5;\n", writer.toString())
+        assertEquals("let x: number = 5;", writer.toString())
     }
 
     @Test

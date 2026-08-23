@@ -15,6 +15,9 @@ data class Declaration(
     override val span: Span,
     val isConst: Boolean = false,
     val nameSpan: Span = span,
+    val spaceBeforeColon: Boolean? = null,
+    val spaceAfterColon: Boolean? = null,
+    val spaceAroundEquals: Boolean? = null,
 ) : Statement() {
     override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
 }
@@ -24,6 +27,7 @@ data class Assignment(
     val value: Expression,
     override val span: Span,
     val nameSpan: Span = span,
+    val spaceAroundEquals: Boolean? = null,
 ) : Statement() {
     override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
 }
