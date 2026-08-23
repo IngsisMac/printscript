@@ -25,17 +25,10 @@ class LexerV10Test {
 
         val tokens = lexer.asSequence().toList()
 
-        val expectedTypes =
-            listOf(
-                TokenType.LET,
-                TokenType.IDENTIFIER,
-                TokenType.COLON,
-                TokenType.NUMBER,
-                TokenType.EQUAL,
-                TokenType.NUMBER_LITERAL,
-                TokenType.SEMICOLON,
-            )
-        assertEquals(expectedTypes, tokens.map { it.type })
+        val expected =
+            com.printscript.token.TokenFactory
+                .declaration("x", "number", "5")
+        assertEquals(expected.map { it.type }, tokens.map { it.type })
         assertEquals("x", tokens[1].lexeme)
         assertEquals("5", tokens[5].lexeme)
     }
