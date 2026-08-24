@@ -2,6 +2,7 @@ package com.printscript.cli
 
 import com.printscript.cli.commands.AnalyzeCommand
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -48,6 +49,14 @@ class AnalyzeCommandTest {
     }
 
     @Test
+    @DisplayName("Análisis estático exitoso pasando código directo mediante la opción --code")
+    fun analisisExitosoDeCodigoInline() {
+        val exitCode = commandLine.execute("analyze", "--code", "let myVar: number = 10;")
+
+        assertEquals(0, exitCode)
+    }
+
+    @Test
     @DisplayName("Análisis estático funciona mediante el alias analyzing de la consigna")
     fun analisisFuncionaMedianteAliasAnalyzing(
         @TempDir tempDir: File,
@@ -77,8 +86,7 @@ class AnalyzeCommandTest {
         val output = outContent.toString()
 
         assertEquals(0, exitCode)
-        org.junit.jupiter.api.Assertions
-            .assertTrue(output.contains("[Progreso] Sentencia #1 parseada"))
+        assertTrue(output.contains("[Progreso] Sentencia #1 parseada"))
     }
 
     @Test
@@ -139,10 +147,11 @@ class AnalyzeCommandTest {
     }
 
     @Test
-    @DisplayName("Manejo de archivo nulo directamente en la llamada a AnalyzeCommand")
+    @DisplayName("Manejo de archivo nulo y sin opción --code directamente en AnalyzeCommand")
     fun manejoDeArchivoNuloEnAnalyzeCommandDirecto() {
         val cmd = AnalyzeCommand()
         cmd.file = null
+        cmd.inlineCode = null
 
         val code = cmd.call()
 

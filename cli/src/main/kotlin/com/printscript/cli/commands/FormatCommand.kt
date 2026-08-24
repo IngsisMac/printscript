@@ -10,20 +10,25 @@ import picocli.CommandLine.Parameters
 import picocli.CommandLine.Spec
 import java.io.File
 import java.io.PrintWriter
+import java.io.Reader
+import java.io.StringReader
 import java.util.concurrent.Callable
 
 @Command(
     name = "format",
     aliases = ["formatting"],
-    description = ["Formatea un archivo fuente PrintScript de acuerdo a reglas de estilo."],
+    description = ["Formatea un archivo fuente o código directo PrintScript de acuerdo a reglas de estilo."],
     mixinStandardHelpOptions = true,
 )
 class FormatCommand : Callable<Int> {
     @Spec
     var spec: CommandSpec? = null
 
-    @Parameters(index = "0", description = ["Ruta al archivo fuente .ps"])
+    @Parameters(index = "0", arity = "0..1", description = ["Ruta al archivo fuente .ps"])
     var file: File? = null
+
+    @Option(names = ["-s", "--src", "--code"], description = ["Código fuente directo para formatear"])
+    var inlineCode: String? = null
 
     @Option(names = ["-c", "--config"], description = ["Ruta al archivo de configuración JSON"])
     var configFile: File? = null
@@ -48,58 +53,83 @@ class FormatCommand : Callable<Int> {
 
     override fun call(): Int {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
-        val target = resolveTargetAndVersion(err) ?: return 2
-        return formatScript(target.first, target.second)
-    }
-
-    private fun resolveTargetAndVersion(err: PrintWriter): Pair<File, Version>? {
-        val targetFile = file
-        if (targetFile == null || !targetFile.exists()) {
-            val path = targetFile?.path?.let { " $it" } ?: " "
-            err.println("Error: Archivo no encontrado$path")
-            return null
-        }
         val version =
             Version.from(versionStr).getOrElse {
                 err.println("Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
-                return null
+                return 2
             }
-        return targetFile to version
+        return formatScript(version, err)
     }
 
     private fun formatScript(
-        targetFile: File,
         version: Version,
+        err: PrintWriter,
     ): Int {
         val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
-        val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
         val config = ConfigLoader.loadConfig(configFile)
+        val code = inlineCode
+        val targetFile = file
 
         return when {
-            preview -> formatPreview(targetFile, version, config, out)
+            code != null -> formatInline(code, version, config, out, err)
+            targetFile != null -> formatFromFile(targetFile, version, config, out, err)
+            else -> {
+                err.println("Error: Se debe proporcionar un archivo fuente o la opción --code.")
+                2
+            }
+        }
+    }
+
+    private fun formatInline(
+        code: String,
+        version: Version,
+        config: Map<String, Any?>,
+        out: PrintWriter,
+        err: PrintWriter,
+    ): Int =
+        if (outputFile != null) {
+            val writer = outputFile!!.bufferedWriter()
+            val result =
+                StringReader(code).use { reader ->
+                    PrintScriptRunner.format(reader, version, config, writer, createProgressCallback())
+                }
+            writer.flush()
+            handleFormatErrors(result.errors, err)
+        } else {
+            formatPreview(StringReader(code), version, config, out, err)
+        }
+
+    private fun formatFromFile(
+        targetFile: File,
+        version: Version,
+        config: Map<String, Any?>,
+        out: PrintWriter,
+        err: PrintWriter,
+    ): Int {
+        if (!targetFile.exists()) {
+            err.println("Error: Archivo no encontrado ${targetFile.path}")
+            return 2
+        }
+        return when {
+            preview -> formatPreview(targetFile.reader(), version, config, out, err)
             outputFile != null -> formatToFile(targetFile, outputFile!!, version, config, err)
             else -> formatToFile(targetFile, targetFile, version, config, err)
         }
     }
 
     private fun formatPreview(
-        targetFile: File,
+        source: Reader,
         version: Version,
         config: Map<String, Any?>,
         out: PrintWriter,
+        err: PrintWriter,
     ): Int {
         val result =
-            targetFile.reader().use { reader ->
+            source.use { reader ->
                 PrintScriptRunner.format(reader, version, config, out, createProgressCallback())
             }
 
-        if (result.errors.isNotEmpty()) {
-            val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
-            result.errors.forEach { err.println(it.render()) }
-            return 1
-        }
-        out.flush()
-        return 0
+        return handleFormatErrors(result.errors, err).also { out.flush() }
     }
 
     private fun formatToFile(
@@ -113,8 +143,7 @@ class FormatCommand : Callable<Int> {
         val result = writeFormattedToTemp(source, temp, version, config)
         if (result.errors.isNotEmpty()) {
             temp.delete()
-            result.errors.forEach { err.println(it.render()) }
-            return 1
+            return handleFormatErrors(result.errors, err)
         }
         replaceTargetFile(temp, target)
         return 0
@@ -147,6 +176,15 @@ class FormatCommand : Callable<Int> {
             temp.copyTo(target, overwrite = true)
             temp.delete()
         }
+    }
+
+    private fun handleFormatErrors(
+        errors: List<com.printscript.common.PrintScriptError>,
+        err: PrintWriter,
+    ): Int {
+        if (errors.isEmpty()) return 0
+        errors.forEach { err.println(it.render()) }
+        return 1
     }
 
     private fun createProgressCallback(): (Int, com.printscript.ast.Statement) -> Unit {

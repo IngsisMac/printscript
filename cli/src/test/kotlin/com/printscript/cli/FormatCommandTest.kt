@@ -56,6 +56,25 @@ class FormatCommandTest {
     }
 
     @Test
+    @DisplayName("Formateo de código directo inline emite el resultado a consola")
+    fun formateoDeCodigoInline(
+        @TempDir tempDir: File,
+    ) {
+        val configFile =
+            File(tempDir, "config.json").apply {
+                writeText(
+                    "{\"enforce-spacing-around-equals\": true, \"enforce-spacing-after-colon-in-declaration\": true}"
+                )
+            }
+        val exitCode = commandLine.execute("format", "--code", "let x:number=10;", "-c", configFile.absolutePath)
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertTrue(output.contains("let x: number = 10;"))
+    }
+
+    @Test
     @DisplayName("Formateo con flag --output escribe en un nuevo archivo y no modifica el original")
     fun formateoConFlagOutputGuardaEnNuevoArchivo(
         @TempDir tempDir: File,
@@ -198,10 +217,11 @@ class FormatCommandTest {
     }
 
     @Test
-    @DisplayName("Manejo de archivo nulo directamente en la llamada a FormatCommand")
+    @DisplayName("Manejo de archivo nulo y sin opción --code directamente en FormatCommand")
     fun manejoDeArchivoNuloEnFormatCommandDirecto() {
         val cmd = FormatCommand()
         cmd.file = null
+        cmd.inlineCode = null
 
         val code = cmd.call()
 

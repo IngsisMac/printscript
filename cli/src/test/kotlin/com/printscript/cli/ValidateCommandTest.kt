@@ -52,6 +52,17 @@ class ValidateCommandTest {
     }
 
     @Test
+    @DisplayName("Validación exitosa pasando código directo mediante la opción --code")
+    fun validacionExitosaDeCodigoInline() {
+        val exitCode = commandLine.execute("validate", "--code", "let x: number = 42;\nprintln(x);")
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertTrue(output.contains("Validación completada sin errores."))
+    }
+
+    @Test
     @DisplayName("Validación funciona mediante el alias validation de la consigna")
     fun validacionFuncionaMedianteAliasValidation(
         @TempDir tempDir: File,
@@ -131,10 +142,11 @@ class ValidateCommandTest {
     }
 
     @Test
-    @DisplayName("Manejo de archivo nulo directamente en ValidateCommand")
+    @DisplayName("Manejo de archivo nulo y sin opción --code directamente en ValidateCommand")
     fun manejoDeArchivoNuloEnValidateCommandDirecto() {
         val cmd = ValidateCommand()
         cmd.file = null
+        cmd.inlineCode = null
 
         val code = cmd.call()
 

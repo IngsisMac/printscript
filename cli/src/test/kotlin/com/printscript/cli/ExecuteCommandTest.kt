@@ -49,6 +49,17 @@ class ExecuteCommandTest {
     }
 
     @Test
+    @DisplayName("Ejecución exitosa pasando código directo mediante la opción --code")
+    fun ejecucionExitosaDeCodigoInline() {
+        val exitCode = commandLine.execute("execute", "--code", "let a: number = 10;\nprintln(a);")
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertTrue(output.contains("10"))
+    }
+
+    @Test
     @DisplayName("Ejecución funciona mediante el alias execution de la consigna")
     fun ejecucionFuncionaMedianteAliasExecution(
         @TempDir tempDir: File,
@@ -141,10 +152,11 @@ class ExecuteCommandTest {
     }
 
     @Test
-    @DisplayName("Manejo de archivo nulo directamente en la llamada a ExecuteCommand")
+    @DisplayName("Manejo de archivo nulo y sin opción --code directamente en ExecuteCommand")
     fun manejoDeArchivoNuloEnExecuteCommandDirecto() {
         val cmd = ExecuteCommand()
         cmd.file = null
+        cmd.inlineCode = null
 
         val code = cmd.call()
 

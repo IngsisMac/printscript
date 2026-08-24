@@ -9,20 +9,25 @@ import picocli.CommandLine.Parameters
 import picocli.CommandLine.Spec
 import java.io.File
 import java.io.PrintWriter
+import java.io.Reader
+import java.io.StringReader
 import java.util.concurrent.Callable
 
 @Command(
     name = "validate",
     aliases = ["validation", "check"],
-    description = ["Valida la sintaxis y semántica de un archivo PrintScript sin ejecutarlo."],
+    description = ["Valida la sintaxis y semántica de un archivo o código PrintScript sin ejecutarlo."],
     mixinStandardHelpOptions = true,
 )
 class ValidateCommand : Callable<Int> {
     @Spec
     var spec: CommandSpec? = null
 
-    @Parameters(index = "0", description = ["Ruta al archivo fuente .ps"])
+    @Parameters(index = "0", arity = "0..1", description = ["Ruta al archivo fuente .ps"])
     var file: File? = null
+
+    @Option(names = ["-s", "--src", "--code"], description = ["Código fuente directo para validar"])
+    var inlineCode: String? = null
 
     @Option(names = ["-v", "--version"], defaultValue = "1.0", description = ["Versión del lenguaje (1.0 o 1.1)"])
     var versionStr: String = "1.0"
@@ -32,32 +37,47 @@ class ValidateCommand : Callable<Int> {
 
     override fun call(): Int {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
-        val target = resolveTargetAndVersion(err) ?: return 2
+        val target = resolveReaderAndVersion(err) ?: return 2
         return validateScript(target.first, target.second)
     }
 
-    private fun resolveTargetAndVersion(err: PrintWriter): Pair<File, Version>? {
-        val targetFile = file
-        if (targetFile == null || !targetFile.exists()) {
-            val path = targetFile?.path?.let { " $it" } ?: " "
-            err.println("Error: Archivo no encontrado$path")
-            return null
-        }
+    private fun resolveReaderAndVersion(err: PrintWriter): Pair<Reader, Version>? {
+        val reader = resolveSourceReader(err) ?: return null
         val version =
             Version.from(versionStr).getOrElse {
                 err.println("Error: Versión no válida '$versionStr'. Usar 1.0 o 1.1.")
                 return null
             }
-        return targetFile to version
+        return reader to version
+    }
+
+    private fun resolveSourceReader(err: PrintWriter): Reader? {
+        val code = inlineCode
+        val targetFile = file
+        return when {
+            code != null -> StringReader(code)
+            targetFile != null -> {
+                if (!targetFile.exists()) {
+                    err.println("Error: Archivo no encontrado ${targetFile.path}")
+                    null
+                } else {
+                    targetFile.reader()
+                }
+            }
+            else -> {
+                err.println("Error: Se debe proporcionar un archivo fuente o la opción --code.")
+                null
+            }
+        }
     }
 
     private fun validateScript(
-        targetFile: File,
+        source: Reader,
         version: Version,
     ): Int {
         val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
         val result =
-            targetFile.reader().use { reader ->
+            source.use { reader ->
                 PrintScriptRunner.validate(reader, version, createProgressCallback(out))
             }
 
