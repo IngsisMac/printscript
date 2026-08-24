@@ -23,6 +23,7 @@ class Interpreter(
     private val globalEnv = Environment()
     private val errors = mutableListOf<PrintScriptError>()
 
+    @Suppress("TooGenericExceptionCaught")
     fun execute(statements: Iterator<Statement>): List<PrintScriptError> {
         while (statements.hasNext()) {
             val stmt = tryNextStatement(statements) ?: break
@@ -37,6 +38,7 @@ class Interpreter(
         return errors
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun tryNextStatement(statements: Iterator<Statement>): Statement? =
         try {
             statements.next()

@@ -144,7 +144,7 @@ private fun parseNumberValue(
 ): NumberValue =
     try {
         NumberValue(BigDecimal(strValue))
-    } catch (e: Exception) {
+    } catch (e: NumberFormatException) {
         throw InterpreterException("Cannot convert input '$strValue' to number", span)
     }
 

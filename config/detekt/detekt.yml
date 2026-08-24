@@ -6,9 +6,10 @@ complexity:
   CyclomaticComplexMethod:
     active: true
   TooManyFunctions:
-    active: false
-  LargeClass:
-    active: false
+    active: true
+    thresholdInFiles: 20
+    thresholdInClasses: 20
+    thresholdInInterfaces: 20
   LongMethod:
     active: true
     threshold: 20
@@ -21,15 +22,6 @@ complexity:
     functionThreshold: 6
     constructorThreshold: 7
     ignoreDefaultParameters: true
-
-exceptions:
-  TooGenericExceptionThrown:
-    active: false
-  TooGenericExceptionCaught:
-    active: false
-  SwallowedException:
-    active: false
-
 naming:
   ClassNaming:
     active: true
@@ -48,8 +40,6 @@ naming:
     enumEntryPattern: '[A-Z][_A-Z0-9]*'
 
 style:
-  ThrowsCount:
-    active: false
   ReturnCount:
     active: true
     max: 3
