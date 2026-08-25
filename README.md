@@ -47,7 +47,7 @@ El proyecto incluye un punto de entrada principal (`Main.kt`) y un comando inter
 ./gradlew run --args="demo"
 ```
 
-### 3. Ejecución de Archivos de Ejemplo (`examples/`)
+### 3. Ejecución de Archivos de Ejemplo (`docs/examples/`)
 El repositorio incluye una suite de scripts listos para probar ante los profesores:
 
 ```bash

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.io.StringWriter
+import java.io.Writer
 
 class CustomFormatterRulesTest {
     private lateinit var formatter: DefaultFormatter
@@ -72,5 +73,74 @@ class CustomFormatterRulesTest {
         formatter.format(printStmt, writer, config)
 
         assertEquals("println(\"Hello\");", writer.toString())
+    }
+
+    @Test
+    @DisplayName("Extensibilidad: Formatter soporta reglas personalizadas inyectadas sin modificar DefaultFormatter")
+    fun formatterSoportaReglasPersonalizadas() {
+        val customRule =
+            object : com.printscript.formatter.rule.FormattingRule {
+                override fun appliesTo(statement: com.printscript.ast.Statement): Boolean = statement is Declaration
+
+                override fun format(
+                    statement: com.printscript.ast.Statement,
+                    writer: Writer,
+                    context: FormatterContext,
+                ) {
+                    val decl = statement as Declaration
+                    writer.write("// CUSTOM: ${decl.name}")
+                }
+            }
+
+        val customFormatter = DefaultFormatter(rules = listOf(customRule))
+        val decl = Declaration("x", "number", null, dummySpan, isConst = false)
+        val writer = StringWriter()
+
+        customFormatter.format(decl, writer)
+
+        assertEquals("// CUSTOM: x", writer.toString())
+    }
+
+    @Test
+    @DisplayName("Error al formatear sentencia sin regla compatible")
+    fun errorAlFormatearSentenciaSinRegla() {
+        val emptyFormatter = DefaultFormatter(rules = emptyList())
+        val decl = Declaration("x", "number", null, dummySpan, isConst = false)
+        val writer = StringWriter()
+
+        org.junit.jupiter.api.assertThrows<IllegalStateException> {
+            emptyFormatter.format(decl, writer)
+        }
+    }
+
+    @Test
+    @DisplayName("Extensibilidad: ExpressionFormatter soporta reglas personalizadas de expresión")
+    fun expressionFormatterSoportaReglasPersonalizadas() {
+        val customExprRule =
+            object : com.printscript.formatter.expression.ExpressionRule {
+                override fun appliesTo(expression: com.printscript.ast.Expression): Boolean =
+                    expression is NumberLiteral
+
+                override fun format(
+                    expression: com.printscript.ast.Expression,
+                    config: FormatterConfig,
+                    formatter: ExpressionFormatter,
+                ): String = "#NUM#${(expression as NumberLiteral).value}"
+            }
+
+        val customExprFormatter = DefaultExpressionFormatter(rules = listOf(customExprRule))
+        val result = customExprFormatter.format(NumberLiteral("123", dummySpan), FormatterConfig())
+
+        assertEquals("#NUM#123", result)
+    }
+
+    @Test
+    @DisplayName("Error al formatear expresión sin regla compatible")
+    fun errorAlFormatearExpresionSinRegla() {
+        val emptyExprFormatter = DefaultExpressionFormatter(rules = emptyList())
+
+        org.junit.jupiter.api.assertThrows<IllegalStateException> {
+            emptyExprFormatter.format(NumberLiteral("123", dummySpan), FormatterConfig())
+        }
     }
 }
