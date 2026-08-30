@@ -11,6 +11,7 @@ import com.printscript.ast.NumberLiteral
 import com.printscript.ast.PrintStatement
 import com.printscript.ast.Statement
 import com.printscript.ast.StringLiteral
+import com.printscript.ast.UnaryOp
 import com.printscript.ast.Variable
 import com.printscript.common.PrintScriptError
 import com.printscript.linter.LinterConfig
@@ -49,6 +50,8 @@ class AstVisitorLinter(
     override fun visit(node: Variable): List<PrintScriptError> = emptyList()
 
     override fun visit(node: BinaryOp): List<PrintScriptError> = emptyList()
+
+    override fun visit(node: UnaryOp): List<PrintScriptError> = emptyList()
 
     override fun visit(node: CallExpression): List<PrintScriptError> = emptyList()
 

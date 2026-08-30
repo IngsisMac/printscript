@@ -5,6 +5,7 @@ import com.printscript.formatter.expression.BinaryOpExpressionRule
 import com.printscript.formatter.expression.CallExpressionRule
 import com.printscript.formatter.expression.ExpressionRule
 import com.printscript.formatter.expression.LiteralExpressionRule
+import com.printscript.formatter.expression.UnaryOpExpressionRule
 import com.printscript.formatter.expression.VariableExpressionRule
 
 class DefaultExpressionFormatter(
@@ -25,6 +26,7 @@ class DefaultExpressionFormatter(
             listOf(
                 LiteralExpressionRule(),
                 VariableExpressionRule(),
+                UnaryOpExpressionRule(),
                 BinaryOpExpressionRule(),
                 CallExpressionRule(),
             )

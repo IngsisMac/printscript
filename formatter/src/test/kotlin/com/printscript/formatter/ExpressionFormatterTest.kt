@@ -5,6 +5,7 @@ import com.printscript.ast.BooleanLiteral
 import com.printscript.ast.CallExpression
 import com.printscript.ast.NumberLiteral
 import com.printscript.ast.StringLiteral
+import com.printscript.ast.UnaryOp
 import com.printscript.ast.Variable
 import com.printscript.common.Position
 import com.printscript.common.Span
@@ -62,6 +63,24 @@ class ExpressionFormatterTest {
 
         assertEquals("readInput(\"Ingrese valor:\")", resultWithArg)
         assertEquals("readEnv()", resultWithoutArg)
+    }
+
+    @Test
+    @DisplayName("Formateo de operaciones unarias")
+    fun formateoDeOperacionesUnarias() {
+        val unaryNum = UnaryOp("-", NumberLiteral("5", dummySpan), dummySpan)
+        val unaryBinary =
+            UnaryOp(
+                "-",
+                BinaryOp(NumberLiteral("1", dummySpan), "+", NumberLiteral("2", dummySpan), dummySpan),
+                dummySpan
+            )
+
+        val numResult = ExpressionFormatter.format(unaryNum, defaultConfig)
+        val binaryResult = ExpressionFormatter.format(unaryBinary, defaultConfig)
+
+        assertEquals("-5", numResult)
+        assertEquals("-(1 + 2)", binaryResult)
     }
 
     @Test

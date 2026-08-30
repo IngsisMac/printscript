@@ -99,6 +99,16 @@ class ExpressionTest {
     }
 
     @Test
+    @DisplayName("UnaryOp conserva el operador, el operando y su span")
+    fun unaryOpConservaOperadorYOperand() {
+        val unaryNode = UnaryOp("-", leftNum, dummySpan)
+
+        assertEquals("-", unaryNode.operator)
+        assertEquals(leftNum, unaryNode.operand)
+        assertEquals(dummySpan, unaryNode.span)
+    }
+
+    @Test
     @DisplayName("Instancias de Expression con mismos valores son iguales por data class")
     fun expresionesIgualesTienenMismoEqualsYHashCode() {
         val node1 = Variable("x", dummySpan)

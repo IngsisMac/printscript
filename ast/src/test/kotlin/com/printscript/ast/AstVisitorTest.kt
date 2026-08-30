@@ -30,6 +30,8 @@ class AstVisitorTest {
 
         override fun visit(node: BinaryOp): String = "BinaryOp:${node.operator}"
 
+        override fun visit(node: UnaryOp): String = "UnaryOp:${node.operator}"
+
         override fun visit(node: CallExpression): String = "CallExpression:${node.name}"
     }
 
@@ -127,6 +129,16 @@ class AstVisitorTest {
         val result = binary.accept(testVisitor)
 
         assertEquals("BinaryOp:+", result)
+    }
+
+    @Test
+    @DisplayName("accept en UnaryOp invoca visit(UnaryOp)")
+    fun acceptEnUnaryOpInvocaVisitUnaryOp() {
+        val unary = UnaryOp("-", NumberLiteral("1", dummySpan), dummySpan)
+
+        val result = unary.accept(testVisitor)
+
+        assertEquals("UnaryOp:-", result)
     }
 
     @Test

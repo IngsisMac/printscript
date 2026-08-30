@@ -5,12 +5,14 @@ import com.printscript.ast.BooleanLiteral
 import com.printscript.ast.CallExpression
 import com.printscript.ast.NumberLiteral
 import com.printscript.ast.StringLiteral
+import com.printscript.ast.UnaryOp
 import com.printscript.ast.Variable
 import com.printscript.common.Version
 import com.printscript.interpreter.evaluator.BinaryOpEvaluator
 import com.printscript.interpreter.evaluator.CallExpressionEvaluator
 import com.printscript.interpreter.evaluator.ExpressionEvaluatorFactory
 import com.printscript.interpreter.evaluator.LiteralEvaluator
+import com.printscript.interpreter.evaluator.UnaryOpEvaluator
 import com.printscript.interpreter.evaluator.VariableEvaluator
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -37,6 +39,7 @@ class ExpressionEvaluatorFactoryTest {
         assertTrue(evaluators.containsKey(NumberLiteral::class))
         assertTrue(evaluators.containsKey(StringLiteral::class))
         assertTrue(evaluators.containsKey(Variable::class))
+        assertTrue(evaluators.containsKey(UnaryOp::class))
         assertTrue(evaluators.containsKey(BinaryOp::class))
         assertFalse(evaluators.containsKey(BooleanLiteral::class))
         assertFalse(evaluators.containsKey(CallExpression::class))
@@ -44,6 +47,7 @@ class ExpressionEvaluatorFactoryTest {
         assertInstanceOf(LiteralEvaluator::class.java, evaluators[NumberLiteral::class])
         assertInstanceOf(LiteralEvaluator::class.java, evaluators[StringLiteral::class])
         assertInstanceOf(VariableEvaluator::class.java, evaluators[Variable::class])
+        assertInstanceOf(UnaryOpEvaluator::class.java, evaluators[UnaryOp::class])
         assertInstanceOf(BinaryOpEvaluator::class.java, evaluators[BinaryOp::class])
     }
 
@@ -56,10 +60,12 @@ class ExpressionEvaluatorFactoryTest {
         assertTrue(evaluators.containsKey(StringLiteral::class))
         assertTrue(evaluators.containsKey(BooleanLiteral::class))
         assertTrue(evaluators.containsKey(Variable::class))
+        assertTrue(evaluators.containsKey(UnaryOp::class))
         assertTrue(evaluators.containsKey(BinaryOp::class))
         assertTrue(evaluators.containsKey(CallExpression::class))
 
         assertInstanceOf(LiteralEvaluator::class.java, evaluators[BooleanLiteral::class])
+        assertInstanceOf(UnaryOpEvaluator::class.java, evaluators[UnaryOp::class])
         assertInstanceOf(CallExpressionEvaluator::class.java, evaluators[CallExpression::class])
     }
 }

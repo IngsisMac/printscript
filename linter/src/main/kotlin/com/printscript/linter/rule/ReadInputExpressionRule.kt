@@ -11,6 +11,7 @@ import com.printscript.ast.NumberLiteral
 import com.printscript.ast.PrintStatement
 import com.printscript.ast.Statement
 import com.printscript.ast.StringLiteral
+import com.printscript.ast.UnaryOp
 import com.printscript.ast.Variable
 import com.printscript.common.PrintScriptError
 import com.printscript.linter.LinterConfig
@@ -63,6 +64,7 @@ class ReadInputExpressionRule : LinterRule {
                 if (expr.name == "readInput") calls.add(expr)
                 expr.argument?.let { collectReadInputCalls(it, calls) }
             }
+            is UnaryOp -> collectReadInputCalls(expr.operand, calls)
             is BinaryOp -> {
                 collectReadInputCalls(expr.left, calls)
                 collectReadInputCalls(expr.right, calls)

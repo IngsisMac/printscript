@@ -6,6 +6,7 @@ import com.printscript.ast.CallExpression
 import com.printscript.ast.Expression
 import com.printscript.ast.NumberLiteral
 import com.printscript.ast.StringLiteral
+import com.printscript.ast.UnaryOp
 import com.printscript.ast.Variable
 import com.printscript.common.Span
 import com.printscript.interpreter.Environment
@@ -46,6 +47,24 @@ class VariableEvaluator : ExpressionEvaluator<Variable> {
         env: Environment,
         context: InterpreterContext,
     ): Value = env.get(expr.name, expr.span)
+}
+
+class UnaryOpEvaluator : ExpressionEvaluator<UnaryOp> {
+    override fun evaluate(
+        expr: UnaryOp,
+        env: Environment,
+        context: InterpreterContext,
+    ): Value {
+        val value = context.evaluateExpression(expr.operand, env)
+        if (value !is NumberValue) {
+            throw InterpreterException("Unary '${expr.operator}' not supported on ${value.typeName}", expr.span)
+        }
+        return when (expr.operator) {
+            "-" -> NumberValue(value.value.negate())
+            "+" -> value
+            else -> throw InterpreterException("Unknown unary operator: ${expr.operator}", expr.span)
+        }
+    }
 }
 
 class BinaryOpEvaluator : ExpressionEvaluator<BinaryOp> {

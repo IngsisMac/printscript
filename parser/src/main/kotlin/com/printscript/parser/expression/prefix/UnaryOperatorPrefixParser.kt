@@ -1,8 +1,7 @@
 package com.printscript.parser.expression.prefix
 
-import com.printscript.ast.BinaryOp
 import com.printscript.ast.Expression
-import com.printscript.ast.NumberLiteral
+import com.printscript.ast.UnaryOp
 import com.printscript.common.Span
 import com.printscript.parser.ExpressionParser
 import com.printscript.parser.TokenStream
@@ -18,8 +17,7 @@ class UnaryOperatorPrefixParser : PrefixParser {
         expressionParser: ExpressionParser,
     ): Expression {
         val operand = expressionParser.parseUnaryExpression(stream)
-        return BinaryOp(
-            NumberLiteral("0", token.span),
+        return UnaryOp(
             token.lexeme,
             operand,
             Span(token.span.start, operand.span.end),

@@ -1,9 +1,9 @@
 package com.printscript.parser
 
-import com.printscript.ast.BinaryOp
 import com.printscript.ast.BooleanLiteral
 import com.printscript.ast.CallExpression
 import com.printscript.ast.Declaration
+import com.printscript.ast.UnaryOp
 import com.printscript.common.Version
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -27,20 +27,20 @@ class PrefixParsersTest {
             .toList()
 
     @Test
-    @DisplayName("Parse de operador unario menos genera operación binaria con cero")
+    @DisplayName("Parse de operador unario menos genera nodo UnaryOp")
     fun parseUnaryMinusOperator() {
         val decl = parseString("let x: number = -5;")[0] as Declaration
 
-        val op = decl.value as BinaryOp
+        val op = decl.value as UnaryOp
         assertEquals("-", op.operator)
     }
 
     @Test
-    @DisplayName("Parse de operador unario más genera operación binaria con cero")
+    @DisplayName("Parse de operador unario más genera nodo UnaryOp")
     fun parseUnaryPlusOperator() {
         val decl = parseString("let x: number = +5;")[0] as Declaration
 
-        val op = decl.value as BinaryOp
+        val op = decl.value as UnaryOp
         assertEquals("+", op.operator)
     }
 

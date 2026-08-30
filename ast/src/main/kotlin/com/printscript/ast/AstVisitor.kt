@@ -19,5 +19,7 @@ interface AstVisitor<R> {
 
     fun visit(node: BinaryOp): R
 
+    fun visit(node: UnaryOp): R
+
     fun visit(node: CallExpression): R
 }

@@ -177,4 +177,19 @@ class InterpreterV10Test : BaseInterpreterTest(Version.V1_0) {
         assertTrue(errors.isEmpty(), "Unexpected errors: ${errors.map { it.message }}")
         assertTrue(outputs.isEmpty(), "Validation mode should not emit outputs")
     }
+
+    @Test
+    @DisplayName("Menos unario niega un valor numérico")
+    fun unaryMinusNegatesNumber() {
+        val src =
+            """
+            let x: number = -5;
+            println(x);
+            """.trimIndent()
+
+        val errors = execute(src)
+
+        assertTrue(errors.isEmpty(), "Unexpected errors: ${errors.map { it.message }}")
+        assertEquals(listOf("-5"), outputs)
+    }
 }

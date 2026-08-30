@@ -45,6 +45,14 @@ data class BinaryOp(
     override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
 }
 
+data class UnaryOp(
+    val operator: String, // "-", "+"
+    val operand: Expression,
+    override val span: Span,
+) : Expression() {
+    override fun <R> accept(visitor: AstVisitor<R>): R = visitor.visit(this)
+}
+
 data class CallExpression(
     val name: String,
     val argument: Expression?,

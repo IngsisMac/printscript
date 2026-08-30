@@ -25,7 +25,7 @@ class InterpreterConfigTest {
         assertNotNull(config)
         assertEquals(version10, config.version)
         assertEquals(3, config.statementEvaluators.size)
-        assertEquals(4, config.expressionEvaluators.size)
+        assertEquals(5, config.expressionEvaluators.size)
     }
 
     @Test
@@ -36,6 +36,6 @@ class InterpreterConfigTest {
         assertNotNull(config)
         assertEquals(version11, config.version)
         assertEquals(4, config.statementEvaluators.size)
-        assertEquals(6, config.expressionEvaluators.size)
+        assertEquals(7, config.expressionEvaluators.size)
     }
 }
