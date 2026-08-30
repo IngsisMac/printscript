@@ -46,13 +46,13 @@ Invocación directa de comandos con parámetros y opciones desde la terminal o s
 ### `execute` (alias: `execution`, `run`)
 Interpreta y ejecuta código PrintScript, interactuando con la entrada y salida estándar.
 
-- **Con archivo:**
-  ```bash
-  printscript execute ruta/al/archivo.ps [-v 1.0|1.1]
-  ```
 - **Con código inline:**
   ```bash
   printscript execute --code "let a: number = 10; println(a * 2);" -v 1.0
+  ```
+- **Con archivo `.ps`:**
+  ```bash
+  printscript execute script.ps -v 1.0 --progress
   ```
 - **Opciones:**
   - `-v, --version`: Versión del lenguaje (`1.0` o `1.1`, por defecto `1.0`).
@@ -63,17 +63,21 @@ Interpreta y ejecuta código PrintScript, interactuando con la entrada y salida 
 ### `format` (alias: `formatting`)
 Aplica reglas de estilo configurables vía JSON.
 
-- **Con archivo (formateo in-place por defecto):**
+- **Con código inline (usando `--preview` para ver el resultado en consola):**
   ```bash
-  printscript format ruta/al/archivo.ps -c config.json
+  printscript format --code "let x:number=10;let y:number=20;println(x+y);" -c config.json --preview
   ```
-- **Con archivo hacia la consola (`--preview`):**
+- **Con archivo `.ps` (muestra en pantalla sin alterar el archivo original):**
   ```bash
-  printscript format ruta/al/archivo.ps -c config.json --preview
+  printscript format script.ps -c config.json --preview
   ```
-- **Con código inline:**
+- **Con archivo `.ps` (formateo in-place que sobreescribe el archivo con el código limpio):**
   ```bash
-  printscript format --code "let x:number=10;let y:number=20;" -c config.json --preview
+  printscript format script.ps -c config.json
+  ```
+- **Guardando en un archivo de salida nuevo:**
+  ```bash
+  printscript format script.ps -c config.json -o script_formatted.ps
   ```
 - **Opciones:**
   - `-c, --config`: Ruta al archivo JSON de reglas del Formatter.
@@ -84,15 +88,19 @@ Aplica reglas de estilo configurables vía JSON.
 ---
 
 ### `analyze` (alias: `analyzing`, `lint`)
-Ejecuta el análisis estático (Linter) verificando convenciones de nomenclatura y restricciones de llamadas.
+Ejecuta el análisis estático (Linter) verificando convenciones de nomenclatura (`camelCase` / `snake_case`) y restricciones de sentencias.
 
-- **Con archivo:**
+- **Con código inline (detecta variable snake_case o expresión compleja en `println`):**
   ```bash
-  printscript analyze ruta/al/archivo.ps -c config/linter.json
+  printscript analyze --code "let my_variable: number = 10; println(10 + 20);" -c config.json -v 1.0
   ```
-- **Con código inline:**
+- **Con código inline limpio (sin violaciones):**
   ```bash
-  printscript analyze --code "let invalid_name: number = 10;" -c config/linter.json
+  printscript analyze --code "let myVariable: number = 10; println(myVariable);" -c config.json -v 1.0
+  ```
+- **Con archivo `.ps`:**
+  ```bash
+  printscript analyze script.ps -c config.json -v 1.1
   ```
 - **Opciones:**
   - `-c, --config`: Ruta al archivo JSON de reglas del Linter.
@@ -101,15 +109,19 @@ Ejecuta el análisis estático (Linter) verificando convenciones de nomenclatura
 ---
 
 ### `validate` (alias: `validation`, `check`)
-Valida la corrección léxica, gramatical y de tipos del código sin ejecutar efectos colaterales de I/O.
+Valida la corrección léxica, sintáctica y de tipos del código sin ejecutar efectos colaterales.
 
-- **Con archivo:**
+- **Con código inline válido:**
   ```bash
-  printscript validate ruta/al/archivo.ps [-v 1.0|1.1]
+  printscript validate --code "let x: number = 10; println(x);" -v 1.0
   ```
-- **Con código inline:**
+- **Con código inline con error (falta punto y coma):**
   ```bash
-  printscript validate --code "let x: number = 10;" -v 1.0
+  printscript validate --code "let x: number = 10" -v 1.0
+  ```
+- **Con archivo `.ps`:**
+  ```bash
+  printscript validate script.ps -v 1.1
   ```
 
 ---

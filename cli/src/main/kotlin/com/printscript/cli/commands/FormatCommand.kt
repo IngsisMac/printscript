@@ -128,7 +128,7 @@ class FormatCommand : Callable<Int> {
             source.use { reader ->
                 PrintScriptRunner.format(reader, version, config, out, createProgressCallback())
             }
-
+        out.println()
         return handleFormatErrors(result.errors, err).also { out.flush() }
     }
 
