@@ -1,5 +1,6 @@
 package com.printscript.interpreter
 
+import com.printscript.common.EnvSource
 import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
 import com.printscript.common.PrintScriptError
@@ -33,7 +34,8 @@ abstract class BaseInterpreterTest(
         val lexer = Lexer(StringReader(source), version)
         val parser = Parser(lexer, version)
         val statements = parser.parse()
-        val interpreter = Interpreter(version, emitter, inputSource, isValidationMode = isValidationMode)
+        val interpreter =
+            Interpreter(version, emitter, inputSource, EnvSource.SYSTEM, isValidationMode = isValidationMode)
         return interpreter.execute(statements)
     }
 }

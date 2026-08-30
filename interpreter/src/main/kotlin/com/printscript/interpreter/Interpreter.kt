@@ -7,6 +7,7 @@ import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
 import com.printscript.common.Position
 import com.printscript.common.PrintScriptError
+import com.printscript.common.PrintScriptFailure
 import com.printscript.common.Span
 import com.printscript.common.Version
 import com.printscript.interpreter.evaluator.ExpressionEvaluator
@@ -16,54 +17,46 @@ class Interpreter(
     override val version: Version,
     override val output: OutputEmitter = OutputEmitter { },
     override val input: InputSource = InputSource { "" },
-    override val env: EnvSource = EnvSource { System.getenv(it) },
+    override val env: EnvSource = EnvSource.DENY,
     override val isValidationMode: Boolean = false,
     private val config: InterpreterConfig = InterpreterConfig.from(version),
 ) : InterpreterContext {
     private val globalEnv = Environment()
     private val errors = mutableListOf<PrintScriptError>()
 
-    @Suppress("TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
     fun execute(statements: Iterator<Statement>): List<PrintScriptError> {
         while (statements.hasNext()) {
             val stmt = tryNextStatement(statements) ?: break
             try {
                 executeStatement(stmt, globalEnv)
-            } catch (e: InterpreterException) {
-                errors.add(PrintScriptError(e.message, e.span))
             } catch (e: RuntimeException) {
-                errors.add(PrintScriptError(e.message ?: "Unknown error", stmt.span))
+                val error =
+                    if (e is PrintScriptFailure) {
+                        PrintScriptError(e.rawMessage, e.span)
+                    } else {
+                        PrintScriptError(e.message ?: "Unknown error", Span(Position(1, 1), Position(1, 1)))
+                    }
+                errors.add(error)
             }
         }
         return errors
     }
 
-    @Suppress("TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
     private fun tryNextStatement(statements: Iterator<Statement>): Statement? =
         try {
             statements.next()
         } catch (e: Exception) {
-            errors.add(extractError(e))
+            val error =
+                if (e is PrintScriptFailure) {
+                    PrintScriptError(e.rawMessage, e.span)
+                } else {
+                    PrintScriptError(e.message ?: "Unknown error", Span(Position(1, 1), Position(1, 1)))
+                }
+            errors.add(error)
             null
         }
-
-    private fun extractError(e: Exception): PrintScriptError = PrintScriptError(extractRawMessage(e), extractSpan(e))
-
-    private fun extractSpan(e: Exception): Span =
-        (
-            e.javaClass.methods
-                .firstOrNull { it.name == "getSpan" }
-                ?.invoke(e) as? Span
-        )
-            ?: Span(Position(1, 1), Position(1, 1))
-
-    private fun extractRawMessage(e: Exception): String =
-        (
-            e.javaClass.methods
-                .firstOrNull { it.name == "getRawMessage" }
-                ?.invoke(e) as? String
-        )
-            ?: e.message ?: "Error"
 
     @Suppress("UNCHECKED_CAST")
     override fun executeStatement(

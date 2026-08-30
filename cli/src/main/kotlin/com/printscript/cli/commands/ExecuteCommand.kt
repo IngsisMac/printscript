@@ -1,5 +1,6 @@
 package com.printscript.cli.commands
 
+import com.printscript.common.EnvSource
 import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
 import com.printscript.common.Version
@@ -83,7 +84,14 @@ class ExecuteCommand : Callable<Int> {
         val input = createInputSource(out)
         val result =
             source.use { reader ->
-                PrintScriptRunner.execute(reader, version, emitter, input, onProgress = createProgressCallback(out))
+                PrintScriptRunner.execute(
+                    reader,
+                    version,
+                    emitter,
+                    input,
+                    env = EnvSource.SYSTEM,
+                    onProgress = createProgressCallback(out),
+                )
             }
 
         return handleErrors(result.errors)

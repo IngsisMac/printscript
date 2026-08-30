@@ -5,16 +5,17 @@ import com.printscript.ast.Statement
 import com.printscript.common.EnvSource
 import com.printscript.common.InputSource
 import com.printscript.common.OutputEmitter
+import com.printscript.common.Position
 import com.printscript.common.PrintScriptError
+import com.printscript.common.PrintScriptFailure
+import com.printscript.common.Span
 import com.printscript.common.Version
 import com.printscript.formatter.DefaultFormatter
 import com.printscript.formatter.FormatterConfig
 import com.printscript.interpreter.Interpreter
 import com.printscript.lexer.Lexer
-import com.printscript.lexer.LexerException
 import com.printscript.linter.DefaultLinter
 import com.printscript.linter.LinterConfig
-import com.printscript.parser.ParseException
 import com.printscript.parser.Parser
 import java.io.Reader
 import java.io.Writer
@@ -30,17 +31,13 @@ object PrintScriptRunner {
         version: Version,
         output: OutputEmitter,
         input: InputSource,
-        env: EnvSource = EnvSource { System.getenv(it) },
+        env: EnvSource = EnvSource.DENY,
         onProgress: (Int, Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
-        try {
-            val statements = trackProgress(Parser(Lexer(source, version), version).parse(), onProgress)
+        guarded {
+            val statements = trackProgress(statements(source, version), onProgress)
             val interpreter = Interpreter(version, output, input, env, isValidationMode = false)
             ExecutionResult(interpreter.execute(statements))
-        } catch (e: LexerException) {
-            ExecutionResult(listOf(e.toError()))
-        } catch (e: ParseException) {
-            ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         }
 
     @JvmOverloads
@@ -49,14 +46,10 @@ object PrintScriptRunner {
         version: Version,
         onProgress: (Int, Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
-        try {
-            val statements = trackProgress(Parser(Lexer(source, version), version).parse(), onProgress)
+        guarded {
+            val statements = trackProgress(statements(source, version), onProgress)
             val interpreter = Interpreter(version, isValidationMode = true)
             ExecutionResult(interpreter.execute(statements))
-        } catch (e: LexerException) {
-            ExecutionResult(listOf(e.toError()))
-        } catch (e: ParseException) {
-            ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         }
 
     @JvmOverloads
@@ -67,15 +60,11 @@ object PrintScriptRunner {
         writer: Writer,
         onProgress: (Int, Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
-        try {
-            val statements = trackProgress(Parser(Lexer(source, version), version).parse(), onProgress)
+        guarded {
+            val statements = trackProgress(statements(source, version), onProgress)
             val formatterConfig = FormatterConfig.fromMap(config)
             formatStatements(statements, writer, formatterConfig)
             ExecutionResult(emptyList())
-        } catch (e: LexerException) {
-            ExecutionResult(listOf(e.toError()))
-        } catch (e: ParseException) {
-            ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         }
 
     private fun formatStatements(
@@ -105,15 +94,11 @@ object PrintScriptRunner {
         onError: (PrintScriptError) -> Unit = {},
         onProgress: (Int, Statement) -> Unit = { _, _ -> },
     ): ExecutionResult =
-        try {
-            val statements = trackProgress(Parser(Lexer(source, version), version).parse(), onProgress)
+        guarded {
+            val statements = trackProgress(statements(source, version), onProgress)
             val linterConfig = LinterConfig.fromMap(config)
             val errors = DefaultLinter().analyze(statements, linterConfig, onError)
             ExecutionResult(errors)
-        } catch (e: LexerException) {
-            ExecutionResult(listOf(e.toError()))
-        } catch (e: ParseException) {
-            ExecutionResult(listOf(PrintScriptError(e.rawMessage, e.span)))
         }
 
     @JvmOverloads
@@ -133,6 +118,29 @@ object PrintScriptRunner {
         onError: (PrintScriptError) -> Unit = {},
         onProgress: (Int, Statement) -> Unit = { _, _ -> },
     ): ExecutionResult = analyze(source, version, ConfigLoader.parseJsonToMap(config), onError, onProgress)
+
+    private fun statements(
+        source: Reader,
+        version: Version,
+    ): Iterator<Statement> {
+        val lexer = Lexer(source, version)
+        val parser = Parser(lexer, version)
+        return parser.parse()
+    }
+
+    @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
+    private inline fun guarded(block: () -> ExecutionResult): ExecutionResult =
+        try {
+            block()
+        } catch (e: Exception) {
+            val error =
+                if (e is PrintScriptFailure) {
+                    PrintScriptError(e.rawMessage, e.span)
+                } else {
+                    PrintScriptError(e.message ?: "Unknown error", Span(Position(1, 1), Position(1, 1)))
+                }
+            ExecutionResult(listOf(error))
+        }
 
     private fun trackProgress(
         statements: Iterator<Statement>,

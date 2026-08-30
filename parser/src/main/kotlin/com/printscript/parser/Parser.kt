@@ -2,6 +2,7 @@ package com.printscript.parser
 
 import com.printscript.ast.Expression
 import com.printscript.ast.Statement
+import com.printscript.common.PrintScriptFailure
 import com.printscript.common.Span
 import com.printscript.common.Version
 import com.printscript.parser.statement.StatementParser
@@ -50,6 +51,7 @@ class Parser(
 }
 
 class ParseException(
-    val rawMessage: String,
-    val span: Span,
-) : Exception(rawMessage)
+    override val rawMessage: String,
+    override val span: Span,
+) : Exception(rawMessage),
+    PrintScriptFailure

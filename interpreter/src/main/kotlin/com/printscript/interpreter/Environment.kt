@@ -1,12 +1,17 @@
 package com.printscript.interpreter
 
+import com.printscript.common.PrintScriptFailure
 import com.printscript.common.Span
 import java.math.BigDecimal
 
 class InterpreterException(
     override val message: String,
-    val span: Span,
-) : RuntimeException(message)
+    override val span: Span,
+) : RuntimeException(message),
+    PrintScriptFailure {
+    override val rawMessage: String
+        get() = message
+}
 
 data class Symbol(
     val name: String,
