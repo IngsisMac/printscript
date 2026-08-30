@@ -69,4 +69,28 @@ class DefaultLinterTest {
 
         assertEquals(2, errors.size)
     }
+
+    @Test
+    @DisplayName("Análisis consecutivos en la misma instancia de DefaultLinter son independientes")
+    fun consecutiveAnalyzeCallsAreIndependent() {
+        val config = LinterConfig(noUnusedVariables = true)
+
+        // Primer análisis: declara 'a' y nunca la usa -> genera 1 error
+        val firstSource =
+            listOf(
+                Declaration("a", "number", NumberLiteral("1", span), span),
+            )
+        val firstErrors = linter.analyze(firstSource.iterator(), config)
+        assertEquals(1, firstErrors.size)
+        assertTrue(firstErrors[0].message.contains("Variable 'a' is declared but never used"))
+
+        // Segundo análisis: declara 'b' y la usa -> 0 errores (no debe tener residuo de 'a')
+        val secondSource =
+            listOf(
+                Declaration("b", "number", NumberLiteral("2", span), span),
+                PrintStatement(Variable("b", span), span),
+            )
+        val secondErrors = linter.analyze(secondSource.iterator(), config)
+        assertTrue(secondErrors.isEmpty(), "Expected no errors on second independent run, but got: $secondErrors")
+    }
 }

@@ -8,6 +8,7 @@ import com.printscript.ast.Expression
 import com.printscript.ast.IfStatement
 import com.printscript.ast.PrintStatement
 import com.printscript.ast.Statement
+import com.printscript.ast.UnaryOp
 import com.printscript.ast.Variable
 import com.printscript.common.PrintScriptError
 import com.printscript.common.Span
@@ -36,11 +37,6 @@ class NoUnusedVariablesRule : LinterRule {
             }
     }
 
-    override fun reset() {
-        declaredVariables.clear()
-        usedVariables.clear()
-    }
-
     private fun processStatement(statement: Statement) {
         when (statement) {
             is Declaration -> {
@@ -60,6 +56,7 @@ class NoUnusedVariablesRule : LinterRule {
     private fun collectUsedVariables(expression: Expression) {
         when (expression) {
             is Variable -> usedVariables.add(expression.name)
+            is UnaryOp -> collectUsedVariables(expression.operand)
             is BinaryOp -> {
                 collectUsedVariables(expression.left)
                 collectUsedVariables(expression.right)

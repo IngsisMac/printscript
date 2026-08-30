@@ -11,25 +11,20 @@ import com.printscript.linter.rule.ReadInputExpressionRule
 import com.printscript.linter.visitor.AstVisitorLinter
 
 class DefaultLinter(
-    private val rules: List<LinterRule> =
-        listOf(
-            IdentifierFormatRule(),
-            PrintlnExpressionRule(),
-            ReadInputExpressionRule(),
-            NoEmptyPrintlnRule(),
-            NoUnusedVariablesRule(),
-        ),
+    private val ruleSupplier: () -> List<LinterRule> = { defaultRules() },
 ) : Linter {
+    constructor(rules: List<LinterRule>) : this({ rules })
+
     override fun analyze(
         statements: Iterator<Statement>,
         config: LinterConfig,
         onError: (PrintScriptError) -> Unit,
     ): List<PrintScriptError> {
-        rules.forEach { it.reset() }
+        val rules = ruleSupplier()
         val visitor = AstVisitorLinter(rules, config)
         val errors = mutableListOf<PrintScriptError>()
         processStatements(statements, visitor, errors, onError)
-        collectFinishedErrors(config, errors, onError)
+        collectFinishedErrors(rules, config, errors, onError)
         return errors
     }
 
@@ -48,6 +43,7 @@ class DefaultLinter(
     }
 
     private fun collectFinishedErrors(
+        rules: List<LinterRule>,
         config: LinterConfig,
         errors: MutableList<PrintScriptError>,
         onError: (PrintScriptError) -> Unit,
@@ -58,5 +54,16 @@ class DefaultLinter(
                 errors.add(error)
             }
         }
+    }
+
+    companion object {
+        fun defaultRules(): List<LinterRule> =
+            listOf(
+                IdentifierFormatRule(),
+                PrintlnExpressionRule(),
+                ReadInputExpressionRule(),
+                NoEmptyPrintlnRule(),
+                NoUnusedVariablesRule(),
+            )
     }
 }

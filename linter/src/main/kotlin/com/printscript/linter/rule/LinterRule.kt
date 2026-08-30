@@ -11,6 +11,4 @@ interface LinterRule {
     ): List<PrintScriptError>
 
     fun finish(config: LinterConfig): List<PrintScriptError> = emptyList()
-
-    fun reset() {}
 }

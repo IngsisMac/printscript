@@ -82,17 +82,4 @@ class NoUnusedVariablesRuleTest {
 
         assertTrue(errors.isEmpty())
     }
-
-    @Test
-    @DisplayName("Reset reinicia el estado interno de variables registradas")
-    fun resetReiniciaElEstadoInterno() {
-        val decl = Declaration("temp", "number", NumberLiteral("1", span1), span1)
-        val config = LinterConfig(noUnusedVariables = true)
-
-        rule.check(decl, config)
-        rule.reset()
-        val errors = rule.finish(config)
-
-        assertTrue(errors.isEmpty())
-    }
 }
