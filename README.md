@@ -47,24 +47,28 @@ El proyecto incluye un punto de entrada principal (`Main.kt`) y un comando inter
 ./gradlew run --args="demo"
 ```
 
-### 3. Ejecución de Archivos de Ejemplo (`docs/examples/`)
-El repositorio incluye una suite de scripts listos para probar ante los profesores:
+### 3. Ejecución de Archivos de Ejemplo (`cli/examples/`)
+El repositorio incluye una suite de scripts listos para probar ante los profesores o en la terminal:
 
 ```bash
 # 1. Ejecutar script PrintScript 1.0 (aritmética, variables y strings)
-./gradlew run --args="execute examples/1.0/01_math_and_strings.ps"
+./gradlew run --args="execute cli/examples/1.0/01_math_and_strings.ps"
 
 # 2. Ejecutar script PrintScript 1.1 (constantes, booleanos y condicionales if/else)
-./gradlew run --args="execute examples/1.1/01_conditionals_and_booleans.ps -v 1.1"
+./gradlew run --args="execute cli/examples/1.1/01_conditionals_and_booleans.ps -v 1.1"
 
 # 3. Formatear script desordenado en consola (preview)
-./gradlew run --args="format examples/1.0/02_messy_format.ps --config examples/configs/formatter_rules.json --preview"
+./gradlew run --args="format cli/examples/1.0/02_messy_format.ps --config cli/examples/configs/formatter_rules.json --preview"
+# O usando script_messy.ps:
+./gradlew run --args="format cli/examples/script_messy.ps --config cli/examples/config.json --preview"
 
 # 4. Analizar script con violaciones de Linter (camelCase y expresiones en println)
-./gradlew run --args="analyze examples/1.0/03_linter_issues.ps --config examples/configs/linter_rules.json"
+./gradlew run --args="analyze cli/examples/1.0/03_linter_issues.ps --config cli/examples/configs/linter_rules.json"
+# O usando script_lint.ps:
+./gradlew run --args="analyze cli/examples/script_lint.ps --config cli/examples/config.json"
 
 # 5. Validar script con error sintáctico (reporta fila:columna con Spans)
-./gradlew run --args="validate examples/invalid/01_syntax_error.ps"
+./gradlew run --args="validate cli/examples/invalid/01_syntax_error.ps"
 ```
 
 ---
@@ -437,7 +441,7 @@ printscript/
 ├── linter/               # DefaultLinter, AstVisitorLinter y LinterRules (Strategy)
 ├── runner/               # PrintScriptRunner (Fachada de la API pública)
 ├── cli/                  # PrintScriptCli con subcomandos PicoCLI y ConfigLoader
-├── examples/             # Scripts .ps y configuraciones JSON listos para pruebas y demo
+│   └── examples/         # Scripts .ps y configuraciones JSON listos para pruebas y demo
 ├── buildSrc/             # Plugins de convención de Gradle (Kotlin, Testing, Calidad)
 └── docs/specs/           # Escenarios vivos de especificación
 ```
