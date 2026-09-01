@@ -4,50 +4,50 @@ skinparam classAttributeIconSize 0
 package "com.printscript.linter" {
 
     interface Linter {
-        + analyze(statement : Statement) : List<PrintScriptError>
+        + analyze(statements : Iterator<Statement>, config : LinterConfig, onError : (PrintScriptError) -> Unit) : List<PrintScriptError>
     }
 
-    class DefaultLinter {
-        - config : LinterConfig
+    class DefaultLinter implements Linter {
         - rules : List<LinterRule>
-        + analyze(statement : Statement) : List<PrintScriptError>
+        + analyze(statements : Iterator<Statement>, config : LinterConfig, onError : (PrintScriptError) -> Unit) : List<PrintScriptError>
     }
 
-    enum IdentifierCase {
+    enum IdentifierFormat {
         CAMEL_CASE
         SNAKE_CASE
+        NONE
+        + matches(identifier : String) : Boolean
+        + {static} fromString(raw : String?) : IdentifierFormat
     }
 
     class LinterConfig {
-        + identifierCase : IdentifierCase
-        + enforceSimplePrintlnExpression : Boolean
-        + enforceSimpleReadInputExpression : Boolean
+        + identifierFormat : IdentifierFormat
+        + mandatoryVariableOrLiteralInPrintln : Boolean
+        + mandatoryVariableOrLiteralInReadInput : Boolean
+        + noUnusedVariables : Boolean
+        + noEmptyPrintln : Boolean
+        + {static} fromMap(map : Map<String, Any?>) : LinterConfig
     }
+}
 
+package "com.printscript.linter.rule" {
     interface LinterRule {
         + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
     }
 
-    class IdentifierNamingRule {
-        + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
-    }
-
-    class PrintlnExpressionRule {
-        + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
-    }
-
-    class ReadInputExpressionRule {
-        + check(statement : Statement, config : LinterConfig) : List<PrintScriptError>
-    }
-
-    Linter <|.. DefaultLinter
-    DefaultLinter --> "1" LinterConfig : config
-    DefaultLinter --> "*" LinterRule : rules
-    LinterConfig --> "1" IdentifierCase : identifierCase
-
-    LinterRule <|.. IdentifierNamingRule
-    LinterRule <|.. PrintlnExpressionRule
-    LinterRule <|.. ReadInputExpressionRule
+    class IdentifierFormatRule implements LinterRule
+    class PrintlnExpressionRule implements LinterRule
+    class ReadInputExpressionRule implements LinterRule
+    class NoEmptyPrintlnRule implements LinterRule
+    class NoUnusedVariablesRule implements LinterRule
 }
+
+package "com.printscript.linter.visitor" {
+    class AstVisitorLinter implements AstVisitor
+}
+
+DefaultLinter --> "1" LinterConfig : config
+DefaultLinter --> "*" LinterRule : rules
+LinterConfig --> "1" IdentifierFormat : identifierFormat
 
 @enduml

@@ -3,30 +3,25 @@ skinparam classAttributeIconSize 0
 
 package "com.printscript.runner" {
 
-    class PrintScriptRunner {
-        + execute(source : Reader, version : Version, emitter : OutputEmitter, input : InputSource) : RunResult
-        + format(source : Reader, version : Version, config : FormatterConfig, writer : Writer) : FormatResult
-        + analyze(source : Reader, version : Version, config : LinterConfig) : AnalyzeResult
+    class PrintScriptRunner << (O, #FF7700) singleton >> {
+        + execute(source : Reader, version : Version, output : OutputEmitter, input : InputSource, env : EnvSource, onProgress : Function) : ExecutionResult
+        + validate(source : Reader, version : Version, onProgress : Function) : ExecutionResult
+        + format(source : Reader, version : Version, config : Map<String, Any?>, writer : Writer, onProgress : Function) : ExecutionResult
+        + format(source : Reader, version : Version, config : Reader, writer : Writer, onProgress : Function) : ExecutionResult
+        + analyze(source : Reader, version : Version, config : Map<String, Any?>, onError : Function, onProgress : Function) : ExecutionResult
+        + analyze(source : Reader, version : Version, config : Reader, onError : Function, onProgress : Function) : ExecutionResult
     }
 
-    class RunResult {
+    class ExecutionResult {
         + errors : List<PrintScriptError>
-        + isSuccess : Boolean
     }
 
-    class FormatResult {
-        + errors : List<PrintScriptError>
-        + isSuccess : Boolean
+    class ConfigLoader {
+        + {static} parseJsonToMap(reader : Reader) : Map<String, Any?>
     }
 
-    class AnalyzeResult {
-        + warnings : List<PrintScriptError>
-        + isSuccess : Boolean
-    }
-
-    PrintScriptRunner ..> RunResult
-    PrintScriptRunner ..> FormatResult
-    PrintScriptRunner ..> AnalyzeResult
+    PrintScriptRunner ..> ExecutionResult
+    PrintScriptRunner ..> ConfigLoader
 }
 
 @enduml

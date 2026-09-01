@@ -8,7 +8,7 @@ package "com.printscript.parser" {
         - statementParsers : List<StatementParser>
         - expressionParser : ExpressionParser
         + parse() : Iterator<Statement>
-        + parseNextStatement() : Statement
+        + parseNextStatement() : Statement?
         + parseExpression(minBp : Int) : Expression
     }
 
@@ -36,6 +36,7 @@ package "com.printscript.parser" {
         + consume() : Token
         + expect(type : TokenType) : Token
         + match(type : TokenType) : Boolean
+        + check(type : TokenType) : Boolean
     }
 
     class ExpressionParser {
@@ -43,6 +44,11 @@ package "com.printscript.parser" {
         - infixParsers : List<InfixParser>
         + parseExpression(stream : TokenStream, minBp : Int) : Expression
         + parseUnaryExpression(stream : TokenStream) : Expression
+    }
+
+    class ParseException {
+        + rawMessage : String
+        + span : Span
     }
 }
 

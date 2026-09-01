@@ -4,57 +4,77 @@ skinparam classAttributeIconSize 0
 package "com.printscript.formatter" {
 
     interface Formatter {
-        + format(statement : Statement, writer : Writer)
+        + format(statement : Statement, writer : Writer, config : FormatterConfig)
     }
 
-    class DefaultFormatter {
-        - config : FormatterConfig
+    class DefaultFormatter implements Formatter {
         - rules : List<FormattingRule>
-        + format(statement : Statement, writer : Writer)
+        - expressionFormatter : ExpressionFormatter
+        + format(statement : Statement, writer : Writer, config : FormatterConfig)
     }
 
     class FormatterConfig {
-        + spaceBeforeColon : Int
-        + spaceAfterColon : Int
-        + spaceAroundEquals : Int
-        + newlineBeforePrintln : Int
+        + spaceBeforeColon : Boolean?
+        + spaceAfterColon : Boolean?
+        + spaceAroundEquals : Boolean?
+        + lineBreaksAfterPrintln : Int
         + indentSpaces : Int
         + ifBraceSameLine : Boolean
+        + noSpaceBeforeSemicolon : Boolean
+        + maxBlankLines : Int
+        + {static} fromMap(map : Map<String, Any?>) : FormatterConfig
     }
 
+    class FormatterContext {
+        + config : FormatterConfig
+        + expressionFormatter : ExpressionFormatter
+        + indentation : Int
+        + writer : Writer
+        + withIndent(delta : Int) : FormatterContext
+        + write(text : String)
+        + writeIndent()
+    }
+
+    interface ExpressionFormatter {
+        + format(expression : Expression, context : FormatterContext)
+    }
+
+    class DefaultExpressionFormatter implements ExpressionFormatter {
+        - rules : List<ExpressionRule>
+        + format(expression : Expression, context : FormatterContext)
+    }
+}
+
+package "com.printscript.formatter.rule" {
     interface FormattingRule {
         + appliesTo(statement : Statement) : Boolean
-        + format(statement : Statement, config : FormatterConfig, writer : Writer)
+        + format(statement : Statement, writer : Writer, context : FormatterContext)
     }
 
-    class DeclarationFormattingRule {
-        + appliesTo(statement : Statement) : Boolean
-        + format(statement : Statement, config : FormatterConfig, writer : Writer)
-    }
-
-    class AssignationFormattingRule {
-        + appliesTo(statement : Statement) : Boolean
-        + format(statement : Statement, config : FormatterConfig, writer : Writer)
-    }
-
-    class PrintFormattingRule {
-        + appliesTo(statement : Statement) : Boolean
-        + format(statement : Statement, config : FormatterConfig, writer : Writer)
-    }
-
-    class IfFormattingRule {
-        + appliesTo(statement : Statement) : Boolean
-        + format(statement : Statement, config : FormatterConfig, writer : Writer)
-    }
-
-    Formatter <|.. DefaultFormatter
-    DefaultFormatter --> "1" FormatterConfig : config
-    DefaultFormatter --> "*" FormattingRule : rules
-
-    FormattingRule <|.. DeclarationFormattingRule
-    FormattingRule <|.. AssignationFormattingRule
-    FormattingRule <|.. PrintFormattingRule
-    FormattingRule <|.. IfFormattingRule
+    class DeclarationFormattingRule implements FormattingRule
+    class AssignmentFormattingRule implements FormattingRule
+    class PrintStatementFormattingRule implements FormattingRule
+    class IfFormattingRule implements FormattingRule
 }
+
+package "com.printscript.formatter.expression" {
+    interface ExpressionRule {
+        + appliesTo(expression : Expression) : Boolean
+        + format(expression : Expression, context : FormatterContext)
+    }
+
+    class LiteralExpressionRule implements ExpressionRule
+    class VariableExpressionRule implements ExpressionRule
+    class BinaryOpExpressionRule implements ExpressionRule
+    class UnaryOpExpressionRule implements ExpressionRule
+    class CallExpressionRule implements ExpressionRule
+}
+
+DefaultFormatter --> "*" FormattingRule : rules
+DefaultFormatter --> "1" ExpressionFormatter : expressionFormatter
+DefaultFormatter ..> FormatterConfig
+DefaultFormatter ..> FormatterContext
+
+DefaultExpressionFormatter --> "*" ExpressionRule : rules
 
 @enduml

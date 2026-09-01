@@ -18,38 +18,38 @@ package "com.printscript.common" {
     enum Version {
         V1_0
         V1_1
-        + from(versionStr : String) : Version
+        + identifier : String
+        + {static} from(id : String) : Result<Version>
     }
 
     interface OutputEmitter {
-        + emit(message : String)
+        + print(message : String)
     }
 
     interface InputSource {
-        + readInput(prompt : String) : String
+        + input(prompt : String) : String
     }
 
     interface EnvSource {
-        + readEnv(name : String) : String
+        + env(name : String) : String?
+        + {static} DENY : EnvSource
+        + {static} SYSTEM : EnvSource
     }
 
-    enum ErrorType {
-        LEXICAL
-        SYNTAX
-        SEMANTIC
-        RUNTIME
+    interface PrintScriptFailure {
+        + rawMessage : String
+        + span : Span
     }
 
     class PrintScriptError {
         + message : String
         + span : Span
-        + type : ErrorType
+        + render() : String
     }
 
     Span *-- "1" Position : start
     Span *-- "1" Position : end
     PrintScriptError --> "1" Span : span
-    PrintScriptError --> "1" ErrorType : type
 }
 
 @enduml

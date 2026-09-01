@@ -6,35 +6,37 @@ package "com.printscript.token" {
     enum TokenType {
         LET
         CONST
+        NUMBER
+        STRING
+        BOOLEAN
         IF
         ELSE
         PRINTLN
         READ_INPUT
         READ_ENV
-        NUMBER_TYPE
-        STRING_TYPE
-        BOOLEAN_TYPE
-        IDENTIFIER
-        NUMBER_LITERAL
-        STRING_LITERAL
-        BOOLEAN_LITERAL
         PLUS
         MINUS
         STAR
         SLASH
-        ASSIGN
-        COLON
-        SEMICOLON
+        EQUAL
         LPAREN
         RPAREN
         LBRACE
         RBRACE
+        SEMICOLON
+        COMMA
+        COLON
+        IDENTIFIER
+        NUMBER_LITERAL
+        STRING_LITERAL
+        TRUE
+        FALSE
         EOF
     }
 
     class Token {
         + type : TokenType
-        + value : String
+        + lexeme : String
         + span : Span
     }
 

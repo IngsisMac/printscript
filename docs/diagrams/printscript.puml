@@ -5,6 +5,8 @@ package "com.printscript.common" {
     enum Version {
         V1_0
         V1_1
+        + identifier : String
+        + {static} from(id : String) : Result<Version>
     }
     class Position {
         + line : Int
@@ -15,98 +17,94 @@ package "com.printscript.common" {
         + end : Position
     }
     interface OutputEmitter {
-        + emit(message : String)
+        + print(message : String)
     }
     interface InputSource {
-        + readInput(prompt : String) : String
+        + input(prompt : String) : String
     }
     interface EnvSource {
-        + readEnv(name : String) : String
+        + env(name : String) : String?
+        + {static} DENY : EnvSource
+        + {static} SYSTEM : EnvSource
+    }
+    class PrintScriptError {
+        + message : String
+        + span : Span
+        + render() : String
     }
 }
 
 package "com.printscript.token" {
     enum TokenType {
-        LET
-        CONST
-        IF
-        ELSE
-        PRINTLN
-        READ_INPUT
-        READ_ENV
-        NUMBER_TYPE
-        STRING_TYPE
-        BOOLEAN_TYPE
-        IDENTIFIER
-        NUMBER_LITERAL
-        STRING_LITERAL
-        BOOLEAN_LITERAL
-        PLUS
-        MINUS
-        STAR
-        SLASH
-        ASSIGN
-        COLON
-        SEMICOLON
-        LPAREN
-        RPAREN
-        LBRACE
-        RBRACE
+        LET, CONST, NUMBER, STRING, BOOLEAN
+        IF, ELSE, PRINTLN, READ_INPUT, READ_ENV
+        PLUS, MINUS, STAR, SLASH, EQUAL
+        LPAREN, RPAREN, LBRACE, RBRACE, SEMICOLON, COMMA, COLON
+        IDENTIFIER, NUMBER_LITERAL, STRING_LITERAL, TRUE, FALSE
         EOF
     }
     class Token {
         + type : TokenType
-        + value : String
+        + lexeme : String
         + span : Span
     }
 }
 
 package "com.printscript.ast" {
-    interface Statement {
+    interface AstNode {
+        + span : Span
+        + accept(visitor : AstVisitor<R>) : R
+    }
+    abstract class Statement implements AstNode {
         + span : Span
     }
-    interface Expression {
+    abstract class Expression implements AstNode {
         + span : Span
     }
 }
 
 package "com.printscript.lexer" {
-    interface Lexer {
+    class Lexer implements Iterator {
         + hasNext() : Boolean
         + next() : Token
     }
 }
 
 package "com.printscript.parser" {
-    interface Parser {
-        + hasNext() : Boolean
-        + next() : Statement
+    class Parser {
+        + parse() : Iterator<Statement>
+        + parseNextStatement() : Statement?
+        + parseExpression(minBp : Int) : Expression
     }
 }
 
 package "com.printscript.interpreter" {
-    interface Interpreter {
-        + execute(statement : Statement)
+    class Interpreter {
+        + execute(statements : Iterator<Statement>) : List<PrintScriptError>
     }
 }
 
 package "com.printscript.formatter" {
     interface Formatter {
-        + format(statement : Statement, writer : Writer)
+        + format(statement : Statement, writer : Writer, config : FormatterConfig)
     }
 }
 
 package "com.printscript.linter" {
     interface Linter {
-        + analyze(statement : Statement) : List<PrintScriptError>
+        + analyze(statements : Iterator<Statement>, config : LinterConfig, onError : Function) : List<PrintScriptError>
     }
 }
 
 package "com.printscript.runner" {
-    class PrintScriptRunner {
-        + execute(source : Reader, version : Version, emitter : OutputEmitter, input : InputSource) : RunResult
-        + format(source : Reader, version : Version, config : FormatterConfig, writer : Writer) : FormatResult
-        + analyze(source : Reader, version : Version, config : LinterConfig) : AnalyzeResult
+    class PrintScriptRunner << (O, #FF7700) singleton >> {
+        + execute(source : Reader, version : Version, output : OutputEmitter, input : InputSource, env : EnvSource) : ExecutionResult
+        + validate(source : Reader, version : Version) : ExecutionResult
+        + format(source : Reader, version : Version, config : Map, writer : Writer) : ExecutionResult
+        + analyze(source : Reader, version : Version, config : Map, onError : Function) : ExecutionResult
+    }
+    class ExecutionResult {
+        + errors : List<PrintScriptError>
     }
 }
 
@@ -118,8 +116,7 @@ Expression --> Span
 Lexer ..|> Iterator
 Lexer ..> Token
 
-Parser ..|> Iterator
-Parser ..> Lexer
+Parser ..> Token
 Parser ..> Statement
 
 Interpreter ..> Statement
@@ -135,5 +132,6 @@ PrintScriptRunner ..> Parser
 PrintScriptRunner ..> Interpreter
 PrintScriptRunner ..> Formatter
 PrintScriptRunner ..> Linter
+PrintScriptRunner ..> ExecutionResult
 
 @enduml

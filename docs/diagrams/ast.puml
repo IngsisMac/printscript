@@ -18,6 +18,7 @@ package "com.printscript.ast" {
         + visit(node : BooleanLiteral) : R
         + visit(node : Variable) : R
         + visit(node : BinaryOp) : R
+        + visit(node : UnaryOp) : R
         + visit(node : CallExpression) : R
     }
 
@@ -36,6 +37,9 @@ package "com.printscript.ast" {
         + isConst : Boolean
         + span : Span
         + nameSpan : Span
+        + spaceBeforeColon : Boolean?
+        + spaceAfterColon : Boolean?
+        + spaceAroundEquals : Boolean?
     }
 
     class Assignment extends Statement {
@@ -43,6 +47,7 @@ package "com.printscript.ast" {
         + value : Expression
         + span : Span
         + nameSpan : Span
+        + spaceAroundEquals : Boolean?
     }
 
     class PrintStatement extends Statement {
@@ -84,6 +89,12 @@ package "com.printscript.ast" {
         + span : Span
     }
 
+    class UnaryOp extends Expression {
+        + operator : String
+        + operand : Expression
+        + span : Span
+    }
+
     class CallExpression extends Expression {
         + name : String
         + argument : Expression?
@@ -98,6 +109,7 @@ package "com.printscript.ast" {
     IfStatement --> "0..*" Statement : elseBranch
     BinaryOp --> "1" Expression : left
     BinaryOp --> "1" Expression : right
+    UnaryOp --> "1" Expression : operand
     CallExpression --> "0..1" Expression : argument
     Statement ..> AstVisitor
     Expression ..> AstVisitor

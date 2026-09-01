@@ -16,8 +16,8 @@ package "com.printscript.lexer" {
 
     class CharStream {
         - reader : Reader
-        - position : Position
-        - buffer : StringBuilder
+        - currentLine : Int
+        - currentColumn : Int
         + hasMore() : Boolean
         + peek() : Char?
         + advance() : Char?
@@ -57,7 +57,7 @@ package "com.printscript.lexer" {
     }
 
     class LexerException {
-        + message : String
+        + rawMessage : String
         + span : Span
     }
 

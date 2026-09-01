@@ -16,15 +16,31 @@ package "com.printscript.interpreter" {
     class Interpreter implements InterpreterContext {
         - globalEnv : Environment
         - errors : List<PrintScriptError>
-        - declarationEvaluator : DeclarationEvaluator
-        - assignmentEvaluator : AssignmentEvaluator
-        - printEvaluator : PrintStatementEvaluator
-        - ifEvaluator : IfStatementEvaluator
-        - literalEvaluator : LiteralEvaluator
-        - variableEvaluator : VariableEvaluator
-        - binaryOpEvaluator : BinaryOpEvaluator
-        - callExprEvaluator : CallExpressionEvaluator
+        - config : InterpreterConfig
         + execute(statements : Iterator<Statement>) : List<PrintScriptError>
+    }
+
+    class InterpreterConfig {
+        + statementEvaluators : Map<KClass<out Statement>, StatementEvaluator<*>>
+        + expressionEvaluators : Map<KClass<out Expression>, ExpressionEvaluator<*>>
+        + version : Version
+        + {static} from(version : Version) : InterpreterConfig
+    }
+
+    class StatementEvaluatorFactory {
+        + {static} create(version : Version) : Map<KClass<out Statement>, StatementEvaluator<*>>
+    }
+
+    class ExpressionEvaluatorFactory {
+        + {static} create(version : Version) : Map<KClass<out Expression>, ExpressionEvaluator<*>>
+    }
+
+    interface StatementEvaluator<in T> {
+        + evaluate(statement : T, env : Environment, context : InterpreterContext)
+    }
+
+    interface ExpressionEvaluator<in T> {
+        + evaluate(expression : T, env : Environment, context : InterpreterContext) : Value
     }
 
     class Environment {
@@ -64,10 +80,14 @@ package "com.printscript.interpreter" {
 
     class InterpreterException {
         + message : String
+        + rawMessage : String
         + span : Span
     }
 
     Interpreter --> "1" Environment : globalEnv
+    Interpreter --> "1" InterpreterConfig : config
+    InterpreterConfig ..> StatementEvaluatorFactory
+    InterpreterConfig ..> ExpressionEvaluatorFactory
     Environment --> "0..1" Environment : parent
     Environment *-- "*" Symbol : variables
     Symbol --> "0..1" Value : value
