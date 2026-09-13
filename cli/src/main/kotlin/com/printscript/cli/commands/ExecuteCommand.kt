@@ -129,10 +129,11 @@ class ExecuteCommand : Callable<Int> {
     private fun createEnvSource(): EnvSource {
         if (envVars.isEmpty()) return EnvSource.SYSTEM
         val customMap =
-            envVars.mapNotNull { entry ->
-                val parts = entry.split("=", limit = 2)
-                if (parts.size == 2) parts[0].trim() to parts[1] else null
-            }.toMap()
+            envVars
+                .mapNotNull { entry ->
+                    val parts = entry.split("=", limit = 2)
+                    if (parts.size == 2) parts[0].trim() to parts[1] else null
+                }.toMap()
         return EnvSource { key -> customMap[key] ?: EnvSource.SYSTEM.env(key) }
     }
 }
