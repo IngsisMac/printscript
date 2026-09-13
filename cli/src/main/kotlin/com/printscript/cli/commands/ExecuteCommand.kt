@@ -39,6 +39,14 @@ class ExecuteCommand : Callable<Int> {
     @Option(names = ["--progress"], description = ["Muestra el progreso durante el parsing en pantalla"])
     var showProgress: Boolean = false
 
+    @Option(
+        names = ["-e", "--env"],
+        description = ["Variable de entorno adicional en formato KEY=VALUE"],
+    )
+    var envVars: List<String> = emptyList()
+
+    var customInputSource: InputSource? = null
+
     override fun call(): Int {
         val err = spec?.commandLine()?.err ?: PrintWriter(System.err, true)
         val target = resolveReaderAndVersion(err) ?: return 2
@@ -81,7 +89,7 @@ class ExecuteCommand : Callable<Int> {
     ): Int {
         val out = spec?.commandLine()?.out ?: PrintWriter(System.out, true)
         val emitter = OutputEmitter { line -> out.println(line) }
-        val input = createInputSource(out)
+        val input = customInputSource ?: createInputSource()
         val result =
             source.use { reader ->
                 PrintScriptRunner.execute(
@@ -89,7 +97,7 @@ class ExecuteCommand : Callable<Int> {
                     version,
                     emitter,
                     input,
-                    env = EnvSource.SYSTEM,
+                    env = createEnvSource(),
                     onProgress = createProgressCallback(out),
                 )
             }
@@ -111,14 +119,20 @@ class ExecuteCommand : Callable<Int> {
             }
         }
 
-    private fun createInputSource(out: PrintWriter): InputSource {
+    private fun createInputSource(): InputSource {
         val scanner = Scanner(System.`in`)
-        return InputSource { prompt ->
-            if (prompt.isNotEmpty()) {
-                out.print(prompt)
-                out.flush()
-            }
+        return InputSource {
             if (scanner.hasNextLine()) scanner.nextLine() else ""
         }
+    }
+
+    private fun createEnvSource(): EnvSource {
+        if (envVars.isEmpty()) return EnvSource.SYSTEM
+        val customMap =
+            envVars.mapNotNull { entry ->
+                val parts = entry.split("=", limit = 2)
+                if (parts.size == 2) parts[0].trim() to parts[1] else null
+            }.toMap()
+        return EnvSource { key -> customMap[key] ?: EnvSource.SYSTEM.env(key) }
     }
 }

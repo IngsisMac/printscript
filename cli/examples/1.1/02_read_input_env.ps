@@ -1,5 +1,7 @@
-let userProfile: string = readEnv("USER");
-println("Perfil activo desde env: " + userProfile);
+let nombre: string = readInput("Ingresá tu nombre: ");
+let edad: number = readInput("Ingresá tu edad: ");
+let usuarioSo: string = readEnv("USER");
 
-let nickname: string = readInput("Ingresa tu nombre: ");
-println("Hola, " + nickname);
+println("¡Hola " + nombre + "!");
+println("El año que viene vas a tener: " + (edad + 1));
+println("Tu usuario de Linux reportado por readEnv('USER') es: " + usuarioSo);
