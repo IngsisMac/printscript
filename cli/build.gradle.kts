@@ -17,6 +17,7 @@ application {
 
 tasks.named<JavaExec>("run") {
     workingDir = rootDir
+    standardInput = System.`in`
 }
 
 tasks.withType<JacocoReport>().configureEach {

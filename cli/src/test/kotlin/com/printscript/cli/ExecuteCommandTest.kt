@@ -188,4 +188,24 @@ class ExecuteCommandTest {
 
         assertEquals(2, code)
     }
+
+    @Test
+    @DisplayName("Ejecución soporta variables de entorno inline mediante el flag -e")
+    fun ejecucionSoportaVariablesDeEntornoInline() {
+        val exitCode =
+            commandLine.execute(
+                "execute",
+                "--version",
+                "1.1",
+                "-e",
+                "CUSTOM_KEY=custom_value",
+                "--code",
+                "println(readEnv(\"CUSTOM_KEY\"));",
+            )
+        outWriter.flush()
+        val output = outContent.toString()
+
+        assertEquals(0, exitCode)
+        assertTrue(output.contains("custom_value"))
+    }
 }

@@ -57,17 +57,22 @@ El repositorio incluye una suite de scripts listos para probar ante los profesor
 # 2. Ejecutar script PrintScript 1.1 (constantes, booleanos y condicionales if/else)
 ./gradlew run --args="execute cli/examples/1.1/01_conditionals_and_booleans.ps -v 1.1"
 
-# 3. Formatear script desordenado en consola (preview)
+# 3. Ejecutar script interactivo PrintScript 1.1 (I/O interactivo con readInput, coerción a number y readEnv)
+./gradlew run --args="execute cli/examples/1.1/02_read_input_env.ps -v 1.1"
+# O directamente con el binario compilado:
+./cli/build/install/cli/bin/cli execute cli/examples/1.1/02_read_input_env.ps -v 1.1
+
+# 4. Formatear script desordenado en consola (preview)
 ./gradlew run --args="format cli/examples/1.0/02_messy_format.ps --config cli/examples/configs/formatter_rules.json --preview"
 # O usando script_messy.ps:
 ./gradlew run --args="format cli/examples/script_messy.ps --config cli/examples/config.json --preview"
 
-# 4. Analizar script con violaciones de Linter (camelCase y expresiones en println)
+# 5. Analizar script con violaciones de Linter (camelCase y expresiones en println)
 ./gradlew run --args="analyze cli/examples/1.0/03_linter_issues.ps --config cli/examples/configs/linter_rules.json"
 # O usando script_lint.ps:
 ./gradlew run --args="analyze cli/examples/script_lint.ps --config cli/examples/config.json"
 
-# 5. Validar script con error sintáctico (reporta fila:columna con Spans)
+# 6. Validar script con error sintáctico (reporta fila:columna con Spans)
 ./gradlew run --args="validate cli/examples/invalid/01_syntax_error.ps"
 ```
 
