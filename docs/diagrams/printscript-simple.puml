@@ -1,0 +1,126 @@
+@startuml
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam classFontSize 12
+skinparam packageFontSize 13
+skinparam defaultFontName "Helvetica, Arial, sans-serif"
+
+skinparam class {
+    BackgroundColor #F8F9FA
+    BorderColor #2B2D42
+    ArrowColor #2B2D42
+}
+
+' ================= CAPA DE ENTRADA Y ORQUESTACIÓN =================
+package "cli & runner" {
+    class PrintScriptCli << (C,#4A90E2) Command >> {
+        + call() : Int
+    }
+
+    class PrintScriptRunner << (F,#FF9F1C) Facade >> {
+        + execute(source, version, io...) : ExecutionResult
+        + validate(source, version) : ExecutionResult
+        + format(source, version, config, writer) : ExecutionResult
+        + analyze(source, version, config, onError) : ExecutionResult
+    }
+
+    class ExecutionResult {
+        + errors : List<PrintScriptError>
+    }
+}
+
+' ================= CAPA DEL PIPELINE STREAMING =================
+package "pipeline" {
+    class Lexer << (I,#E71D36) Iterator >> {
+        + hasNext() : Boolean
+        + next() : Token
+    }
+
+    class Parser << (P,#2EC4B6) Pratt >> {
+        + parse() : Iterator<Statement>
+        + parseNextStatement() : Statement?
+    }
+
+    class Interpreter << (E,#9B5DE5) >> {
+        + execute(statements : Iterator<Statement>) : List<PrintScriptError>
+    }
+
+    interface Formatter {
+        + format(statement, writer, config)
+    }
+
+    interface Linter {
+        + analyze(statements, config, onError) : List<PrintScriptError>
+    }
+}
+
+' ================= CAPA DE DATOS Y CONTRATOS =================
+package "ast & token" {
+    interface AstNode {
+        + span : Span
+        + accept(visitor) : R
+    }
+    abstract class Statement implements AstNode
+    abstract class Expression implements AstNode
+
+    class Token {
+        + type : TokenType
+        + lexeme : String
+        + span : Span
+    }
+    enum TokenType
+}
+
+package "common (I/O & Errors)" {
+    interface OutputEmitter {
+        + print(message : String)
+    }
+    interface InputSource {
+        + input(prompt : String) : String
+    }
+    interface EnvSource {
+        + env(name : String) : String?
+    }
+    class Span {
+        + start : Position
+        + end : Position
+    }
+    enum Version {
+        V1_0
+        V1_1
+    }
+    class PrintScriptError {
+        + message : String
+        + span : Span
+    }
+}
+
+' ================= RELACIONES CLAVE =================
+PrintScriptCli --> PrintScriptRunner : invoca
+PrintScriptRunner --> ExecutionResult : retorna
+
+PrintScriptRunner ..> Lexer : orquesta
+PrintScriptRunner ..> Parser : orquesta
+PrintScriptRunner ..> Interpreter : orquesta
+PrintScriptRunner ..> Formatter : orquesta
+PrintScriptRunner ..> Linter : orquesta
+
+Lexer ..> Token : produce
+Parser ..> Token : consume
+Parser ..> Statement : produce
+
+Interpreter ..> Statement : evalúa
+Formatter ..> Statement : formatea
+Linter ..> Statement : inspecciona
+
+Interpreter --> OutputEmitter : I/O
+Interpreter --> InputSource : I/O
+Interpreter --> EnvSource : I/O
+
+Token --> Span
+AstNode --> Span
+PrintScriptError --> Span
+
+@enduml
